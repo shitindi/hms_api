@@ -1,0 +1,46 @@
+// Install REST Client extension for testing
+
+1. //Initialize project
+npm init
+
+2. // install web server
+npm i express
+
+3. //install logging service
+npm i morgan http-errors
+
+4. // install dotenv for accesing environment setting
+npm i dotenv
+
+5. // install nodemodem
+npm i nodemon
+
+6. //Install and initialize sequalize
+#npm install sequelize
+#npm install -g sequelize-cli
+#sequelize init
+
+7. // Install mysql lib
+npm i mysql2
+
+8. // Generate models
+#sequelize model:generate --name User --attributes name:string, email:string, password:string
+
+9. //Migrate database
+#sequelize db:migrate
+
+10. // Install data validator
+npm i @hapi/joi
+
+11. // //Token generation and cryptography
+npm i bcrypt
+npm i jsonwebtoken
+
+12. // Install Redis by downloading
+https://github.com/tporadowski/redis/releases
+
+13. // Install redis data viewer so can be accessed globaly
+#npm install -g redis-commander
+#redis-commander
+14. // Install redis client
+npm i redis

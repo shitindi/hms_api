@@ -1,0 +1,38 @@
+GET http://localhost:7000/admin
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6WzBdLCJpYXQiOjE3MTQ5Nzg4MzgsImV4cCI6MTcxNDk4MjQzOCwiYXVkIjoiMSIsImlzcyI6ImJ5dGV3YXJlLmNvLnR6In0.cq7YXybty6w3RQ-H1hYvr_ljAiKCvTmNjV3thjayhLg
+
+### Login route
+
+POST  http://localhost:7000/auth/login
+Content-Type: application/json
+ 
+{
+    "email": "bobndina@hotmail.com",
+    "password": "bob@123" 
+}
+
+### Register Route  
+POST  http://localhost:7000/auth/register
+Content-Type: application/json
+ 
+{
+    "email": "bobndina@hotmail.com",
+    "password": "bob@123"
+}
+
+### Refresh token Route
+POST  http://localhost:7000/auth/refresh-token 
+Content-Type: application/json
+
+{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6WzBdLCJpYXQiOjE3MTQ5ODE2OTEsImV4cCI6MTcxNzU3MzY5MSwiYXVkIjoiMSIsImlzcyI6ImJ5dGV3YXJlLmNvLnR6In0.Tpr1pTpFI_4mEAP7behgL7JSj4VCQfbftumjBUPlUsw"
+}
+
+### Logout Route
+
+DELETE  http://localhost:7000/auth/logout
+Content-Type: application/json
+
+{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6WzBdLCJpYXQiOjE3MTUwNzMyNjEsImV4cCI6MTcxNzY2NTI2MSwiYXVkIjoiMSIsImlzcyI6ImJ5dGV3YXJlLmNvLnR6In0.WP8aYKEFxTkuvZ4KvhfpsTOq8tqjGkAiZzWVYbupwyM"
+}
