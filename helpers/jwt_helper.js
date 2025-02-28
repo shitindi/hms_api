@@ -55,7 +55,9 @@ const signRefreshToken = (userId, roles = [0]) => {
            
            // await client.connect()
          
-        
+           resolve(token) 
+
+           /*
            client.SET(userId.toString(), token, {EX: refExpTime * 60 * 60 * 24})
            .then( reply => {
             resolve(token) 
@@ -64,7 +66,8 @@ const signRefreshToken = (userId, roles = [0]) => {
             logData("signAccessToken: "+err)
             reject(createError.InternalServerError())
             return
-           })           
+           })  
+            */         
         })
     })
 }

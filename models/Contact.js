@@ -2,7 +2,7 @@ const  {sequelize:db, DataTypes} = require('../helpers/sequelize_init')
 const {logData} = require('../helpers/logger')
 const {User} = require('./User')
 
-const Contact = db.define('Contact', {
+const Contact = db.define('contact', {
     
     first_name: {
        type: DataTypes.STRING(30),
@@ -41,7 +41,7 @@ Contact.hasOne(User, {foreignKey: {name: 'contact_id', allowNull: false}, onUpda
 User.belongsTo(Contact, {foreignKey: {name: 'contact_id', allowNull: false}, onUpdate: 'CASCADE'})
 
 
-User.hasOne(Contact, {foreignKey: {name: 'created_by', allowNull: false}, onUpdate: 'CASCADE'})
+User.hasMany(Contact, {foreignKey: {name: 'created_by', allowNull: false}, onUpdate: 'CASCADE'})
 Contact.belongsTo(User, {foreignKey: {name: 'created_by', allowNull: false}, onUpdate: 'CASCADE'})
 
 Contact.sync({alter: true})

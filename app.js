@@ -9,6 +9,7 @@ require('dotenv').config()
 const app = express()
 app.use(morgan('env'))
 app.use(express.json())
+app.set('trust proxy', true)
 
 //Handle form data encoded in url
 app.unsubscribe(express.urlencoded({extended: true}))

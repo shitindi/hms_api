@@ -6,6 +6,7 @@ const ActiveSession = db.define('active_session', {
    user_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
+    unique: true
    },
    loggin_date: {
     type: DataTypes.DATE,
@@ -31,6 +32,9 @@ const ActiveSession = db.define('active_session', {
    },
    user_token: {
      type: DataTypes.STRING(100),
+   },
+   refresh_token: {
+    type: DataTypes.STRING(100)
    }
 })
 
@@ -41,5 +45,5 @@ ActiveSession.sync({alter: true})
   .then( data =>{})
   .catch( err => logData('Create tbl ActiveSession: ' + err))
 
-  module.exports = { LoginAttempt}
+  module.exports = { ActiveSession }
 

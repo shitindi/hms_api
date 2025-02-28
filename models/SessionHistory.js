@@ -34,6 +34,9 @@ const SessionHistory = db.define('session_history', {
    },
    user_token: {
      type: DataTypes.STRING(100),
+   },
+   refresh_token: {
+    type: DataTypes.STRING(100)
    }
 })
 
@@ -44,5 +47,5 @@ SessionHistory.sync({alter: true})
   .then( data =>{})
   .catch( err => logData('Create tbl SessionHistory: ' + err))
 
-  module.exports = { LoginAttempt}
+  module.exports = { SessionHistory}
 

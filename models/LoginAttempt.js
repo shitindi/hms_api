@@ -5,16 +5,19 @@ const {User} = require('./User')
 const LoginAttempt = db.define('login_attempt', {
    user_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
      },
-   name: {
+    
+   login_name: {
     type: DataTypes.STRING(100),
     allowNull: false,
-   },
+   }, 
+    /*
    attempt_date: {
     type: DataTypes.DATE,
     allowNull: false,
    },
+   */
    is_success: {
     type: DataTypes.BOOLEAN,
     allowNull: false,

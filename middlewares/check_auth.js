@@ -1,5 +1,7 @@
 const createError = require('http-errors');
 const JWT = require('jsonwebtoken')
+const {ActiveSession} = require('../models/ActiveSession')
+
 
 
 const verifyAccessToken = (req, res, next) => {
@@ -8,6 +10,14 @@ const verifyAccessToken = (req, res, next) => {
 
     const token = req.headers['authorization'].split(' ')[1]
     const secret = process.env.ACCESS_TOKEN_SECRET;
+
+    let  SessionData = ActiveSession.findOne(
+        {user_token: token}
+    );
+
+    if (!SessionData){
+        return  next(createError.Unauthorized())
+    }
 
     JWT.verify(token, secret, (err, payload) => {
 

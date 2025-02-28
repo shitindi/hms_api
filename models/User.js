@@ -1,5 +1,6 @@
 const {sequelize:db, DataTypes} = require('../helpers/sequelize_init')
 const {logData} = require('../helpers/logger')
+const { Tenant } = require('./Tenant')
 
 const User = db.define('user', {
    user_name: {
@@ -40,9 +41,15 @@ const User = db.define('user', {
    contact_id: {
       type: DataTypes.INTEGER,
       allowNull: false
+   },
+   tenant_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true
    }
 }
 )
+Tenant.hasMany(User, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
+User.belongsTo(Tenant, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
 
 
 User.sync({alter: true})
