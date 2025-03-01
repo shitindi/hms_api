@@ -1,14 +1,22 @@
-const {User: Users} = require('../models/User');
+const {User: Users} = require('../models/Auth/User');
+const { Op } = require('sequelize')
+
 const {logData} = require('../helpers/logger')
 const { LoginAttempt } = require('../models/LoginAttempt')
 const { ActiveSession } = require('../models/ActiveSession')
 const { SessionHistory} = require('../models/SessionHistory')
 
 const createError = require('http-errors');
-const {authSchema} = require('../helpers/validation_schema')
+const {authSchema, passUpdate} = require('../helpers/validation_schema')
 const  hash = require('../helpers/hash_data')
 const {signAccessToken, signRefreshToken, verifyRefreshToken} = require('../helpers/jwt_helper');
-const client = require('../helpers/init_redis');
+//const client = require('../helpers/init_redis');
+
+const {getRandomString} = require('../helpers/code_generator')
+const {ActivationCode: ActivationCodes} = require('../models/Auth/ActivationCode')
+const {encryptSymmetric: encryp, decryptSymmetric: decrypt} = require('./helpers/cryptography')
+const {sendMail} = require('../helpers/mailing')
+
 
 const register = async (req, res, next) => {
 
@@ -33,6 +41,10 @@ const register = async (req, res, next) => {
         .then( async result =>  {
             const accessToken = await signAccessToken(result.id)
             const refreshToken = await signRefreshToken(result.id)
+
+            //Create email verification link
+            generateVerificationEmail(result.id, user.email, user.email)
+
             res.status(201).json({
                 message: "User created successfully",
                 accessToken,
@@ -53,6 +65,100 @@ const register = async (req, res, next) => {
     }
 }
 
+const generateVerificationEmail = async (userId, email, name) => {
+    try{
+        // Generate tokens to be inserted into
+        const token = getRandomString(64)
+        const activationCode = {
+            user_id: userId,
+            activation_type: 1,
+            user_token: token
+    }
+
+    ActivationCodes.destroy({where: {user_id: userId}})
+
+    await ActivationCodes.create(activationCode);
+
+    let tokenJson = {
+        user_id: userId,
+        token: token
+    }
+    
+    tokenText = JSON.stringify(tokenJson)
+        
+    const key =  process.env.CRYPTOGRAPHY_SECRET
+    const serviceUrl = process.env.MAIL_ACTIVATION_URL
+    
+    const crypoData =  encryp(key, tokenText)
+    
+    const mailToken = {
+        referer: crypoData.ciphertext,
+        nonce: crypoData.iv,
+        tag: crypoData.tag
+    }
+    
+    const tokenString = JSON.stringify(mailToken)
+    
+    console.log('token stry: ', tokenString);
+    
+    
+    const tokenToBase64 = Buffer.from(tokenString).toString('base64')
+
+    const activationLink = `${serviceUrl}?lnk=${tokenToBase64}`
+
+    sendMail(email, name, activationLink)
+    
+    }catch(err){
+        logData('generateVerificationEmail: ' + err)
+    }
+}
+
+const  verifyEmail = async (req, res, next) => {
+
+    try{
+        const key =  process.env.CRYPTOGRAPHY_SECRET
+
+        const tokenBase64 = req.query.lnk;
+        const tokenFromBase64 = Buffer.from(tokenBase64, 'base64').toString('ascii')
+
+        const cryptoObj = JSON.parse(tokenFromBase64)
+        const plaintext = decrypt(key, cryptoObj.referer, cryptoObj.nonce, cryptoObj.tag);
+
+        const tokenObj =   JSON.parse(plaintext)
+
+        const ActCode = ActivationCodes.findOne({
+            where: {[Op.and]: {user_id: tokenObj.user_id, user_token: tokenObj.user_token}}
+        })
+
+        if(!ActCode){
+            throw createError.NotFound("Activation link is not valid")
+        }
+
+        const User = Users.findOne({
+            where: {id: tokenObj.user_id}
+        })
+
+        if (!User){
+            throw createError.NotFound("Activation link is not valid") 
+        }
+
+        let eventTime = new Date().toISOString().replace('T', ' ').split('.')[0];
+
+        User.email_verified = true
+        User.is_active = true
+        User.activated_date=eventTime
+
+        Users.update(User, {
+            where: {id:tokenObj.user_id}, fields: ['email_verified', 'is_active', 'activated_date']
+        })
+        res.status(200).json({
+            message: "Email verified successfully",
+        })
+    }catch(err){
+        logData('verifyEmail: ' + err)
+    }
+}
+
 const login = async (req, res, next) => {
     try{
         const login = await authSchema.validateAsync(req.body); 
@@ -65,6 +171,9 @@ const login = async (req, res, next) => {
 
         if( !User){
            await logLoginAttempt(null, login.email, req.ip , false)
+
+           //increment login attempt fails, usefull for account lock feature
+           Users.increment( {retry_count: +1}, {where: {id: User.id}})
             throw createError.NotFound("User not registered")
         }
 
@@ -76,6 +185,12 @@ const login = async (req, res, next) => {
 
         const accessToken = await signAccessToken(User.id)
         const refreshToken = await signRefreshToken(User.id)
+
+        //reset user login retry count
+        User.retry_count = 0;
+        Users.update(
+            User, {where: {id:User.id}, fields:['retry_count']}
+        );
 
         await logSessionData(User.id, req.ip, accessToken, refreshToken);
 
@@ -90,6 +205,36 @@ const login = async (req, res, next) => {
     }
 }
 
+const changePassword = async (req, res, nex) => {
+    try{
+        const login = await passUpdate.validateAsync(req.body); 
+
+        let User = await Users.findOne({
+            where: { email: login.email }
+        }
+        );
+
+        if( !User){
+            throw createError.NotFound("User not registered")
+        }
+
+        const isMatch = await hash.isPasswordmatch(login.password, User.password)
+
+        if(!isMatch){
+            throw createError.NotFound("User not registered")
+        }
+
+        User.password =  await hash.hashPassword(login.newPassword)
+        User.retry_count = 0
+        User.must_change_password = false
+
+        Users.update(User, {where :{id: User.id}, fields: ['password', 'retry_count', 'must_change_password']})
+
+    }catch(error){
+        logData('changePassword: ' + error)
+    }
+}
+
 const refresh = async (req, res, next) => {
     try{
         const { refreshToken } = req.body
@@ -99,6 +244,19 @@ const refresh = async (req, res, next) => {
         //Generate a pair of refresh and access tokens
         const accessToken = await signAccessToken(userId)
         const newRefreshToken = await signRefreshToken(userId)
+
+        let session = ActiveSession.findOne({
+            where: {[Op.and] : {user_id: userId, refresh_token: refreshToken}}
+        })
+        
+        if (!session){
+            return reject(createError.Unauthorized()) 
+        }
+        session.user_token = accessToken
+        session.refresh_token = newRefreshToken
+        session.user_ip = req.ip
+        ActiveSession.update(session, {where: {user_id:userId}, fields: ['user_token','refresh_token', 'user_ip']})
+
          res.send({accessToken, refreshToken: newRefreshToken})
     }catch(error){
         next(error)
@@ -217,6 +375,7 @@ const destroySession = async( userId) => {
 module.exports = {
     register,
     login,
+    changePassword,
     refresh,
     logout
 }

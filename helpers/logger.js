@@ -10,7 +10,7 @@ let date = new Date();
     const year = t.getFullYear();
     return `${year}${month}${date}`;
   }
-  let filename = 'Logs\\' + getCurrentDate() + '.txt';
+  let filename = 'Logs/' + getCurrentDate() + '.txt';
 
 
 

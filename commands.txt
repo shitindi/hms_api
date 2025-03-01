@@ -44,3 +44,6 @@ https://github.com/tporadowski/redis/releases
 #redis-commander
 14. // Install redis client
 npm i redis
+
+15. Node mailing library
+npm install nodemailer

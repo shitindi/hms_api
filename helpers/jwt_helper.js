@@ -1,5 +1,7 @@
 const client = require('./init_redis')
 const {logData} = require('../helpers/logger')
+const { ActiveSession: Session } = require('../models/ActiveSession')
+const {Op} = require('sequelize')
 
 
 const JWT = require('jsonwebtoken')
@@ -79,8 +81,17 @@ const verifyRefreshToken = refreshToken => {
     JWT.verify(refreshToken, secret, (err, payload) => {
         if (err) return reject(createError.Unauthorized())
         
-        // extract userid
+        // extract userid from redis
         const userId = payload.aud
+
+        let User = Session.findOne({
+            where: {[Op.and] : {user_id: userId, refresh_token: refreshToken}}
+        })
+        
+        if (!User){
+            return reject(createError.Unauthorized()) 
+        }
+        /*
         client.GET(userId.toString())
         .then( result => {
             if (refreshToken ===result) return resolve(userId)
@@ -92,6 +103,7 @@ const verifyRefreshToken = refreshToken => {
             reject(createError.InternalServerError())
             return
         })
+        */
 
         resolve(userId)
     })

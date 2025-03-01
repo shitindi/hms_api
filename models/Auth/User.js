@@ -1,5 +1,5 @@
-const {sequelize:db, DataTypes} = require('../helpers/sequelize_init')
-const {logData} = require('../helpers/logger')
+const {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
+const {logData} = require('../../helpers/logger')
 const { Tenant } = require('./Tenant')
 
 const User = db.define('user', {
@@ -15,7 +15,7 @@ const User = db.define('user', {
     must_change_password: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: false
+      defaultValue: true
     },
     email_verified: {
       type: DataTypes.BOOLEAN,
@@ -44,6 +44,10 @@ const User = db.define('user', {
    },
    tenant_id: {
       type: DataTypes.INTEGER,
+      allowNull: true
+   },
+   activated_date: {
+      type: DataTypes.DATE,
       allowNull: true
    }
 }

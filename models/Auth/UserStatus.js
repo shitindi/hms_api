@@ -1,5 +1,5 @@
-const  {sequelize:db, DataTypes} = require('../helpers/sequelize_init')
-const {logData} = require('../helpers/logger')
+const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
+const {logData} = require('../../helpers/logger')
 
 const UserStatus = db.define('UserStatus', {
 

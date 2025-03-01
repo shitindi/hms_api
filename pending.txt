@@ -1,6 +1,6 @@
-1. Add more field to user table
+1. Add more field to user table (done)
 2. Add role functionality
-3. Add login activity logging
+3. Add login activity logging (done)
 4. Add user activity logging
 5. Add error looging in field
 5. Add email and sms verification
@@ -8,3 +8,4 @@
 7. Add external login and authentication
 8. Add single signon ability
 9. Implement multifactor
+10. Implement password history
