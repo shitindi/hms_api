@@ -1,8 +1,6 @@
 const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
-const {logData} = require('../../helpers/logger')
-const {User} = require('./User')
 
-const Contact = db.define('contact', {
+const Contact = db.define('auth_tbl_contact', {
     
     first_name: {
        type: DataTypes.STRING(30),
@@ -21,10 +19,18 @@ const Contact = db.define('contact', {
      type: DataTypes.STRING(50),
      unique: true
     },
+    mobile_no: {
+      type: DataTypes.STRING(15),
+      allowNull: true
+    },
     phone: {
        type: DataTypes.STRING(15),
        unique: true,
        allowNull: true
+    },
+    position: {
+      type: DataTypes.STRING(50),
+      allowNull: true
     },
     address: {
         type: DataTypes.STRING(200),
@@ -32,20 +38,32 @@ const Contact = db.define('contact', {
     },
     created_by :{
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: true
      },
 
 })
 
-Contact.hasOne(User, {foreignKey: {name: 'contact_id', allowNull: false}, onUpdate: 'CASCADE'})
-User.belongsTo(Contact, {foreignKey: {name: 'contact_id', allowNull: false}, onUpdate: 'CASCADE'})
+const createContactObject = (contactObj) => {
+
+  const contact = {
+      first_name: contactObj.first_name,
+      middle_name: contactObj.middle_name,
+      last_name: contactObj.last_name,
+      email: contactObj.email,
+      mobile_no:contactObj.mobile_no,
+      phone: contactObj.phone,
+      position: contactObj.position,
+      address: contactObj.address,
+      created_by : contactObj?.user_id,
+  }
+
+  return contact
+
+}
 
 
-User.hasMany(Contact, {foreignKey: {name: 'created_by', allowNull: false}, onUpdate: 'CASCADE'})
-Contact.belongsTo(User, {foreignKey: {name: 'created_by', allowNull: false}, onUpdate: 'CASCADE'})
 
-Contact.sync({alter: true})
-  .then( data =>{})
-  .catch( err => logData('Create tbl Contact: ' + err))
-
-  module.exports = { Contact}
+  module.exports = { 
+   Contact,
+   createContactObject
+}

@@ -1,8 +1,7 @@
 const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
-const {logData} = require('../../helpers/logger')
 
 //Type of activation whether is phone, sms, or reset code
-const ActivationType = db.define('activation_type', {
+const ActivationType = db.define('auth_lkp_activation_type', {
 
     ID: {
         type: DataTypes.TINYINT,
@@ -19,8 +18,6 @@ const ActivationType = db.define('activation_type', {
 }
 )
 
-ActivationType.sync({alter: true})
-  .then( data =>{})
-  .catch( err => logData('Create tbl activation_type: ' + err))
+
 
   module.exports = { ActivationType }

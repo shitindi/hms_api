@@ -1,8 +1,6 @@
 const {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
-const {logData} = require('../../helpers/logger')
-const { Tenant } = require('./Tenant')
 
-const User = db.define('user', {
+const User = db.define('auth_tbl_user', {
    user_name: {
     type: DataTypes.STRING(100),
     allowNull: false,
@@ -49,15 +47,31 @@ const User = db.define('user', {
    activated_date: {
       type: DataTypes.DATE,
       allowNull: true
+   },
+   user_status: {
+      type: DataTypes.TINYINT,
+      defaultValue: 5,
+      allowNull: false
    }
 }
 )
-Tenant.hasMany(User, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
-User.belongsTo(Tenant, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
 
 
-User.sync({alter: true})
-  .then( data =>{})
-  .catch( err => logData('Create tbl User: ' + err))
 
-  module.exports = { User}
+  const createUserObject = (userObj, contactId, tenantId) =>{
+   const user = {
+   user_name: userObj.user_name,
+   password: userObj.password,
+   confirm_password: userObj.confirm_password,
+   must_change_password: userObj.must_change_password,
+   contact_id: contactId,
+   tenant_id: tenantId,
+   }
+   return user
+  }
+  
+
+  module.exports = { 
+   User,
+   createUserObject
+}

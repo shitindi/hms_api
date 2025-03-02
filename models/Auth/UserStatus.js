@@ -1,11 +1,12 @@
 const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
-const {logData} = require('../../helpers/logger')
 
-const UserStatus = db.define('UserStatus', {
+const UserStatus = db.define('auth_lkp_user_status', {
 
     ID: {
-        type: DataTypes.INTEGER,
-        allowNull: false
+        type: DataTypes.TINYINT,
+        allowNull: false,
+        primaryKey:true,
+        autoIncrement:true
     },
     name: {
         type: DataTypes.STRING(30),
@@ -15,8 +16,6 @@ const UserStatus = db.define('UserStatus', {
 }
 )
 
-UserStatus.sync({alter: true})
-  .then( data =>{})
-  .catch( err => logData('Create tbl UserStatus: ' + err))
+
 
   module.exports = { UserStatus}

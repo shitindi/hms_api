@@ -1,7 +1,6 @@
 const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
-const {logData} = require('../../helpers/logger')
 
-const TenantStatus = db.define('tenant_status', {
+const TenantStatus = db.define('auth_lkp_tenant_status', {
 
     ID: {
         type: DataTypes.TINYINT,
@@ -18,9 +17,5 @@ const TenantStatus = db.define('tenant_status', {
 )
 
 
-
-TenantStatus.sync({alter: true})
-  .then( data =>{})
-  .catch( err => logData('Create tbl Tenant_status: ' + err))
 
   module.exports = { TenantStatus}

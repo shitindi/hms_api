@@ -1,10 +1,6 @@
-const  {sequelize:db, DataTypes} = require('../helpers/sequelize_init')
-const {logData} = require('../helpers/logger')
-const { TenantStatus } = require('./TenantStatus')
+const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
 
-
-
-const Tenant = db.define('tenant', {
+const Tenant = db.define('auth_tbl_tenant', {
     
     tenant_name: {
        type: DataTypes.STRING(150),
@@ -18,15 +14,6 @@ const Tenant = db.define('tenant', {
     }
 });
 
-TenantStatus.hasMany(Tenant, {foreignKey: {name: 'status_id', allowNull: false}, onUpdate: 'CASCADE'})
-Tenant.belongsTo(TenantStatus, {foreignKey: {name: 'status_id', allowNull: false}, onUpdate: 'CASCADE'})
 
-
-
-
-
-Tenant.sync({alter: true})
-  .then( data =>{})
-  .catch( err => logData('Create tbl Tenant: ' + err))
 
 module.exports = {Tenant}

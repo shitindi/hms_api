@@ -3,7 +3,7 @@
 3. Add login activity logging (done)
 4. Add user activity logging
 5. Add error looging in field
-5. Add email and sms verification
+5. Add email and sms verification (done email)
 6. Add external authenticators
 7. Add external login and authentication
 8. Add single signon ability

@@ -1,8 +1,6 @@
-const {sequelize:db, DataTypes} = require('../helpers/sequelize_init')
-const {logData} = require('../helpers/logger')
-const {User} = require('./User')
+const {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
 
-const LoginAttempt = db.define('login_attempt', {
+const LoginAttempt = db.define('auth_tbl_login_attempt', {
    user_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
@@ -29,12 +27,6 @@ const LoginAttempt = db.define('login_attempt', {
    }
 })
 
-User.hasMany(LoginAttempt, {foreignKey: {name: user_id, allowNull: false}, onUpdate: 'CASCADE'})
-LoginAttempt.belongsTo(User, {foreignKey: {name: user_id, allowNull: false}, onUpdate: 'CASCADE'})
-
-LoginAttempt.sync({alter: true})
-  .then( data =>{})
-  .catch( err => logData('Create tbl LoginAttempt: ' + err))
 
   module.exports = { LoginAttempt}
 

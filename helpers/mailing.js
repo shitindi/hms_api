@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer')
 const {logData} = require('./logger')
 
-const sendMail = async (recEmail, recName, link) => {
+const sendMail = async (recEmail, textBody) => {
 
     try{
 
@@ -12,10 +12,6 @@ const sendMail = async (recEmail, recName, link) => {
 
     const subject = "Your Account Activation"
     const senderName = "Byteware Accounts "
-
-    let textBody =  `<p>Hi ${recName}, </p>`
-          textBody += '<p>Thanks  your for creating acount with us, please click the link bellow to activate your account </p>'
-          textBody += `<p><a href="${link}">Activate My Account</a></p>`
 
     const serverConfig = {
         host: host,

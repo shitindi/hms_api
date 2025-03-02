@@ -1,7 +1,6 @@
-const {sequelize:db, DataTypes} = require('../helpers/sequelize_init')
-const {logData} = require('../helpers/logger')
-const {User} = require('./User')
-const SessionHistory = db.define('session_history', {
+const {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
+
+const SessionHistory = db.define('auth_tbl_session_history', {
    user_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -40,12 +39,7 @@ const SessionHistory = db.define('session_history', {
    }
 })
 
-User.hasMany(SessionHistory, {foreignKey: {name: user_id, allowNull: false}, onUpdate: 'CASCADE'})
-SessionHistory.belongsTo(User, {foreignKey: {name: user_id, allowNull: false}, onUpdate: 'CASCADE'})
 
-SessionHistory.sync({alter: true})
-  .then( data =>{})
-  .catch( err => logData('Create tbl SessionHistory: ' + err))
 
   module.exports = { SessionHistory}
 

@@ -1,6 +1,7 @@
 const {encryptSymmetric: encryp, decryptSymmetric: decrypt} = require('./helpers/cryptography')
 const {getRandomNumber, getRandomString} = require('./helpers/code_generator')
 const {sendMail} = require('./helpers/mailing')
+const { addDbDateNow, getDbDateNow } = require('./helpers/utility')
 require('dotenv').config()
 
 const runSymmetryCrypto = () =>
@@ -63,4 +64,15 @@ const testRandomGen = () => {
 
 //testRandomGen();
 
-sendMail('ndinao@hotmail.com', 'Ndinao Shitindi', 'https://www.byteware.co.tz')
+//sendMail('ndinao@hotmail.com', 'Ndinao Shitindi', 'https://www.byteware.co.tz')
+// let curtDate = new Date(new Date().setHours(new Date().getHours() + 3)) // new Date()
+// let nowDate = new  Date(curtDate.getTime() - (curtDate.getTimezoneOffset() * 60000)).toISOString().slice(0, 19).replace('T', ' ')
+
+
+// let eventTime =  new Date(new Date().setHours(new Date().getHours() + 1)).toISOString().slice(0, 19).replace('T', ' ');
+
+
+
+
+
+console.log('later date: ' + nowDate )
