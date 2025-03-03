@@ -1,24 +1,4 @@
-2025-03-01 19:16:46: SendMail: Error: connect ECONNREFUSED 127.0.0.1:465
+2025-03-01 19:12:26: SendMail: TypeError: Assignment to constant variable.
  
-2025-03-01 19:18:22: SendMail: Error: connect ECONNREFUSED 127.0.0.1:465
- 
-2025-03-01 19:18:48: SendMail: Error: connect ECONNREFUSED 127.0.0.1:465
- 
-2025-03-01 19:21:12: SendMail: Error: connect ECONNREFUSED 127.0.0.1:465
- 
-2025-03-01 19:21:39: SendMail: Error: connect ECONNREFUSED 127.0.0.1:465
- 
-2025-03-01 19:23:20: SendMail: Error: connect ECONNREFUSED 127.0.0.1:465
- 
-2025-03-01 19:24:22: SendMail: Error: Invalid login: 535 5.7.8 Error: authentication failed: (reason unavailable)
- 
-2025-03-01 19:27:55: SendMail: Error: Invalid login: 535 5.7.8 Error: authentication failed: (reason unavailable)
- 
-2025-03-01 19:28:56: SendMail: Error: Invalid login: 535 5.7.8 Error: authentication failed: (reason unavailable)
- 
-2025-03-01 19:35:23: SendMail: Error: read ECONNRESET
- 
-2025-03-01 19:37:12: SendMail: Error: Client network socket disconnected before secure TLS connection was established
- 
-2025-03-01 19:37:44: SendMail: Error: Client network socket disconnected before secure TLS connection was established
+2025-03-01 19:14:26: SendMail: Error: connect ECONNREFUSED 127.0.0.1:465
  

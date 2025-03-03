@@ -7,11 +7,10 @@ const { LoginAttempt } = require('../models/Auth/LoginAttempt')
 const { ActiveSession } = require('../models/Auth/ActiveSession')
 const { SessionHistory} = require('../models/Auth/SessionHistory')
 const {PasswordHistory} = require('../models/Auth/PasswordHistory')
-const {} = require('../models/Auth/UserStatus')
 
 const createError = require('http-errors');
 const { addHourDbDateNow, getDbDateNow, addMinutesDbDate, getJSDateFromDb } = require('../helpers/utility')
-const {authSchema, passUpdate, emailSchema, passReset, contactSchema} = require('../helpers/auth_validation_schema')
+const {authSchema, passUpdate, emailSchema, passReset, contactSchema, groupSchema} = require('../helpers/auth_validation_schema')
 const  hash = require('../helpers/hash_data')
 const {signAccessToken, signRefreshToken, verifyRefreshToken} = require('../helpers/jwt_helper');
 //const client = require('../helpers/init_redis');
@@ -33,7 +32,7 @@ const register = async (req, res, next) => {
         const user = await userSchema.validateAsync(req.body);   //This will throw error which will be catched in catch block
         const contact = await contactSchema.validateAsync(req.body)
 
-        const Contact = Contacts.findOne({
+        const Contact = await Contacts.findOne({
             where: {email: contact.email}
         })
 
@@ -161,7 +160,7 @@ const  verifyEmail = async (req, res, next) => {
 
         const tokenObj =   JSON.parse(plaintext)
 
-        const ActCode = ActivationCodes.findOne({
+        const ActCode = await ActivationCodes.findOne({
             where: {[Op.and]: {user_id: tokenObj.user_id, user_token: tokenObj.user_token}}
         })
 
@@ -169,7 +168,7 @@ const  verifyEmail = async (req, res, next) => {
             throw createError.NotFound("Activation link is not valid")
         }
 
-        const User = Users.findOne({
+        const User = await Users.findOne({
             where: {id: tokenObj.user_id}
         })
 
@@ -315,7 +314,7 @@ const requestForgotPasswordWeb = async( req, res, next) => {
     try{
         const request = await emailSchema.validateAsync(req.body); 
 
-        const Contact = Contacts.findOne({
+        const Contact = await Contacts.findOne({
             where: {email: request.email}
             , include: [Users]
         })
@@ -380,7 +379,7 @@ const requestForgotPasswordApp = async( req, res, next) => {
     try{
         const request = await emailSchema.validateAsync(req.body); 
 
-        const Contact = Contacts.findOne({
+        const Contact = await Contacts.findOne({
             where: {email: request.email}
             , include: [Users]
         })
@@ -422,7 +421,7 @@ const resetPassword = async(req, res, next) => {
     try{
         const user = await passReset.validateAsync(req.body);
 
-        const activationCode = ActivationCodes.findOne({
+        const activationCode = await ActivationCodes.findOne({
             where: {user_code: user.reset_code}
         })
 
@@ -438,7 +437,7 @@ const resetPassword = async(req, res, next) => {
             createError.Forbidden('The reset code entered already expired!')
         }
 
-        const User = Users.findOne({
+        const User = await Users.findOne({
             where: {id: activationCode.user_id}
         })
 
@@ -495,7 +494,7 @@ const refresh = async (req, res, next) => {
         const accessToken = await signAccessToken(userId)
         const newRefreshToken = await signRefreshToken(userId)
 
-        let session = ActiveSession.findOne({
+        let session = await ActiveSession.findOne({
             where: {[Op.and] : {user_id: userId, refresh_token: refreshToken}}
         })
         
@@ -536,6 +535,7 @@ const logout = async (req, res, next) => {
         })
             */
     }catch(error){
+        logData('logout: ' + error)
         next(error)
     }
 }
@@ -570,7 +570,7 @@ const logSessionData = async (userId, userIp, userToken, refreshToken) => {
     }
 
     try{
-        let activeSession = ActiveSession.findOne({
+        let activeSession = await ActiveSession.findOne({
             where: {id: userId}
         })
 
@@ -618,6 +618,7 @@ const destroySession = async( userId) => {
     }
 
 }
+
 
 
 module.exports = {

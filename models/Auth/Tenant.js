@@ -11,6 +11,10 @@ const Tenant = db.define('auth_tbl_tenant', {
     status_id: {
         type: DataTypes.TINYINT,
         allowNull: false,
+    },
+    contact_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
     }
 });
 

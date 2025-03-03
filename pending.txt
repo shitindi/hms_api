@@ -8,4 +8,6 @@
 7. Add external login and authentication
 8. Add single signon ability
 9. Implement multifactor
-10. Implement password history
+10. Implement password history (done)
+11. lookups
+12. Swagger documentation
