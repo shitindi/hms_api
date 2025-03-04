@@ -1,15 +1,18 @@
 const createError = require('http-errors');
-const { groupSchema, userSchema, contactSchema, userGroupSchema, groupPermissionSchema } = require('../helpers/auth_validation_schema')
+const { groupSchema, userSchema, contactSchema, userGroupSchema, groupPermissionSchema, userPermissionSchema } = require('../helpers/auth_validation_schema')
 const { Group: Groups } = require('../models/Auth/Group');
 const { User: Users } = require('../models/Auth/User')
 const { Contact: Contacts } = require('../models/Auth/Contact');
 const { UserStatus } = require('../models/Auth/UserStatus')
 const { UserGroup: UserGroups } = require('../models/Auth/UserGroup')
-const { GroupPermission, GroupPermission } = require('../models/Auth/GroupPermission')
-const { PersmissionType: PermisionTypes, PersmissionType } = require('../models/Auth/PermisionType')
+const { GroupPermission } = require('../models/Auth/GroupPermission')
+const {UserPermission, UserPermission} = require('../models/Auth/UserPermission')
+const { PersmissionType} = require('../models/Auth/PermisionType')
 const { Module: Modules } = require('../models/Auth/Module')
 const { logData } = require('../helpers/logger');
 const { request } = require('express');
+const { Tenant: Tenants } = require('../models/Auth/Tenant');
+const { TenantStatus} = require('../models/Auth/TenantStatus')
 
 const groupDetails = async (req, res, next) => {
 
@@ -330,7 +333,8 @@ const editGroupPermission = async (req, res, next) => {
         const groupPermission = groupPermissionSchema.validateAsync(req.body)
 
         const GroupPermission = await GroupPermission.findOne({
-            where: { [Op.and]: { module_id:groupPermission.module_id, group_id: groupPermission.group_id, permission_type: groupPermission.permission_type } }
+            where: { [Op.and]: { module_id:groupPermission.module_id, group_id: groupPermission.group_id,
+                                 permission_type: groupPermission.permission_type } }
         });
 
         // Exist same group name in same tenant
@@ -359,8 +363,133 @@ const editGroupPermission = async (req, res, next) => {
     }
 }
 
-const tenantDetails = async (req, res, next) => {
+const userPermissionDetails = async (req, res, next) => {
     try {
+        const permissionId = req.params.id;
+        let permissionList = null;
+
+        if (permissionId) {
+            // parameter is passed
+            permissionList = await UserPermission.findAll({
+                where: { id: permissionId },
+                include: [{
+                    model: Users,
+                    attributes: ['id', 'user_name'],
+                    include: [{
+                        model: Contacts,
+                        attributes: ['id', 'first_name', 'last_name']
+                    }]
+                },
+                {
+                    model: Modules
+                },
+                {
+                    model: PersmissionType
+                },
+                ],
+            })
+
+        } else {
+            // no parameter is passed
+            permissionList = await UserPermission.findAll({
+                include: [{
+                    model: Users,
+                    attributes: ['id', 'user_name'],
+                    include: [{
+                        model: Contacts,
+                        attributes: ['id', 'first_name', 'last_name']
+                    }]
+                },
+                {
+                    model: Modules
+                },
+                {
+                    model: PersmissionType
+                },
+               
+                ],
+            })
+        }
+
+        res.status(200).json(
+            permissionList
+        )
+
+    } catch (err) {
+        logData('userPermissionDetails: ' + err)
+    }
+}
+
+const editUserPermission = async (req, res, next) => {
+    try {
+        const userPermission = userPermissionSchema.validateAsync(req.body)
+
+        const UserPermission = await UserPermission.findOne({
+            where: { [Op.and]: { user_id: userPermission.user_id, permission_type: groupPermission.permission_type,
+                 module_id: userPermission.module_id } }
+        });
+
+        // Exist same group name in same tenant
+        if (UserPermission) {
+            // if ID is present then is for update
+            if (userPermission.id && userPermission.id > 0 && userPermission.id == UserPermission.id) {
+                UserPermission.update(
+                    userPermission, { where: { id: UserPermission.id } }
+                )
+            }
+
+            createError.Conflict('The User permission specified already exists!')
+        } else {
+            // Otherwise create new group
+            userPermission = await UserPermission.create(userPermission)
+        }
+
+
+
+        res.status(200).json({
+            ...userPermission,
+            message: "User permission details updated successfuly!",
+        })
+    } catch (err) {
+        logData('editUserPermission: ' + err)
+    }
+}
+
+const tenantDetails = async (req, res, next) => {
+    try  {
+        const tenantId = req.params.id;
+        let tenantList = null;
+
+        if (tenantId) {
+            // parameter is passed
+            tenantList = await Tenants.findAll({
+                where: { id: tenantId },
+                include: [{
+                    model: Contacts,                    
+                },
+                {
+                    model: TenantStatus
+                }
+            ],
+            })
+
+        } else {
+            // no parameter is passed
+            tenantList = await Tenants.findAll({
+                where: { id: tenantId },
+                include: [{
+                    model: Contacts,                    
+                },
+                {
+                    model: TenantStatus
+                }
+            ],
+            })
+        }
+
+        res.status(200).json(
+            tenantList
+        )
 
 
 
@@ -377,5 +506,8 @@ module.exports = {
     userGroupDetails,
     editUserGroup,
     groupPermissionDetails,
-    editGroupPermission
+    editGroupPermission,
+    userPermissionDetails,
+    editUserPermission,
+    tenantDetails
 }

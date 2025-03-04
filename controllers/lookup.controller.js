@@ -1,0 +1,64 @@
+const createError = require('http-errors');
+const { logData } = require('../helpers/logger');
+const {ActivationType} = require('../models/Auth/ActivationType')
+const {TenantStatus} = require('../models/Auth/TenantStatus')
+const {UserStatus} = require('../models/Auth/UserStatus')
+const {PersmissionType} = require('../models/Auth/PermisionType')
+
+
+// Authentication lookup
+const activationType = async (req, res, next) => {
+
+    try{
+        const activationTypes = await ActivationType.findAll()
+
+        res.status(200).json( activationTypes)
+    }catch(err){
+        logData('activationType: ' + err)
+        next(err)
+    }
+}
+
+const tenantStatuses = async (req, res, next) => {
+
+    try{
+        const tenantStatuses = await TenantStatus.findAll()
+
+        res.status(200).json( tenantStatuses)
+    }catch(err){
+        logData('tenantStatuses: ' + err)
+        next(err)
+    }
+}
+
+const userStatuses = async (req, res, next) => {
+
+    try{
+        const userStatuses = await UserStatus.findAll()
+
+        res.status(200).json( userStatuses)
+    }catch(err){
+        logData('userStatuses: ' + err)
+        next(err)
+    }
+}
+
+
+const permissionTypes = async (req, res, next) => {
+
+    try{
+        const permissionTypes = await PersmissionType.findAll()
+
+        res.status(200).json( permissionTypes)
+    }catch(err){
+        logData('permissionTypes: ' + err)
+        next(err)
+    }
+}
+
+module.exports = {
+    activationType,
+    tenantStatuses,
+    userStatuses,
+    permissionTypes
+}

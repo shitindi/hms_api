@@ -1,8 +1,11 @@
 const express = require('express')
 const morgan = require('morgan')
 const createError = require('http-errors')
+
+// routes
 const authRoute = require('./routes/Auth.route')
 const adminRoute = require('./routes/Admin.route')
+const lookupRoute = require('./routes/Lookup.route')
 require('dotenv').config()
 //require('./helpers/init_redis')
 
@@ -18,6 +21,7 @@ const PORT = process.env.PORT || 7000
 
 app.use("/auth", authRoute)
 app.use("/admin", adminRoute)
+app.use("/lookup", lookupRoute)
 
 
 // Catch all routes

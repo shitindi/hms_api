@@ -11,5 +11,9 @@ router.post("/user-edit", verifyAccessToken, adminController.editUser)
 router.get('/user-groups', verifyAccessToken, adminController.userGroupDetails)
 router .post('/user-group-edit', verifyAccessToken, adminController.editUserGroup)
 router.get("/group-permissions", verifyAccessToken,adminController.groupPermissionDetails)
-router.post("group-permission-edit", verifyAccessToken, adminController.editGroupPermission)
+router.post("/group-permission-edit", verifyAccessToken, adminController.editGroupPermission)
+router.get("/user-permissions", verifyAccessToken, adminController.userPermissionDetails)
+router.post("/user-permission-edit", verifyAccessToken, adminController.editUserPermission)
+router.get("/tenant-details", verifyAccessToken, adminController.tenantDetails)
+
 module.exports = router

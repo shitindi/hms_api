@@ -80,6 +80,14 @@ const groupPermissionSchema = Joi.object({
        is_active: Joi.boolean().required().default(false)
 })
 
+const userPermissionSchema = Joi.object({
+    id: Joi.number(),
+    user_id: Joi.number().required(),
+       permission_type: Joi.number().required(),
+       created_by: Joi.number().required(),
+       is_active: Joi.boolean().required().default(false)
+})
+
 module.exports = {
     authSchema,
     passUpdate,
@@ -89,5 +97,6 @@ module.exports = {
     userSchema,
     groupSchema,
     userGroupSchema,
-    groupPermissionSchema
+    groupPermissionSchema,
+    userPermissionSchema
 }
