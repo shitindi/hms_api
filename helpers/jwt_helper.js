@@ -1,6 +1,6 @@
-const client = require('./init_redis')
+//const client = require('./init_redis')
 const {logData} = require('../helpers/logger')
-const { ActiveSession: Session } = require('../models/ActiveSession')
+const { ActiveSession: Session } = require('../models/Auth/ActiveSession')
 const {Op} = require('sequelize')
 
 

@@ -2,6 +2,9 @@ const express = require('express')
 const morgan = require('morgan')
 const createError = require('http-errors')
 
+const swaggerDocs = require('./swagger.js')
+
+
 // routes
 const authRoute = require('./routes/Auth.route')
 const adminRoute = require('./routes/Admin.route')
@@ -18,6 +21,12 @@ app.set('trust proxy', true)
 app.unsubscribe(express.urlencoded({extended: true}))
 
 const PORT = process.env.PORT || 7000
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`)
+   
+})
+swaggerDocs(app, );
 
 app.use("/auth", authRoute)
 app.use("/admin", adminRoute)
@@ -43,6 +52,4 @@ app.use((err, req, res, next) => {
 }
 )
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
-})
+

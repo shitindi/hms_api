@@ -17,7 +17,7 @@ const {signAccessToken, signRefreshToken, verifyRefreshToken} = require('../help
 
 const {getRandomString, getRandomNumber} = require('../helpers/code_generator')
 const {ActivationCode: ActivationCodes} = require('../models/Auth/ActivationCode')
-const {encryptSymmetric: encryp, decryptSymmetric: decrypt} = require('./helpers/cryptography')
+const {encryptSymmetric: encryp, decryptSymmetric: decrypt} = require('../helpers/cryptography')
 const {sendMail} = require('../helpers/mailing');
 const { sequelize } = require('../helpers/sequelize_init');
 const { UserStatusHistory } = require('../models/Auth/UserStatusHistory');
@@ -506,7 +506,7 @@ const refresh = async (req, res, next) => {
         session.user_ip = req.ip
         ActiveSession.update(session, {where: {user_id:userId}, fields: ['user_token','refresh_token', 'user_ip']})
 
-         res.send({accessToken, refreshToken: newRefreshToken})
+         res.status(200).json({accessToken, refreshToken: newRefreshToken})
     }catch(error){
         next(error)
     }
@@ -516,7 +516,7 @@ const logout = async (req, res, next) => {
     try{
 
         const { refreshToken } = req.body
-        if(!refreshToken) throw createError.BadGateway()
+        if(!refreshToken) throw createError.Unauthorized()
         
         const userId = await verifyRefreshToken(refreshToken)
 

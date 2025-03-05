@@ -7,6 +7,11 @@ const Module = db.define('auth_tbl_module', {
     allowNull: false,
     unique: true
    },
+   code: {
+      type: DataTypes.SMALLINT,
+      allowNull: false,
+      unique: true
+   },
    description: {
       type: DataTypes.STRING(300),
       allowNull: false

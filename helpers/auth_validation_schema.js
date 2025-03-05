@@ -30,14 +30,14 @@ const passReset= Joi.object({
 const contactSchema = Joi.object({
     //Contact model
     id: Joi.number(),
-    first_name: Joi.string(30).required(),
-    middle_name: Joi.string(30),
-    last_name: Joi.string(30).required(),
-    email: Joi.string(100).required().email(),
-    mobile_no:Joi.string(15).required(),
-    phone: Joi.string(15),
-    position: Joi.string(100),
-    address: Joi.string(150),
+    first_name: Joi.string().required().max(30).min(2),
+    middle_name: Joi.string().max(30).min(2),
+    last_name: Joi.string().required().max(30).min(2),
+    email: Joi.string().required().email().max(100),
+    mobile_no:Joi.string().required().min(10).max(16),
+    phone: Joi.string().min(12).max(17),
+    position: Joi.string().max(100),
+    address: Joi.string().max(150),
     created_by : Joi.number(),
 })
 
@@ -45,7 +45,7 @@ const contactSchema = Joi.object({
 const userSchema = Joi.object({
     // User model
     id: Joi.number(),
-    user_name: Joi.string(100).email().required(),
+    user_name: Joi.string().email().required().max(100),
     password: Joi.string().min(6).max(16).required(),
     confirm_password: Joi.ref('password'),
     must_change_password: Joi.bool() ,
@@ -56,10 +56,10 @@ const userSchema = Joi.object({
 // Schema for group details
 const groupSchema = Joi.object({
     id: Joi.number(),
-     group_name: Joi.string(50).required().min(2),
+     group_name: Joi.string().required().min(2).max(50),
     tenant_id: Joi.number().required(),
     created_by: Joi.number().required(),
-    description: Joi.string(300),
+    description: Joi.string().max(300),
     is_active: Joi.bool().required().default(false)
 })
 

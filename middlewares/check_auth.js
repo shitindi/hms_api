@@ -1,6 +1,6 @@
 const createError = require('http-errors');
 const JWT = require('jsonwebtoken')
-const {ActiveSession} = require('../models/ActiveSession')
+const {ActiveSession} = require('../models/Auth/ActiveSession')
 
 
 

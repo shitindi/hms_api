@@ -47,3 +47,6 @@ npm i redis
 
 15. Node mailing library
 npm install nodemailer
+
+16. Swagger documentation
+npm install  swagger-jsdoc swagger-ui-express
