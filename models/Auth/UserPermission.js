@@ -5,6 +5,10 @@ const UserPermission = db.define('auth_tbl_user_permission', {
     type: DataTypes.INTEGER,
     allowNull: false
    },
+   tenant_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+   },
    user_id: {
       type: DataTypes.INTEGER,
       allowNull: false

@@ -217,8 +217,6 @@ const login = async (req, res, next) => {
         if( !User){
            await logLoginAttempt(null, login.email, req.ip , false)
 
-           //increment login attempt fails, usefull for account lock feature
-           Users.increment( {retry_count: +1}, {where: {id: User.id}})
             throw createError.NotFound("User not registered")
         }
 
@@ -226,8 +224,35 @@ const login = async (req, res, next) => {
 
         await logLoginAttempt(User.id, login.email, req.ip , isMatch)
 
-        if (!isMatch) throw createError.Unauthorized('Username/password not valid')
+        const passwordRetryCount = process.env.MAXIMUM_LOGIN_ATTEMPTS
 
+        if (!isMatch){
+
+            //increment login attempt fails, usefull for account lock feature
+           Users.increment( {retry_count: +1}, {where: {id: User.id}})
+
+           if(User.retry_count >=  passwordRetryCount){
+            User.is_active = false
+            User.user_status = 2
+            Users.update(
+                User, {where: {id:User.id}, fields:['is_active', 'user_status']}
+            );
+                throw createError.Forbidden('User account locked')
+           }
+             throw createError.Unauthorized('Username/password not valid')
+        }
+            
+        if (User.retry_count >= passwordRetryCount){
+            throw createError.Forbidden('Account is locked too many attempts')
+        }
+        else if (User.email_verified != true){
+            throw createError.Forbidden('Account is not verified')
+        }else if (User.is_active != true){
+            throw createError.Forbidden('Account is not active')
+        }else if (User.user_status != 1){
+            throw createError.Forbidden('Account is locked')
+        }
+        
         const accessToken = await signAccessToken(User.id)
         const refreshToken = await signRefreshToken(User.id)
 

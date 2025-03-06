@@ -4,6 +4,7 @@ const {ActivationType} = require('../models/Auth/ActivationType')
 const {TenantStatus} = require('../models/Auth/TenantStatus')
 const {UserStatus} = require('../models/Auth/UserStatus')
 const {PersmissionType} = require('../models/Auth/PermisionType')
+const {Module} = require('../models/Auth/Module')
 
 
 // Authentication lookup
@@ -56,9 +57,21 @@ const permissionTypes = async (req, res, next) => {
     }
 }
 
+const appModules = async(req, res, next) => {
+    try{
+        const appModules = await Module.findAll()
+
+        res.status(200).json(appModules)
+    }catch(err){
+        logData('appModules: ' + err)
+        next(err)
+    }
+}
+
 module.exports = {
     activationType,
     tenantStatuses,
     userStatuses,
-    permissionTypes
+    permissionTypes,
+    appModules
 }

@@ -13,6 +13,7 @@ const { logData } = require('../helpers/logger');
 const { request } = require('express');
 const { Tenant: Tenants } = require('../models/Auth/Tenant');
 const { TenantStatus} = require('../models/Auth/TenantStatus')
+const {hashPassword} = require('../helpers/hash_data')
 
 const groupDetails = async (req, res, next) => {
 
@@ -216,6 +217,7 @@ const userDetails = async (req, res, next) => {
     }
 }
 
+    
 const editUser = async (req, res, next) => {
     try {
 
@@ -230,9 +232,9 @@ const editUser = async (req, res, next) => {
         // Exist same user name in same tenant
         if (User) {
             // if ID is present then is for update
-            if (user.id && user.id > 0 && user.id == User.id) {
+            if (user.user_id && user.user_id > 0 && user.id == User.id) {
                 User.update(
-                    user, { where: { id: user.id } }
+                    user, { where: { id: user.user_id } }
                 );
 
                 const Contact = await Contacts.findOne({
@@ -241,7 +243,9 @@ const editUser = async (req, res, next) => {
 
                 if (Contact && Contact.id == User.contact_id) {
                     await Contacts.update(
-                        contact, { where: { id: contact.id } }
+                        contact, { where: { id: User.contact_id },
+                        fields: ['must_change_password', 'user_status']
+                    }
                     )
                 }
             }
@@ -251,6 +255,7 @@ const editUser = async (req, res, next) => {
             // Otherwise create new user and contact
             const newContact = await Users.create(contact)
             user.contact_id = newContact.id
+            user.password = hashPassword(user.password)
             user = await Users.create(user)
         }
 

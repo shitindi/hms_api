@@ -29,7 +29,7 @@ const passReset= Joi.object({
 // Schema for contact object
 const contactSchema = Joi.object({
     //Contact model
-    id: Joi.number(),
+  //  id: Joi.number(),
     first_name: Joi.string().required().max(30).min(2),
     middle_name: Joi.string().max(30).min(2),
     last_name: Joi.string().required().max(30).min(2),
@@ -44,19 +44,20 @@ const contactSchema = Joi.object({
 // Schema for user details
 const userSchema = Joi.object({
     // User model
-    id: Joi.number(),
+    user_id: Joi.number(),
     user_name: Joi.string().email().required().max(100),
     password: Joi.string().min(6).max(16).required(),
     confirm_password: Joi.ref('password'),
     must_change_password: Joi.bool() ,
     contact_id: Joi.number().required(),
     tenant_id: Joi.number(),
+    user_status: Joi.number().required().default(1)
 }).with('password','confirm_password')
 
 // Schema for group details
 const groupSchema = Joi.object({
     id: Joi.number(),
-     group_name: Joi.string().required().min(2).max(50),
+    group_name: Joi.string().required().min(2).max(50),
     tenant_id: Joi.number().required(),
     created_by: Joi.number().required(),
     description: Joi.string().max(300),
@@ -65,6 +66,7 @@ const groupSchema = Joi.object({
 
 const userGroupSchema = Joi.object({
     id: Joi.number(),
+    tenant_id: Joi.number().required(),
     user_id: Joi.number().required(),
     group_id: Joi.number().required(),
     created_by: Joi.number().required(),
@@ -74,14 +76,17 @@ const userGroupSchema = Joi.object({
 const groupPermissionSchema = Joi.object({
      id: Joi.number(),
      module_id: Joi.number().required(),
-       group_id: Joi.number().required(),
-       permission_type: Joi.number().required(),
-       created_by: Joi.number().required(),
+     tenant_id: Joi.number().required(),
+     group_id: Joi.number().required(),
+     permission_type: Joi.number().required(),
+     created_by: Joi.number().required(),
        is_active: Joi.boolean().required().default(false)
 })
 
 const userPermissionSchema = Joi.object({
     id: Joi.number(),
+    module_id: Joi.number().required(),
+    tenant_id: Joi.number().required(),
     user_id: Joi.number().required(),
        permission_type: Joi.number().required(),
        created_by: Joi.number().required(),

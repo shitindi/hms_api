@@ -18,7 +18,13 @@ const {Group} = require('../models/Auth/Group')
 const {UserGroup} = require('../models/Auth/UserGroup')
 const {GroupPermission} = require('../models/Auth/GroupPermission')
 const {Module} = require('../models/Auth/Module')
+const {ModuleItem} = require('../models/Auth/ModuleItem')
 const {UserPermission} = require('../models/Auth/UserPermission')
+
+const {ActivityLog} = require('../models/Auth/ActivityLog')
+const {ActivityType} = require('../models/Auth/ActivityType')
+
+
 const {hashPassword} = require('./hash_data')
 
 const seedAuthDatabase = async () => {
@@ -30,23 +36,50 @@ const seedAuthDatabase = async () => {
     const userStatusCount = UserStatus.count()
     const usersCount = User.count()
     const permissionTypCount = PersmissionType.count()
+    const activityTypeCount = ActivityType.count()
+    const moduleCount = Module.count()
 
+    if (moduleCount==0){
+       const Module = await Module.create({
+            id: 1,
+          module_name: 'User management',
+           code: 1001,
+           description: 'User, roles and permission managements',
+           is_active: true
+       })
+
+       if (Module && Module.id > 0){
+        ModuleItem.bulkCreate([
+            {id: 1, item_name: 'Users' , module_id: Module.id , code: 101},
+            {id: 2, item_name: 'Groups' , module_id: Module.id , code: 102},
+            {id: 3, item_name: 'User Group' , module_id: Module.id , code: 103},
+            {id: 4, item_name: 'Group Permission' , module_id: Module.id , code: 104},
+            {id: 5, item_name: 'User Permission' , module_id: Module.id , code: 105 }
+        ])
+       }
+    }
+
+    if (activityTypeCount == 0){
+       await ActivityType.bulkCreate([
+            {id: 1,name: 'Create'}, {id: 2, name: 'Modify'}, {id: 3, name: 'Delete'}, {id: 4, name : 'View'}
+        ])
+    }
 
     if (activationTypesCount == 0)
     {
-        ActivationType.bulkCreate([
+        await ActivationType.bulkCreate([
             {id:1, name:'Email Activation'}, {id:2, name: 'SMS Activation'}, {id:3, name: 'OTP code'}, {id: 4, name:'Password reset'}
         ])
     }
 
     if (tenantStatusCount == 0 ){
-        TenantStatus.bulkCreate([
+        await TenantStatus.bulkCreate([
             {id: 1, name: 'Active'}, {id: 2, name:'Suspended'}, {id: 3, name: 'Deleted'}
         ])
     }
 
     if (userStatusCount == 0){
-        UserStatus.bulkCreate([
+        await UserStatus.bulkCreate([
             {id:1, name:'Active'}, {id:2, name: 'Blocked by System'}, {id:3, name: 'Locked by user'}, {id:4, name: 'Deleted'}, {id:5, name: 'Not verified'}
         ])
     }
@@ -60,7 +93,7 @@ const seedAuthDatabase = async () => {
         await User.create(user)
     }
     if (permissionTypCount == 0){
-        PersmissionType.bulkCreate([
+        await PersmissionType.bulkCreate([
             {id:1, name:'Read only'}, {id:2, name: 'Ready and write'}, {id: 3, name: 'No Access'}
         ])
     }
@@ -146,6 +179,9 @@ Group.belongsTo(Tenant, {foreignKey: {name: 'tenant_id', allowNull: false}, onUp
 
 
 // UserGroup data
+Tenant.hasMany(UserGroup, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
+UserGroup.belongsTo(Tenant, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
+
 User.hasMany(UserGroup, {foreignKey: {name: 'created_by', allowNull: false}, onUpdate: 'CASCADE'})
 UserGroup.belongsTo(User, {foreignKey: {name: 'created_by', allowNull: false}, onUpdate: 'CASCADE'})
 
@@ -156,7 +192,7 @@ Group.hasMany(UserGroup, {foreignKey: {name: 'group_id', allowNull: false}, onUp
 UserGroup.belongsTo(Group, {foreignKey: {name: 'group_id', allowNull: false}, onUpdate: 'CASCADE'})
 
 
-// UserGroup data
+// Group permission data
 User.hasMany(GroupPermission, {foreignKey: {name: 'created_by', allowNull: false}, onUpdate: 'CASCADE'})
 GroupPermission.belongsTo(User, {foreignKey: {name: 'created_by', allowNull: false}, onUpdate: 'CASCADE'})
 
@@ -169,7 +205,10 @@ GroupPermission.belongsTo(PersmissionType, {foreignKey: {name: 'permission_type'
 Module.hasMany(GroupPermission, {foreignKey: {name: 'module_id', allowNull: false}, onUpdate: 'CASCADE'})
 GroupPermission.belongsTo(Module, {foreignKey: {name: 'module_id', allowNull: false}, onUpdate: 'CASCADE'})
 
-// UserGroup data
+Tenant.hasMany(GroupPermission, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
+GroupPermission.belongsTo(Tenant, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
+
+// User permision data
 User.hasMany(UserPermission, {foreignKey: {name: 'created_by', allowNull: false}, onUpdate: 'CASCADE'})
 UserPermission.belongsTo(User, {foreignKey: {name: 'created_by', allowNull: false}, onUpdate: 'CASCADE'})
 
@@ -182,92 +221,123 @@ UserPermission.belongsTo(PersmissionType, {foreignKey: {name: 'permission_type',
 Module.hasMany(UserPermission, {foreignKey: {name: 'module_id', allowNull: false}, onUpdate: 'CASCADE'})
 UserPermission.belongsTo(Module, {foreignKey: {name: 'module_id', allowNull: false}, onUpdate: 'CASCADE'})
 
+Tenant.hasMany(UserPermission, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
+UserPermission.belongsTo(Tenant, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
 
+Module.hasMany(UserPermission, {foreignKey: {name: 'module_id', allowNull: false}, onUpdate: 'CASCADE'})
+UserPermission.belongsTo(Module, {foreignKey: {name: 'module_id', allowNull: false}, onUpdate: 'CASCADE'})
+
+
+// Activity logs data
+User.hasMany(ActivityLog, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
+ActivityLog.belongsTo(User, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
+
+ModuleItem.hasMany(ActivityLog, {foreignKey: {name: 'module_item_id', allowNull: false}, onUpdate: 'CASCADE'})
+ActivityLog.belongsTo(ModuleItem, {foreignKey: {name: 'module_item_id', allowNull: false}, onUpdate: 'CASCADE'})
+
+ActivityType.hasMany(ActivityLog, {foreignKey: {name: 'activity_type', allowNull: false}, onUpdate: 'CASCADE'})
+ActivityLog.belongsTo(ActivityType, {foreignKey: {name: 'activity_type', allowNull: false}, onUpdate: 'CASCADE'})
+
+// Module Item data
+Module.hasMany(ModuleItem, {foreignKey: {name: 'module_id', allowNull: false}, onUpdate: 'CASCADE'})
+ModuleItem.belongsTo(Module, {foreignKey: {name: 'module_id', allowNull: false}, onUpdate: 'CASCADE'})
 
 //Lookups
-ActivationType.sync({alter: true})
+ await ActivationType.sync({alter: true})
   .then( data =>{})
   .catch( err => console.log('Create tbl activation_type: ' + err))
 
-  TenantStatus.sync({alter: true})
+  await TenantStatus.sync({alter: true})
   .then( data =>{})
   .catch( err => console.log('Create tbl Tenant_status: ' + err))
 
-  UserStatus.sync({alter: true})
+  await UserStatus.sync({alter: true})
   .then( data =>{})
   .catch( err => console.log('Create tbl UserStatus: ' + err))
-  PersmissionType.sync({alter: true})
+
+  await PersmissionType.sync({alter: true})
   .then( data =>{})
   .catch( err => console.log('Create tbl auth_tbl_permision_type: ' + err))
 
+  await ActivityType.sync({alter: true})
+  .then( data =>{})
+  .catch( err => console.log('Create tbl auth_tbl_activity_type: ' + err))
 
 
 
 
-  User.sync({alter: true})
+  await User.sync({alter: true})
   .then( data =>{})
   .catch( err => console.log('Create tbl User: ' + err))
 
-  Contact.sync({alter: true})
+  await Contact.sync({alter: true})
   .then( data =>{})
   .catch( err => console.log('Create tbl Contact: ' + err))
 
 
-  SessionHistory.sync({alter: true})
+  await SessionHistory.sync({alter: true})
   .then( data =>{})
   .catch( err => console.log('Create tbl SessionHistory: ' + err))
 
-  PasswordHistory.sync({alter: true})
+  await PasswordHistory.sync({alter: true})
   .then( data =>{})
   .catch( err => console.log('Create tbl password_history: ' + err))
 
 
-  LoginAttempt.sync({alter: true})
+  await LoginAttempt.sync({alter: true})
   .then( data =>{})
   .catch( err => console.log('Create tbl LoginAttempt: ' + err))
 
-ActiveSession.sync({alter: true})
+ await ActiveSession.sync({alter: true})
   .then( data =>{})
   .catch( err => console.log('Create tbl ActiveSession: ' + err))
 
-ActivationCode.sync({alter: true})
+ await ActivationCode.sync({alter: true})
   .then( data =>{})
   .catch( err => console.log('Create tbl activation_code: ' + err))
 
 
-  Tenant.sync({alter: true})
+  await Tenant.sync({alter: true})
   .then( data =>{})
   .catch( err => console.log('Create tbl Tenant: ' + err))
 
-  TenantStatusHistory.sync({alter: true})
+  await TenantStatusHistory.sync({alter: true})
   .then( data =>{})
   .catch( err => console.log('Create tbl tenant_status_history: ' + err))
 
 
-UserStatusHistory.sync({alter: true})
+await UserStatusHistory.sync({alter: true})
 .then( data =>{})
 .catch( err => console.log('Create tbl user_status_history: ' + err))
 
-Group.sync({alter: true})
+await Group.sync({alter: true})
   .then( data =>{})
   .catch( err => console.log('Create tbl auth_tbl_group: ' + err))
 
-  UserGroup.sync({alter: true})
+ await UserGroup.sync({alter: true})
   .then( data =>{})
   .catch( err => console.log('Create tbl auth_tbl_user_group: ' + err))
 
 // module data
-Module.sync({alter: true})
+await Module.sync({alter: true})
   .then( data =>{})
   .catch( err => console.log('Create tbl auth_tbl_module: ' + err))
 
-  GroupPermission.sync({alter: true})
+  await GroupPermission.sync({alter: true})
   .then( data =>{})
   .catch( err => console.log('Create tbl auth_tbl_group_permission: ' + err))
 
-  UserPermission.sync({alter: true})
+  await UserPermission.sync({alter: true})
   .then( data =>{})
   .catch( err => console.log('Create tbl auth_tbl_user_permission: ' + err))
+
+  await ActivityLog.sync({alter: true})
+  .then( data =>{})
+  .catch( err => console.log('Create tbl auth_tbl_activity_log: ' + err))
+
+  await ModuleItem.sync({alter: true})
+  .then( data =>{})
+  .catch( err => console.log('Create tbl auth_tbl_module_item ' + err))
 
 }catch(error){
     console.log('SeedDatabase: ' + error)

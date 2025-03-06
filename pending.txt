@@ -1,5 +1,5 @@
 1. Add more field to user table (done)
-2. Add role functionality
+2. Add role functionality (done)
 3. Add login activity logging (done)
 4. Add user activity logging
 5. Add error looging in field
@@ -9,5 +9,6 @@
 8. Add single signon ability
 9. Implement multifactor
 10. Implement password history (done)
-11. lookups
-12. Swagger documentation
+11. lookups (done)
+12. Swagger documentation (done)
+13. At login check if user is active and verified or locked(done)
