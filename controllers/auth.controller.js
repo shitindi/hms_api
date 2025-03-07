@@ -21,6 +21,11 @@ const {encryptSymmetric: encryp, decryptSymmetric: decrypt} = require('../helper
 const {sendMail} = require('../helpers/mailing');
 const { sequelize } = require('../helpers/sequelize_init');
 const { UserStatusHistory } = require('../models/Auth/UserStatusHistory');
+const { UserPermission } = require('../models/Auth/UserPermission');
+const { PersmissionType } = require('../models/Auth/PermisionType');
+const { GroupPermission } = require('../models/Auth/GroupPermission');
+const { Group } = require('../models/Auth/Group');
+const { UserGroup } = require('../models/Auth/UserGroup');
 
 
 const register = async (req, res, next) => {
@@ -210,7 +215,7 @@ const login = async (req, res, next) => {
 
         // Check user if exists
         let User = await Users.findOne({
-            where: { email: login.email }
+            where: { user_name: login.email }
         }
         );
 
@@ -253,7 +258,9 @@ const login = async (req, res, next) => {
             throw createError.Forbidden('Account is locked')
         }
         
-        const accessToken = await signAccessToken(User.id)
+        const userPermissions = await loadUserPermissions(User.id, User.tenant_id)
+
+        const accessToken = await signAccessToken(User.id, User.tenant_id, userPermissions)
         const refreshToken = await signRefreshToken(User.id)
 
         //reset user login retry count
@@ -516,7 +523,13 @@ const refresh = async (req, res, next) => {
         const userId = await verifyRefreshToken(refreshToken)
         
         //Generate a pair of refresh and access tokens
-        const accessToken = await signAccessToken(userId)
+        const User = await Users.findOne({
+            where: {id: userId}, attributes: ['tenant_id'],
+        })
+
+        const userPermissions = await loadUserPermissions(User.id, User.tenant_id)
+
+        const accessToken = await signAccessToken(userId, User.tenant_id, userPermissions)
         const newRefreshToken = await signRefreshToken(userId)
 
         let session = await ActiveSession.findOne({
@@ -644,7 +657,45 @@ const destroySession = async( userId) => {
 
 }
 
+const loadUserPermissions = async(userId, tenantId) => {
+    try{
+        const userPermission = await UserPermission.findAll({
+            where: {user_id: userId, tenant_id: tenantId}
+        })
 
+        const groupPermission = await GroupPermission.findAll({
+            where: {tenant_id: tenantId},
+            include: [
+                {
+                    model: UserGroup,
+                    where: {user_id: userId}
+                }
+            ]
+        })
+        let resUserPermission = []
+        let resGroupPermission = []
+        if (userPermission && userPermission.length > 0){
+            userPermission.forEach( perm=> {
+                resUserPermission.push({module: perm.module_id, permission: perm.permission_type})
+            })
+        }
+
+        if (groupPermission && groupPermission.length > 0){
+            groupPermission.forEach (perm => {
+               let found =   resUserPermission.find( item => {
+                    return item.module ==  perm.module_id
+               })
+               if (!found )
+                    resGroupPermission.push({module: perm.module_id, permission: perm.permission_type})
+            })
+        }
+
+        return resUserPermission.concat(resGroupPermission)
+
+    }catch(err){
+        logData('loadUserPermissions: ' + err)
+    }
+}
 
 module.exports = {
     register,

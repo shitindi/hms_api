@@ -30,7 +30,7 @@ swaggerDocs(app, );
 
 app.use("/auth", authRoute)
 app.use("/admin", adminRoute)
-app.use("/lookup", lookupRoute)
+app.use("/lookups", lookupRoute)
 
 
 // Catch all routes

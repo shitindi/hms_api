@@ -35,4 +35,7 @@ const logUserActivity = async (user_id, module_item_id, activity_type, is_succes
   }
 }
 
-module.exports = {logData}
+module.exports = {
+  logData,
+  logUserActivity
+}

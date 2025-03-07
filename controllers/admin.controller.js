@@ -9,7 +9,7 @@ const { GroupPermission } = require('../models/Auth/GroupPermission')
 const {UserPermission} = require('../models/Auth/UserPermission')
 const { PersmissionType} = require('../models/Auth/PermisionType')
 const { Module: Modules } = require('../models/Auth/Module')
-const { logData } = require('../helpers/logger');
+const { logData, logUserActivity,  } = require('../helpers/logger');
 const { request } = require('express');
 const { Tenant: Tenants } = require('../models/Auth/Tenant');
 const { TenantStatus} = require('../models/Auth/TenantStatus')
@@ -49,6 +49,10 @@ const groupDetails = async (req, res, next) => {
             })
         }
 
+        const { userId, tenatId} =  req.jwtPayload;
+
+        await logUserActivity(userId, 2, 4, true)
+
         res.status(200).json(
             groupList
         )
@@ -68,6 +72,7 @@ const editGroup = async (req, res, next) => {
             where: { [Op.and]: { group_name: group.group_name, tenant_id: group.tenant_id } }
         });
 
+        let action = 0;
         // Exist same group name in same tenant
         if (Group) {
             // if ID is present then is for update
@@ -75,12 +80,14 @@ const editGroup = async (req, res, next) => {
                 Groups.update(
                     group, { where: { id: group.id } }
                 )
+                action = 2
             }
 
             createError.Conflict('The group name already exists!')
         } else {
             // Otherwise create new group
-            await Groups.create(group)
+          group =  await Groups.create(group)
+          action = 1
         }
 
 
@@ -90,7 +97,8 @@ const editGroup = async (req, res, next) => {
             message: "Group details updated successfuly!",
         })
 
-
+        const { userId, tenatId} =  req.jwtPayload;
+        await logUserActivity(userId, 2, action, true, group.id)
 
     } catch (err) {
         logData('createGroup: +' + err)

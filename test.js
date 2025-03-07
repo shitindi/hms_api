@@ -2,6 +2,7 @@ const {encryptSymmetric: encryp, decryptSymmetric: decrypt} = require('./helpers
 const {getRandomNumber, getRandomString} = require('./helpers/code_generator')
 const {sendMail} = require('./helpers/mailing')
 const { addDbDateNow, getDbDateNow } = require('./helpers/utility')
+const {updateAuthDbSchema, seedAuthDatabase}  = require('./helpers/seed_data')
 require('dotenv').config()
 
 const runSymmetryCrypto = () =>
@@ -71,8 +72,7 @@ const testRandomGen = () => {
 
 // let eventTime =  new Date(new Date().setHours(new Date().getHours() + 1)).toISOString().slice(0, 19).replace('T', ' ');
 
+///Seed database
+//updateAuthDbSchema()
 
-
-
-
-console.log('later date: ' + nowDate )
+seedAuthDatabase()

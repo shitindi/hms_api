@@ -31,8 +31,8 @@ const verifyAccessToken = (req, res, next) => {
             }
         }
            // req.payload = payload
-            req.payload = payload
-
+            req.jwtPayload = payload
+    
             next()
         
     }

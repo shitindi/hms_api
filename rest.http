@@ -7,8 +7,8 @@ POST  http://localhost:7000/auth/login
 Content-Type: application/json
  
 {
-    "email": "bobndina@hotmail.com",
-    "password": "bob@123" 
+    "email": "admim@mycompany.com",
+    "password": "Developer@123" 
 }
 
 ### Register Route  
@@ -36,3 +36,8 @@ Content-Type: application/json
 {
     "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6WzBdLCJpYXQiOjE3MTUwNzMyNjEsImV4cCI6MTcxNzY2NTI2MSwiYXVkIjoiMSIsImlzcyI6ImJ5dGV3YXJlLmNvLnR6In0.WP8aYKEFxTkuvZ4KvhfpsTOq8tqjGkAiZzWVYbupwyM"
 }
+
+
+### Lookups
+GET http://localhost:7000/lookups/activation-types
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInRlbmFudElkIjoxLCJyb2xlcyI6WzBdLCJpYXQiOjE3NDEzNDMzNDEsImV4cCI6MTc0MTQyOTc0MSwiYXVkIjoiMSIsImlzcyI6ImJ5dGV3YXJlLmNvLnR6In0.DBC-pJEdeo4gsmdKUoJpBHoA75FIG1-qgr3oMTkXSnk

@@ -7,10 +7,12 @@ const {Op} = require('sequelize')
 const JWT = require('jsonwebtoken')
 const createError = require('http-errors')
 
-const signAccessToken =  (userId, roles = [0]) => {
+const signAccessToken =  (userId, tenantId, roles = []) => {
     return new Promise((resolve, reject) => {
         
         const payload = {
+            userId,
+            tenantId,
             roles
         }
         const secret = process.env.ACCESS_TOKEN_SECRET 
@@ -31,11 +33,13 @@ const signAccessToken =  (userId, roles = [0]) => {
     })
 }
 
-const signRefreshToken = (userId, roles = [0]) => {
+const signRefreshToken = (userId, tenantId, roles = []) => {
 
     return new Promise( (resolve, reject) => {
         
         const payload = {
+            userId,
+            tenantId,
             roles
         }
         

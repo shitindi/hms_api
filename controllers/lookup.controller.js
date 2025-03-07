@@ -11,6 +11,8 @@ const {Module} = require('../models/Auth/Module')
 const activationType = async (req, res, next) => {
 
     try{
+        console.log("User ID: ", req.jwtPayload.userId, ', Tenant Id: ', req.jwtPayload.tenantId,', roles: ', req.jwtPayload.roles,
+             ', Path: ', req.path)
         const activationTypes = await ActivationType.findAll()
 
         res.status(200).json( activationTypes)

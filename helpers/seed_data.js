@@ -2,7 +2,7 @@ const {logData} = require('../helpers/logger')
 const {ActivationCode} = require('../models/Auth/ActivationCode')
 const {ActivationType} = require('../models/Auth/ActivationType')
 const {ActiveSession} = require('../models/Auth/ActiveSession')
-const {Contact} = require('..//models/Auth/Contact')
+const {Contact} = require('../models/Auth/Contact')
 const {LoginAttempt} = require('../models/Auth/LoginAttempt')
 const {PasswordHistory} = require('..//models/Auth/PasswordHistory')
 const {SessionHistory} = require('../models/Auth/SessionHistory')
@@ -24,23 +24,25 @@ const {UserPermission} = require('../models/Auth/UserPermission')
 const {ActivityLog} = require('../models/Auth/ActivityLog')
 const {ActivityType} = require('../models/Auth/ActivityType')
 
-
 const {hashPassword} = require('./hash_data')
+
 
 const seedAuthDatabase = async () => {
     try{
 
    
-    const activationTypesCount = ActivationType.count()
-    const tenantStatusCount = TenantStatus.count()
-    const userStatusCount = UserStatus.count()
-    const usersCount = User.count()
-    const permissionTypCount = PersmissionType.count()
-    const activityTypeCount = ActivityType.count()
-    const moduleCount = Module.count()
+    const activationTypesCount = await ActivationType.count()
+    const tenantStatusCount = await TenantStatus.count()
+    const userStatusCount = await UserStatus.count()
+    const usersCount = await User.count()
+    const permissionTypCount = await PersmissionType.count()
+    const activityTypeCount = await ActivityType.count()
+    const moduleCount = await Module.count()
+
+    console.log('activationCount: ' + activationTypesCount, ', tenantCount: ', tenantStatusCount, ', userStatuscount: ', userStatusCount, ', usersCount: ', usersCount)
 
     if (moduleCount==0){
-       const Module = await Module.create({
+       const module = await Module.create({
             id: 1,
           module_name: 'User management',
            code: 1001,
@@ -48,13 +50,13 @@ const seedAuthDatabase = async () => {
            is_active: true
        })
 
-       if (Module && Module.id > 0){
+       if (module && module.id > 0){
         ModuleItem.bulkCreate([
-            {id: 1, item_name: 'Users' , module_id: Module.id , code: 101},
-            {id: 2, item_name: 'Groups' , module_id: Module.id , code: 102},
-            {id: 3, item_name: 'User Group' , module_id: Module.id , code: 103},
-            {id: 4, item_name: 'Group Permission' , module_id: Module.id , code: 104},
-            {id: 5, item_name: 'User Permission' , module_id: Module.id , code: 105 }
+            {id: 1, item_name: 'Users' , module_id: module.id , code: 101},
+            {id: 2, item_name: 'Groups' , module_id: module.id , code: 102},
+            {id: 3, item_name: 'User Group' , module_id: module.id , code: 103},
+            {id: 4, item_name: 'Group Permission' , module_id: module.id , code: 104},
+            {id: 5, item_name: 'User Permission' , module_id: module.id , code: 105 }
         ])
        }
     }
@@ -79,14 +81,25 @@ const seedAuthDatabase = async () => {
     }
 
     if (userStatusCount == 0){
+       
         await UserStatus.bulkCreate([
             {id:1, name:'Active'}, {id:2, name: 'Blocked by System'}, {id:3, name: 'Locked by user'}, {id:4, name: 'Deleted'}, {id:5, name: 'Not verified'}
         ])
     }
 
     if(usersCount == 0){
+        /*
+        const  cont = await Contact.create(
+            {    first_name: 'Ndinao',middle_name: 'Andrew', last_name: 'Shitindi',email: 'ndinao@hotmail.com', 
+                mobile_no: '0715432268',  phone: '0779786152', position: 'Senior Software Developer',address: 'Buyuni chanika' }
+        )
+
+        const tenant = await Tenant.create(
+            { tenant_name: 'Byteware inc',status_id: 1,contact_id: cont.id}
+        )
+        */
         const user = {user_name:'admim@mycompany.com', password:'', must_change_password: false,email_verified:true, sms_verified: true,
-            is_active: true, retry_count: 5, user_status: 1
+            is_active: true, retry_count: 0, user_status: 1, contact_id: 1, tenant_id: 1
         }
         user.password = await hashPassword('Developer@123')
 
@@ -110,7 +123,6 @@ const updateAuthDbSchema = async () => {
 Contact.hasOne(User, {foreignKey: {name: 'contact_id', allowNull: false}, onUpdate: 'CASCADE'})
 User.belongsTo(Contact, {foreignKey: {name: 'contact_id', allowNull: false}, onUpdate: 'CASCADE'})
 
-
 User.hasMany(Contact, {foreignKey: {name: 'created_by', allowNull: true}, onUpdate: 'CASCADE'})
 Contact.belongsTo(User, {foreignKey: {name: 'created_by', allowNull: true}, onUpdate: 'CASCADE'})
 
@@ -124,20 +136,20 @@ Tenant.belongsTo(Contact, {foreignKey: {name: 'contact_id', allowNull: false}, o
 
 
 // Activation code
-ActivationCode.hasMany(User, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
-User.belongsTo(ActivationCode, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
+User.hasMany(ActivationCode, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
+ActivationCode.belongsTo(User, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
 
 ActivationType.hasMany(ActivationCode, {foreignKey: {name: 'activation_type', allowNull: false}, onUpdate: 'CASCADE'})
 ActivationCode.belongsTo(ActivationType, {foreignKey: {name: 'activation_type', allowNull: false}, onUpdate: 'CASCADE'})
 
 // Activation session
-User.hasOne(ActiveSession, {foreignKey: {name: user_id, allowNull: false}, onUpdate: 'CASCADE'})
-ActiveSession.belongsTo(User, {foreignKey: {name: user_id, allowNull: false}, onUpdate: 'CASCADE'})
+User.hasOne(ActiveSession, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
+ActiveSession.belongsTo(User, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
 
 
 // Login attempt
-User.hasMany(LoginAttempt, {foreignKey: {name: user_id, allowNull: false}, onUpdate: 'CASCADE'})
-LoginAttempt.belongsTo(User, {foreignKey: {name: user_id, allowNull: false}, onUpdate: 'CASCADE'})
+User.hasMany(LoginAttempt, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
+LoginAttempt.belongsTo(User, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
 
 
 // Password history
@@ -146,16 +158,16 @@ User.hasMany(PasswordHistory, {foreignKey: {name: 'user_id', allowNull: false}, 
 PasswordHistory.belongsTo(User, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
 
 //Session history
-User.hasMany(SessionHistory, {foreignKey: {name: user_id, allowNull: false}, onUpdate: 'CASCADE'})
-SessionHistory.belongsTo(User, {foreignKey: {name: user_id, allowNull: false}, onUpdate: 'CASCADE'})
+User.hasMany(SessionHistory, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
+SessionHistory.belongsTo(User, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
 
 //Tenant details
 TenantStatus.hasMany(Tenant, {foreignKey: {name: 'status_id', allowNull: false}, onUpdate: 'CASCADE'})
 Tenant.belongsTo(TenantStatus, {foreignKey: {name: 'status_id', allowNull: false}, onUpdate: 'CASCADE'})
 
 // Tenants status history
-TenantStatusHistory.hasMany(Tenant, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
-Tenant.belongsTo(TenantStatusHistory, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
+Tenant.hasMany(TenantStatusHistory, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
+TenantStatusHistory.belongsTo(Tenant, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
 
 TenantStatus.hasMany(TenantStatusHistory, {foreignKey: {name: 'status_id', allowNull: false}, onUpdate: 'CASCADE'})
 TenantStatusHistory.belongsTo(TenantStatus, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
@@ -164,15 +176,15 @@ UserStatus.hasMany(User, {foreignKey: {name: 'user_status', allowNull: false}, o
 User.belongsTo(UserStatus, {foreignKey: {name: 'user_status', allowNull: false}, onUpdate: 'CASCADE'})
 
 //User Status history
-UserStatusHistory.hasMany(User, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
-User.belongsTo(User, {UserStatusHistory: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
+User.hasMany(UserStatusHistory, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
+UserStatusHistory.belongsTo(User, {UserStatusHistory: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
 
 UserStatus.hasMany(UserStatusHistory, {foreignKey: {name: 'status_id', allowNull: false}, onUpdate: 'CASCADE'})
 UserStatusHistory.belongsTo(UserStatus, {foreignKey: {name: 'status_id', allowNull: false}, onUpdate: 'CASCADE'})
 
 // Group data
 User.hasMany(Group, {foreignKey: {name: 'created_by', allowNull: false}, onUpdate: 'CASCADE'})
-User.belongsTo(Contact, {foreignKey: {name: 'created_by', allowNull: false}, onUpdate: 'CASCADE'})
+Group.belongsTo(User, {foreignKey: {name: 'created_by', allowNull: false}, onUpdate: 'CASCADE'})
 
 Tenant.hasMany(Group, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
 Group.belongsTo(Tenant, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
@@ -185,8 +197,8 @@ UserGroup.belongsTo(Tenant, {foreignKey: {name: 'tenant_id', allowNull: false}, 
 User.hasMany(UserGroup, {foreignKey: {name: 'created_by', allowNull: false}, onUpdate: 'CASCADE'})
 UserGroup.belongsTo(User, {foreignKey: {name: 'created_by', allowNull: false}, onUpdate: 'CASCADE'})
 
-UserGroup.hasMany(User, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
-User.belongsTo(UserGroup, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
+User.hasMany(UserGroup, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
+UserGroup.belongsTo(User, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
 
 Group.hasMany(UserGroup, {foreignKey: {name: 'group_id', allowNull: false}, onUpdate: 'CASCADE'})
 UserGroup.belongsTo(Group, {foreignKey: {name: 'group_id', allowNull: false}, onUpdate: 'CASCADE'})
@@ -263,7 +275,21 @@ ModuleItem.belongsTo(Module, {foreignKey: {name: 'module_id', allowNull: false},
   .then( data =>{})
   .catch( err => console.log('Create tbl auth_tbl_activity_type: ' + err))
 
+  await ActivationCode.sync({alter: true})
+  .then( data =>{})
+  .catch( err => console.log('Create tbl activation_code: ' + err))
 
+
+
+
+
+  await Tenant.sync({alter: true})
+  .then( data =>{})
+  .catch( err => console.log('Create tbl Tenant: ' + err))
+
+  await TenantStatusHistory.sync({alter: true})
+  .then( data =>{})
+  .catch( err => console.log('Create tbl tenant_status_history: ' + err))
 
 
   await User.sync({alter: true})
@@ -291,20 +317,6 @@ ModuleItem.belongsTo(Module, {foreignKey: {name: 'module_id', allowNull: false},
  await ActiveSession.sync({alter: true})
   .then( data =>{})
   .catch( err => console.log('Create tbl ActiveSession: ' + err))
-
- await ActivationCode.sync({alter: true})
-  .then( data =>{})
-  .catch( err => console.log('Create tbl activation_code: ' + err))
-
-
-  await Tenant.sync({alter: true})
-  .then( data =>{})
-  .catch( err => console.log('Create tbl Tenant: ' + err))
-
-  await TenantStatusHistory.sync({alter: true})
-  .then( data =>{})
-  .catch( err => console.log('Create tbl tenant_status_history: ' + err))
-
 
 await UserStatusHistory.sync({alter: true})
 .then( data =>{})
@@ -340,7 +352,7 @@ await Module.sync({alter: true})
   .catch( err => console.log('Create tbl auth_tbl_module_item ' + err))
 
 }catch(error){
-    console.log('SeedDatabase: ' + error)
+    console.log('updateDatabse: ' + error)
 }
 
 }

@@ -6,7 +6,7 @@ const ActivationCode = db.define('auth_tbl_activation_code', {
         allowNull: false,
     },
     activation_type: {          // 1 email, 2 sms, 3 otp code, 4 password reset by email
-        type: DataTypes.INTEGER,
+        type: DataTypes.TINYINT,
         allowNull: false
     },
 
