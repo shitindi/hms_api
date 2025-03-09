@@ -22,6 +22,8 @@ const addMinutesDbDate = (timeOffset) => {
 
 // Convert database date and time format to javascript format
 const getJSDateFromDb = (dbDate) =>{
+    console.log('DB DATE: ', dbDate)
+    dbDate = dbDate.toISOString().replace('Z', '').replace('T', ' ')
     // Split timestamp into [ Y, M, D, h, m, s ]
     var t = dbDate.split(/[- :]/);
 

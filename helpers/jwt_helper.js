@@ -79,39 +79,62 @@ const signRefreshToken = (userId, tenantId, roles = []) => {
 }
 
 
-const verifyRefreshToken = refreshToken => {
-    const secret =  process.env.REFRESH_TOKEN_SECRET
-   return new Promise( (resolve, reject) => {
-    JWT.verify(refreshToken, secret, (err, payload) => {
-        if (err) return reject(createError.Unauthorized())
-        
-        // extract userid from redis
+const verifyRefreshToken = async refreshToken => {
+    try{
+        const secret =  process.env.REFRESH_TOKEN_SECRET
+
+        const payload =  JWT.verify(refreshToken, secret)
+
         const userId = payload.aud
 
-        let User = Session.findOne({
+        let User = await Session.findOne({
             where: {[Op.and] : {user_id: userId, refresh_token: refreshToken}}
         })
         
         if (!User){
-            return reject(createError.Unauthorized()) 
+            throw createError.Unauthorized()
         }
-        /*
-        client.GET(userId.toString())
-        .then( result => {
-            if (refreshToken ===result) return resolve(userId)
 
-            reject(createError.Unauthorized())
-        })
-        .catch( err =>{
-            logData('verifyRefreshToken: ' + err)
-            reject(createError.InternalServerError())
-            return
-        })
-        */
+        return userId
 
-        resolve(userId)
-    })
-   })  
+    }catch(err){
+        logData('verifyRefreshToken: ', err)
+        throw(err)
+    }
+
+  
+//    return new Promise( (resolve, reject) => {
+//     JWT.verify(refreshToken, secret, (err, payload) => {
+//         if (err) return reject(createError.Unauthorized())
+        
+//         // extract userid from redis
+//         const userId = payload.aud
+
+//         let User = Session.findOne({
+//             where: {[Op.and] : {user_id: userId, refresh_token: refreshToken}}
+//         })
+        
+//         if (!User){
+//             return reject(createError.Unauthorized()) 
+//         }
+//         /*
+//         client.GET(userId.toString())
+//         .then( result => {
+//             if (refreshToken ===result) return resolve(userId)
+
+//             reject(createError.Unauthorized())
+//         })
+//         .catch( err =>{
+//             logData('verifyRefreshToken: ' + err)
+//             reject(createError.InternalServerError())
+//             return
+//         })
+//         */
+
+//         resolve(userId)
+//     })
+
+//    })  
 }
 
 module.exports = {

@@ -1,0 +1,89 @@
+GET http://localhost:7000/admin
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6WzBdLCJpYXQiOjE3MTQ5Nzg4MzgsImV4cCI6MTcxNDk4MjQzOCwiYXVkIjoiMSIsImlzcyI6ImJ5dGV3YXJlLmNvLnR6In0.cq7YXybty6w3RQ-H1hYvr_ljAiKCvTmNjV3thjayhLg
+
+
+### Register Route  
+POST  http://localhost:7000/auth/register
+Content-Type: application/json
+ 
+{
+  "first_name": "Ndinao",
+  "middle_name": "andrew",
+  "last_name": "Shitindi",
+  "email": "ndinao@hotmail.com",
+  "mobile_no": "0715432268",
+  "position": "Senior Software Developer",
+  "address": "112, Buyuni chanika",
+  "created_by": 4,
+  "user_name": "ndinao@hotmail.com",
+  "password": "bob@123",
+  "confirm_password": "bob@123",
+  "must_change_password": true,
+  "tenant_id": 2,
+  "user_status": 5,
+  "contact_type": 1
+}
+
+### Verify email
+GET http://localhost:7000/auth/verifyEmail?lnk=eyJyZWZlcmVyIjoiSGhBeEI2T1kvUkNvSDlSakxwT2JTbGJpODVoRStmZ0dlMVBtZS9HQ3IvRG5PQ2xRRGlUblh2UzdJQTBuM0tNaGlNNlhPcU9uRlA1RlFlbDU1SS9jcCtTdnF5cXVJelNDaEhPbHJjVFBGdnlmbEJuZ2puNW5OUEF6bEk2QlA1U21oT3lSNnZRem5QeVJFSHdPc2VMN1d3ND0iLCJub25jZSI6ImRheEx1MDRSWnhtRCtFcTgiLCJ0YWciOnsidHlwZSI6IkJ1ZmZlciIsImRhdGEiOlsyMjYsMTgsMjQwLDcyLDE4OCwyMjIsNjcsMjExLDI1MywyMjMsODAsMTU2LDY0LDc5LDY3LDIxMV19fQ==
+
+### Login route
+
+POST  http://localhost:7000/auth/login
+Content-Type: application/json
+ 
+{
+    "email": "ndinao@hotmail.com",
+    "password":  "shitindi@123"
+}
+
+### Forgot password
+POST  http://localhost:7000/auth/forgot-password
+Content-Type: application/json
+ 
+{
+    "email": "ndinao@hotmail.com"
+}
+
+
+### Reset password
+POST  http://localhost:7000/auth/reset-password
+Content-Type: application/json
+
+{
+  "reset_code": 99986699,
+  "newPassword": "shitindi@123",
+  "confirmPassword": "shitindi@123"
+}
+
+### Change Password
+POST  http://localhost:7000/auth/update-password
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEwLCJ0ZW5hbnRJZCI6Miwicm9sZXMiOltdLCJpYXQiOjE3NDE0Njk4OTUsImV4cCI6MTc0MTU1NjI5NSwiYXVkIjoiMTAiLCJpc3MiOiJieXRld2FyZS5jby50eiJ9.-M2uuw_0RF-E_URSlLCrjxWtyYV-wfF-YoqvxcB0aN8
+Content-Type: application/json
+ 
+{
+    "email": "ndinao@hotmail.com",
+    "password":  "bob@123",
+    "newPassword": "ndina@123",
+    "confirmPassword": "ndina@123"
+}
+
+
+
+### Refresh token Route
+POST  http://localhost:7000/auth/refresh-token 
+Content-Type: application/json
+
+{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6WzBdLCJpYXQiOjE3MTQ5ODE2OTEsImV4cCI6MTcxNzU3MzY5MSwiYXVkIjoiMSIsImlzcyI6ImJ5dGV3YXJlLmNvLnR6In0.Tpr1pTpFI_4mEAP7behgL7JSj4VCQfbftumjBUPlUsw"
+}
+
+### Logout Route
+
+POST   http://localhost:7000/auth/logout
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEwLCJ0ZW5hbnRJZCI6Miwicm9sZXMiOltdLCJpYXQiOjE3NDE1MjA3NTksImV4cCI6MTc0MTYwNzE1OSwiYXVkIjoiMTAiLCJpc3MiOiJieXRld2FyZS5jby50eiJ9.r4Di8nMHYzG_bLyD0JSvY65veQqW5JvQHlkZ7Ede7r8
+
+
+### Lookups
+GET http://localhost:7000/lookups/activation-types
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEwLCJ0ZW5hbnRJZCI6Miwicm9sZXMiOltdLCJpYXQiOjE3NDE1MjA3NTksImV4cCI6MTc0MTYwNzE1OSwiYXVkIjoiMTAiLCJpc3MiOiJieXRld2FyZS5jby50eiJ9.r4Di8nMHYzG_bLyD0JSvY65veQqW5JvQHlkZ7Ede7r8

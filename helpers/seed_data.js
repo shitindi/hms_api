@@ -23,6 +23,7 @@ const {UserPermission} = require('../models/Auth/UserPermission')
 
 const {ActivityLog} = require('../models/Auth/ActivityLog')
 const {ActivityType} = require('../models/Auth/ActivityType')
+const {ContactType} = require('../models/Auth/ContactType')
 
 const {hashPassword} = require('./hash_data')
 
@@ -38,6 +39,7 @@ const seedAuthDatabase = async () => {
     const permissionTypCount = await PersmissionType.count()
     const activityTypeCount = await ActivityType.count()
     const moduleCount = await Module.count()
+    const contactTypeCount = await ContactType.count()
 
     console.log('activationCount: ' + activationTypesCount, ', tenantCount: ', tenantStatusCount, ', userStatuscount: ', userStatusCount, ', usersCount: ', usersCount)
 
@@ -59,6 +61,12 @@ const seedAuthDatabase = async () => {
             {id: 5, item_name: 'User Permission' , module_id: module.id , code: 105 }
         ])
        }
+    }
+
+    if (contactTypeCount == 0){
+        await ContactType.bulkCreate([
+            {id: 1, name: 'Staff'}
+        ])
     }
 
     if (activityTypeCount == 0){
@@ -97,9 +105,9 @@ const seedAuthDatabase = async () => {
         const tenant = await Tenant.create(
             { tenant_name: 'Byteware inc',status_id: 1,contact_id: cont.id}
         )
-        */
+     */
         const user = {user_name:'admim@mycompany.com', password:'', must_change_password: false,email_verified:true, sms_verified: true,
-            is_active: true, retry_count: 0, user_status: 1, contact_id: 1, tenant_id: 1
+            is_active: true, retry_count: 0, user_status: 1, contact_id: 2, tenant_id: 2
         }
         user.password = await hashPassword('Developer@123')
 
@@ -119,140 +127,6 @@ const seedAuthDatabase = async () => {
 const updateAuthDbSchema = async () => {
 
     try{
-// User data
-Contact.hasOne(User, {foreignKey: {name: 'contact_id', allowNull: false}, onUpdate: 'CASCADE'})
-User.belongsTo(Contact, {foreignKey: {name: 'contact_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-User.hasMany(Contact, {foreignKey: {name: 'created_by', allowNull: true}, onUpdate: 'CASCADE'})
-Contact.belongsTo(User, {foreignKey: {name: 'created_by', allowNull: true}, onUpdate: 'CASCADE'})
-
-
-// Tenant data
-Tenant.hasMany(User, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
-User.belongsTo(Tenant, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-Contact.hasOne(Tenant, {foreignKey: {name: 'contact_id', allowNull: false}, onUpdate: 'CASCADE'})
-Tenant.belongsTo(Contact, {foreignKey: {name: 'contact_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-
-// Activation code
-User.hasMany(ActivationCode, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
-ActivationCode.belongsTo(User, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-ActivationType.hasMany(ActivationCode, {foreignKey: {name: 'activation_type', allowNull: false}, onUpdate: 'CASCADE'})
-ActivationCode.belongsTo(ActivationType, {foreignKey: {name: 'activation_type', allowNull: false}, onUpdate: 'CASCADE'})
-
-// Activation session
-User.hasOne(ActiveSession, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
-ActiveSession.belongsTo(User, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-
-// Login attempt
-User.hasMany(LoginAttempt, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
-LoginAttempt.belongsTo(User, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-
-// Password history
-
-User.hasMany(PasswordHistory, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
-PasswordHistory.belongsTo(User, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-//Session history
-User.hasMany(SessionHistory, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
-SessionHistory.belongsTo(User, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-//Tenant details
-TenantStatus.hasMany(Tenant, {foreignKey: {name: 'status_id', allowNull: false}, onUpdate: 'CASCADE'})
-Tenant.belongsTo(TenantStatus, {foreignKey: {name: 'status_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-// Tenants status history
-Tenant.hasMany(TenantStatusHistory, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
-TenantStatusHistory.belongsTo(Tenant, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-TenantStatus.hasMany(TenantStatusHistory, {foreignKey: {name: 'status_id', allowNull: false}, onUpdate: 'CASCADE'})
-TenantStatusHistory.belongsTo(TenantStatus, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-UserStatus.hasMany(User, {foreignKey: {name: 'user_status', allowNull: false}, onUpdate: 'CASCADE'})
-User.belongsTo(UserStatus, {foreignKey: {name: 'user_status', allowNull: false}, onUpdate: 'CASCADE'})
-
-//User Status history
-User.hasMany(UserStatusHistory, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
-UserStatusHistory.belongsTo(User, {UserStatusHistory: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-UserStatus.hasMany(UserStatusHistory, {foreignKey: {name: 'status_id', allowNull: false}, onUpdate: 'CASCADE'})
-UserStatusHistory.belongsTo(UserStatus, {foreignKey: {name: 'status_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-// Group data
-User.hasMany(Group, {foreignKey: {name: 'created_by', allowNull: false}, onUpdate: 'CASCADE'})
-Group.belongsTo(User, {foreignKey: {name: 'created_by', allowNull: false}, onUpdate: 'CASCADE'})
-
-Tenant.hasMany(Group, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
-Group.belongsTo(Tenant, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-
-// UserGroup data
-Tenant.hasMany(UserGroup, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
-UserGroup.belongsTo(Tenant, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-User.hasMany(UserGroup, {foreignKey: {name: 'created_by', allowNull: false}, onUpdate: 'CASCADE'})
-UserGroup.belongsTo(User, {foreignKey: {name: 'created_by', allowNull: false}, onUpdate: 'CASCADE'})
-
-User.hasMany(UserGroup, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
-UserGroup.belongsTo(User, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-Group.hasMany(UserGroup, {foreignKey: {name: 'group_id', allowNull: false}, onUpdate: 'CASCADE'})
-UserGroup.belongsTo(Group, {foreignKey: {name: 'group_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-
-// Group permission data
-User.hasMany(GroupPermission, {foreignKey: {name: 'created_by', allowNull: false}, onUpdate: 'CASCADE'})
-GroupPermission.belongsTo(User, {foreignKey: {name: 'created_by', allowNull: false}, onUpdate: 'CASCADE'})
-
-Group.hasMany(GroupPermission, {foreignKey: {name: 'group_id', allowNull: false}, onUpdate: 'CASCADE'})
-GroupPermission.belongsTo(Group, {foreignKey: {name: 'group_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-PersmissionType.hasMany(GroupPermission, {foreignKey: {name: 'permission_type', allowNull: false}, onUpdate: 'CASCADE'})
-GroupPermission.belongsTo(PersmissionType, {foreignKey: {name: 'permission_type', allowNull: false}, onUpdate: 'CASCADE'})
-
-Module.hasMany(GroupPermission, {foreignKey: {name: 'module_id', allowNull: false}, onUpdate: 'CASCADE'})
-GroupPermission.belongsTo(Module, {foreignKey: {name: 'module_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-Tenant.hasMany(GroupPermission, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
-GroupPermission.belongsTo(Tenant, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-// User permision data
-User.hasMany(UserPermission, {foreignKey: {name: 'created_by', allowNull: false}, onUpdate: 'CASCADE'})
-UserPermission.belongsTo(User, {foreignKey: {name: 'created_by', allowNull: false}, onUpdate: 'CASCADE'})
-
-User.hasMany(UserPermission, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
-UserPermission.belongsTo(User, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-PersmissionType.hasMany(UserPermission, {foreignKey: {name: 'permission_type', allowNull: false}, onUpdate: 'CASCADE'})
-UserPermission.belongsTo(PersmissionType, {foreignKey: {name: 'permission_type', allowNull: false}, onUpdate: 'CASCADE'})
-
-Module.hasMany(UserPermission, {foreignKey: {name: 'module_id', allowNull: false}, onUpdate: 'CASCADE'})
-UserPermission.belongsTo(Module, {foreignKey: {name: 'module_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-Tenant.hasMany(UserPermission, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
-UserPermission.belongsTo(Tenant, {foreignKey: {name: 'tenant_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-Module.hasMany(UserPermission, {foreignKey: {name: 'module_id', allowNull: false}, onUpdate: 'CASCADE'})
-UserPermission.belongsTo(Module, {foreignKey: {name: 'module_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-
-// Activity logs data
-User.hasMany(ActivityLog, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
-ActivityLog.belongsTo(User, {foreignKey: {name: 'user_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-ModuleItem.hasMany(ActivityLog, {foreignKey: {name: 'module_item_id', allowNull: false}, onUpdate: 'CASCADE'})
-ActivityLog.belongsTo(ModuleItem, {foreignKey: {name: 'module_item_id', allowNull: false}, onUpdate: 'CASCADE'})
-
-ActivityType.hasMany(ActivityLog, {foreignKey: {name: 'activity_type', allowNull: false}, onUpdate: 'CASCADE'})
-ActivityLog.belongsTo(ActivityType, {foreignKey: {name: 'activity_type', allowNull: false}, onUpdate: 'CASCADE'})
-
-// Module Item data
-Module.hasMany(ModuleItem, {foreignKey: {name: 'module_id', allowNull: false}, onUpdate: 'CASCADE'})
-ModuleItem.belongsTo(Module, {foreignKey: {name: 'module_id', allowNull: false}, onUpdate: 'CASCADE'})
 
 //Lookups
  await ActivationType.sync({alter: true})
@@ -279,6 +153,9 @@ ModuleItem.belongsTo(Module, {foreignKey: {name: 'module_id', allowNull: false},
   .then( data =>{})
   .catch( err => console.log('Create tbl activation_code: ' + err))
 
+  await ContactType.sync({alter: true})
+  .then( data =>{})
+  .catch( err => console.log('Create tbl contact_type: ' + err))
 
 
 

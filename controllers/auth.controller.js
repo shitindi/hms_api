@@ -1,3 +1,4 @@
+//require('../models/Auth/Associations')
 const {User: Users, createUserObject} = require('../models/Auth/User');
 const {Contact: Contacts, createContactObject} = require('../models/Auth/Contact')
 const { Op } = require('sequelize')
@@ -10,7 +11,7 @@ const {PasswordHistory} = require('../models/Auth/PasswordHistory')
 
 const createError = require('http-errors');
 const { addHourDbDateNow, getDbDateNow, addMinutesDbDate, getJSDateFromDb } = require('../helpers/utility')
-const {authSchema, passUpdate, emailSchema, passReset, contactSchema, groupSchema} = require('../helpers/auth_validation_schema')
+const {authSchema, passUpdate, emailSchema, passReset, contactSchema, userSchema} = require('../helpers/auth_validation_schema')
 const  hash = require('../helpers/hash_data')
 const {signAccessToken, signRefreshToken, verifyRefreshToken} = require('../helpers/jwt_helper');
 //const client = require('../helpers/init_redis');
@@ -22,10 +23,10 @@ const {sendMail} = require('../helpers/mailing');
 const { sequelize } = require('../helpers/sequelize_init');
 const { UserStatusHistory } = require('../models/Auth/UserStatusHistory');
 const { UserPermission } = require('../models/Auth/UserPermission');
-const { PersmissionType } = require('../models/Auth/PermisionType');
 const { GroupPermission } = require('../models/Auth/GroupPermission');
-const { Group } = require('../models/Auth/Group');
 const { UserGroup } = require('../models/Auth/UserGroup');
+const {Group} = require('../models/Auth/Group');
+const { PersmissionType } = require('../models/Auth/PermisionType');
 
 
 const register = async (req, res, next) => {
@@ -34,23 +35,26 @@ const register = async (req, res, next) => {
     try {
      
         // Validate request data
-        const user = await userSchema.validateAsync(req.body);   //This will throw error which will be catched in catch block
-        const contact = await contactSchema.validateAsync(req.body)
-
+        //const user = await authSchema.validateAsync(req.body);   //This will throw error which will be catched in catch block
+        let user = await userSchema.validateAsync(req.body)
+        let contact = await contactSchema.validateAsync(req.body)
+        
         const Contact = await Contacts.findOne({
             where: {email: contact.email}
         })
 
-        if (Contact) throw createError.Conflict(`${user.email} is already been registered`)
+        if (Contact) throw createError.Conflict(`${contact.email} is already been registered`)
         
-        Contact = await Contacts.create(contact, {transaction})
         // Check user if exists
         let User = await Users.findOne({
             where: { user_name: user.user_name }
         }
         );
 
-        if (User) throw createError.Conflict(`${user.email} is already been registered`)
+        if (User) throw createError.Conflict(`${user.user_name} is already been registered`)
+
+        contact = await Contacts.create(contact, {transaction})
+    
 
         const userPassword =  await hash.hashPassword(user.password)
         user.password = userPassword
@@ -78,12 +82,14 @@ const register = async (req, res, next) => {
                 event_date: getDbDateNow()
             }
 
-            UserStatusHistory.create(userStatHistory, {transaction})
+           await UserStatusHistory.create(userStatHistory, {transaction})
+
+           
 
             //Create email verification link
-            generateVerificationEmail(result.id, user.email, user.email)
+            await generateVerificationEmail(result.id, contact.email, contact.email, transaction)
 
-            transaction.commit()
+            await transaction.commit()
 
             res.status(201).json({
                 message: "User created successfully",
@@ -93,13 +99,15 @@ const register = async (req, res, next) => {
             })
 
     } catch (error) {
-        transaction.rollback()
+       await transaction.rollback()
         if (error.isJoi === true) error.status = 422
+        logData('Register: ' + error)
         next(error)
+    
     }
 }
 
-const generateVerificationEmail = async (userId, email, name) => {
+const generateVerificationEmail = async (userId, email, name, transaction) => {
     try{
         // Generate tokens to be inserted into
         const token = getRandomString(64)
@@ -110,9 +118,9 @@ const generateVerificationEmail = async (userId, email, name) => {
             expire_at: addHourDbDateNow(72)
     }
 
-    ActivationCodes.destroy({where: {user_id: userId}})
+    await ActivationCodes.destroy({where: {user_id: userId}}, {transaction})
 
-    await ActivationCodes.create(activationCode);
+    await ActivationCodes.create(activationCode, {  transaction});
 
     let tokenJson = {
         user_id: userId,
@@ -142,17 +150,19 @@ const generateVerificationEmail = async (userId, email, name) => {
     const activationLink = `${serviceUrl}?lnk=${tokenToBase64}`
 
     let textBody =  `<p>Hi ${name}, </p>`
-          textBody += '<p>Thanks  your for creating acount with us, please click the link bellow to activate your account </p>'
+          textBody += '<p>Thanks  you for creating acount with us, please click the link bellow to activate your account </p>'
           textBody += `<p><a href="${activationLink}">Activate My Account</a></p>`
 
-    sendMail(email, textBody)
+    await sendMail(email, textBody)
     
     }catch(err){
         logData('generateVerificationEmail: ' + err)
+        throw(err)
     }
 }
 
 const  verifyEmail = async (req, res, next) => {
+    const transaction = await sequelize.transaction();
 
     try{
         const key =  process.env.CRYPTOGRAPHY_SECRET
@@ -165,15 +175,17 @@ const  verifyEmail = async (req, res, next) => {
 
         const tokenObj =   JSON.parse(plaintext)
 
+
         const ActCode = await ActivationCodes.findOne({
-            where: {[Op.and]: {user_id: tokenObj.user_id, user_token: tokenObj.user_token}}
+            where: {[Op.and]: {user_id: tokenObj.user_id}}
         })
 
-        if(!ActCode || ActCode.activation_type !=1){
+
+        if(!ActCode || ActCode.activation_type !=1 || tokenObj.token != ActCode.user_token){
             throw createError.NotFound("Activation link is not valid")
         }
 
-        const User = await Users.findOne({
+        let User = await Users.findOne({
             where: {id: tokenObj.user_id}
         })
 
@@ -181,15 +193,22 @@ const  verifyEmail = async (req, res, next) => {
             throw createError.NotFound("Activation link is not valid") 
         }
 
+        if (User.email_verified == true){
+            throw createError.Forbidden("This email is already verified!")
+        }
+
         let eventTime = getDbDateNow()
 
         User.email_verified = true
         User.is_active = true
         User.activated_date=eventTime
+        User.user_status = 1
 
-        Users.update(User, {
-            where: {id:tokenObj.user_id}, fields: ['email_verified', 'is_active', 'activated_date']
-        })
+
+       const update = await Users.update(User.dataValues, {
+            where: {id:tokenObj.user_id}, fields: ['email_verified', 'is_active', 'activated_date', 'user_status']
+        }, {transaction})
+
 
         const userStatHistory = {
             user_id: tokenObj.user_id,
@@ -198,12 +217,15 @@ const  verifyEmail = async (req, res, next) => {
             event_date: getDbDateNow()
         }
 
-        UserStatusHistory.create(userStatHistory, {transaction})
+       await UserStatusHistory.create(userStatHistory, {transaction})
+
+      await transaction.commit()
 
         res.status(200).json({
             message: "Email verified successfully",
         })
     }catch(err){
+       await transaction.rollback()
         logData('verifyEmail: ' + err)
         next(err)
     }
@@ -234,13 +256,13 @@ const login = async (req, res, next) => {
         if (!isMatch){
 
             //increment login attempt fails, usefull for account lock feature
-           Users.increment( {retry_count: +1}, {where: {id: User.id}})
+          await Users.increment( {retry_count: +1}, {where: {id: User.id}})
 
            if(User.retry_count >=  passwordRetryCount){
             User.is_active = false
             User.user_status = 2
-            Users.update(
-                User, {where: {id:User.id}, fields:['is_active', 'user_status']}
+           await Users.update(
+                User.dataValues, {where: {id:User.id}, fields:['is_active', 'user_status']}
             );
                 throw createError.Forbidden('User account locked')
            }
@@ -265,8 +287,8 @@ const login = async (req, res, next) => {
 
         //reset user login retry count
         User.retry_count = 0;
-        Users.update(
-            User, {where: {id:User.id}, fields:['retry_count']}
+       await Users.update(
+            User.dataValues, {where: {id:User.id}, fields:['retry_count']}
         );
 
         await logSessionData(User.id, req.ip, accessToken, refreshToken);
@@ -283,11 +305,12 @@ const login = async (req, res, next) => {
 }
 
 const changePassword = async (req, res, next) => {
+    const transaction = await sequelize.transaction();
     try{
-        const login = await passUpdate.validateAsync(req.body); 
+        let login = await passUpdate.validateAsync(req.body); 
 
         let User = await Users.findOne({
-            where: { email: login.email }
+            where: { user_name: login.email }
         }
         );
 
@@ -298,15 +321,20 @@ const changePassword = async (req, res, next) => {
         const isMatch = await hash.isPasswordmatch(login.password, User.password)
 
         if(!isMatch){
-            throw createError.NotFound("User not registered")
+            throw createError.NotFound("Password did not match")
         }
 
-        const newPassword = await hash.hashPassword(user.password)
+        const newPassword = await hash.hashPassword(login.newPassword)
+
         User.password = newPassword
         User.retry_count = 0
         User.must_change_password = false
 
-        Users.update(User, {where :{id: User.id}, fields: ['password', 'retry_count', 'must_change_password']})
+        Users.update(User.dataValues, 
+            {where :{id: User.id}, 
+            fields: ['password', 'retry_count', 'must_change_password']},
+            {transaction}
+        )
 
           //Log first password usage
           const passUsage = {
@@ -317,7 +345,10 @@ const changePassword = async (req, res, next) => {
         }
 
         await PasswordHistory.update(
-            passUsage, {where:{[Op.and]: {user_id: User.id, is_active: true}}, fields: ['user_id', 'end_date', 'is_active']}
+            passUsage, 
+            {where:{[Op.and]: {user_id: User.id, is_active: true}}, 
+            fields: ['user_id', 'end_date', 'is_active'] },
+            {transaction}
         )
 
           //Log first password usage
@@ -329,14 +360,16 @@ const changePassword = async (req, res, next) => {
         
         }
 
-        await PasswordHistory.create(newPassUsage)
+        await PasswordHistory.create(newPassUsage,  {transaction})
 
+       await transaction.commit()
         res.status(200).json({
             message: "Password updated successfuly!",
         })
 
 
     }catch(error){
+        await transaction.rollback
         logData('changePassword: ' + error)
         next(error)
     }
@@ -344,7 +377,7 @@ const changePassword = async (req, res, next) => {
 
 const requestForgotPasswordWeb = async( req, res, next) => {
     try{
-        const request = await emailSchema.validateAsync(req.body); 
+        let request = await emailSchema.validateAsync(req.body); 
 
         const Contact = await Contacts.findOne({
             where: {email: request.email}
@@ -408,80 +441,103 @@ const requestForgotPasswordWeb = async( req, res, next) => {
 }
 
 const requestForgotPasswordApp = async( req, res, next) => {
-    try{
-        const request = await emailSchema.validateAsync(req.body); 
 
-        const Contact = await Contacts.findOne({
-            where: {email: request.email}
-            , include: [Users]
+    const transaction = await sequelize.transaction()
+    try{
+        let request = await emailSchema.validateAsync(req.body); 
+
+        const User = await Users.findOne({
+            
+             include: [ 
+                {
+                    model: Contacts,
+                    where: {email: request.email}
+                }
+             ]
         })
-        if(!Contact)
+
+        if(!User)
             throw createError.NotFound('The Email specified could not found')
-        else if (Contact?.User?.email_verified != true)
+        else if (User.email_verified != true)
             throw createError.Forbidden('The Specified email has not bee verified')
 
         const token = getRandomNumber(8)
 
         const activationCode = {
-            user_id: Contact.User.id,
+            user_id: User.id,
             activation_type: 4,
             user_code: token,
             expire_at: addMinutesDbDate(10)
 
         }
 
-        await ActivationCodes.create(activationCode)
+        await ActivationCodes.destroy(
+            {where: {user_id:User.id, activation_type: 4} },
+            {transaction}
+        )
 
-        const name = `${Contact.first_name}`
+        await ActivationCodes.create(activationCode, {transaction})
+
+        const name = `${User.user_name}`
 
     let textBody =  `<p>Hi ${name}, </p>`
           textBody += '<p>You have sent a request to reset your password, bellow is your reset code; valid within 10 minutes</p>'
           textBody += `<p><b>${token}</b></p>`
 
-    sendMail(email, textBody)
-
-        res.status(200).json({
-            message: "Email for password reset send successful",
+    sendMail(request.email, textBody)
+    await transaction.commit()
+    res.status(200).json({
+            message: "Email for password reset send successful, please check your email",
         })
     }catch(err){
+        await transaction.rollback()
         logData('forgotPasssowrd: ' + err)
-        next(error)
+        next(err)
     }
 }
 
 const resetPassword = async(req, res, next) => {
+    const transaction = await sequelize.transaction()
     try{
-        const user = await passReset.validateAsync(req.body);
+        let user = await passReset.validateAsync(req.body);
 
         const activationCode = await ActivationCodes.findOne({
             where: {user_code: user.reset_code}
         })
 
         if (!activationCode || activationCode.activation_type != 4){
-            createError.NotFound('The reset code entered is not valid')
+           throw createError.NotFound('The reset code entered is not valid')
         }
 
         // check if reset code date is expired
         const requestTime = new Date()
+
         const codeCreatedAt = getJSDateFromDb( activationCode.expire_at)
 
         if (requestTime > codeCreatedAt){
-            createError.Forbidden('The reset code entered already expired!')
+           throw createError.Forbidden('The reset code entered already expired!')
         }
 
-        const User = await Users.findOne({
+        let User = await Users.findOne({
             where: {id: activationCode.user_id}
         })
 
+        
         if(!User){
-            createError.NotFound('No user found with specified code')
+           throw createError.NotFound('No user found with specified code')
         }
 
-        const newPassword = await hash.hashPassword(user.password)
+        console.log('reset values: ', user)
+        const newPassword = await hash.hashPassword(user.newPassword)
+
         User.password = newPassword
-        Users.update(
-            User, {where:{id:User.id}, fields:['password']}
+        User.retry_count =1
+       const updateUser =  await Users.update(
+            User.dataValues, {where:{id:User.id}, fields:['password', 'retry_count']},
+            {transaction}
         )
+
+        console.log('updated User: ', updateUser)
 
           //Log first password usage
           const passUsage = {
@@ -492,7 +548,9 @@ const resetPassword = async(req, res, next) => {
         }
 
         await PasswordHistory.update(
-            passUsage, {where:{[Op.and]: {user_id: User.id, is_active: true}}, fields: ['user_id', 'end_date', 'is_active']}
+            passUsage,
+             {where:{[Op.and]: {user_id: User.id, is_active: true}}, fields: ['user_id', 'end_date', 'is_active']},
+             {transaction}
         )
 
           //Log first password usage
@@ -504,15 +562,17 @@ const resetPassword = async(req, res, next) => {
         
         }
 
-        await PasswordHistory.create(newPassUsage)
+        await PasswordHistory.create(newPassUsage, {transaction})
 
+        await transaction.commit()
         res.status(200).json({
             message: "Password updated successfuly!",
         })
 
     }catch(err){
+        await transaction.rollback()
         logData('passwordReset: ' + err)
-        next(error)
+        next(err)
     }
 }
 
@@ -542,7 +602,7 @@ const refresh = async (req, res, next) => {
         session.user_token = accessToken
         session.refresh_token = newRefreshToken
         session.user_ip = req.ip
-        ActiveSession.update(session, {where: {user_id:userId}, fields: ['user_token','refresh_token', 'user_ip']})
+        ActiveSession.update(session.dataValues, {where: {user_id:userId}, fields: ['user_token','refresh_token', 'user_ip']})
 
          res.status(200).json({accessToken, refreshToken: newRefreshToken})
     }catch(error){
@@ -553,11 +613,11 @@ const refresh = async (req, res, next) => {
 const logout = async (req, res, next) => {
     try{
 
-        const { refreshToken } = req.body
-        if(!refreshToken) throw createError.Unauthorized()
+      //  const { refreshToken } = req.body
+       // if(!refreshToken) throw createError.Unauthorized()
         
-        const userId = await verifyRefreshToken(refreshToken)
-
+       // const userId = await verifyRefreshToken(refreshToken)
+       const { userId} =  req.jwtPayload;
         await destroySession(userId);
 
         res.sendStatus(204);
@@ -609,23 +669,27 @@ const logSessionData = async (userId, userIp, userToken, refreshToken) => {
 
     try{
         let activeSession = await ActiveSession.findOne({
-            where: {id: userId}
+            where: {user_id: userId}
         })
 
         if (activeSession){
             await destroySession(userId);
+
+            // activeSession.id = null
+            // await SessionHistory.create(activeSession.dataValues)
         }
 
         await ActiveSession.create(SessionData)
     }catch(error){
         logData('Create Session Data: ' + error)
+        throw(error)
     }
 }
 
 const destroySession = async( userId) => {
 
     let SessionData = await ActiveSession.findOne({
-        where: { id: userId }
+        where: { user_id: userId }
     }
     );
 
@@ -640,9 +704,13 @@ const destroySession = async( userId) => {
 
     // run queries, pass in transaction
 
-        SessionHistory.create(SessionData, {transaction}),
+    SessionData.logout_date = getDbDateNow()
+    SessionData.is_active = false
+    SessionData.voluntary_logout = false
+    SessionData.id = null
+       await SessionHistory.create(SessionData.dataValues, {transaction}),
 
-        ActiveSession.destroy({where: {user_id: SessionData.user_id}}, {transaction})
+        await ActiveSession.destroy({where: {user_id: SessionData.user_id}}, {transaction})
 
 
     await transaction.commit();
@@ -653,25 +721,35 @@ const destroySession = async( userId) => {
         await transaction.rollback();
     }
         logData('destroySession: ' + err );
+        throw(err)
     }
 
 }
 
 const loadUserPermissions = async(userId, tenantId) => {
     try{
+
+       
+
         const userPermission = await UserPermission.findAll({
             where: {user_id: userId, tenant_id: tenantId}
         })
 
-        const groupPermission = await GroupPermission.findAll({
+
+        const groupPermission = await Group.findAll({
             where: {tenant_id: tenantId},
             include: [
                 {
+                    model: GroupPermission,
+                    
+                },
+                {
                     model: UserGroup,
                     where: {user_id: userId}
-                }
+                  }
             ]
         })
+
         let resUserPermission = []
         let resGroupPermission = []
         if (userPermission && userPermission.length > 0){
@@ -694,6 +772,7 @@ const loadUserPermissions = async(userId, tenantId) => {
 
     }catch(err){
         logData('loadUserPermissions: ' + err)
+        throw(err)
     }
 }
 

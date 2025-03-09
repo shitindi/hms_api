@@ -73,6 +73,6 @@ const testRandomGen = () => {
 // let eventTime =  new Date(new Date().setHours(new Date().getHours() + 1)).toISOString().slice(0, 19).replace('T', ' ');
 
 ///Seed database
-//updateAuthDbSchema()
+updateAuthDbSchema()
 
-seedAuthDatabase()
+//seedAuthDatabase()

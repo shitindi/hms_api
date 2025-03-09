@@ -1,4 +1,7 @@
 const {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
+const {Contact} = require('../Auth/Contact')
+const {Tenant } = require('../Auth/Tenant')
+const {UserStatus} = require('../Auth/UserStatus')
 
 const User = db.define('auth_tbl_user', {
    user_name: {
@@ -34,7 +37,7 @@ const User = db.define('auth_tbl_user', {
    retry_count: {
       type: DataTypes.SMALLINT,
       allowNull: false,
-      defaultValue: 5
+      defaultValue: 0
    },
    contact_id: {
       type: DataTypes.INTEGER,
@@ -56,7 +59,19 @@ const User = db.define('auth_tbl_user', {
 }
 )
 
+// User data
+User.hasMany(Contact, {foreignKey: {name: 'created_by', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Contact.belongsTo(User, { as: 'CreatedBy', foreignKey: {name: 'created_by', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
+
+Contact.hasOne(User, {foreignKey: {name: 'contact_id', allowNull: false}, onDelete: 'NO ACTION',  onUpdate: 'CASCADE'})
+User.belongsTo(Contact, { as: 'Contact', foreignKey: {name: 'contact_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
+Tenant.hasMany(User, {foreignKey: {name: 'tenant_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+User.belongsTo(Tenant, {foreignKey: {name: 'tenant_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
+UserStatus.hasMany(User, {foreignKey: {name: 'user_status', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+User.belongsTo(UserStatus, { as : 'UserSatus', foreignKey: {name: 'user_status', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
   const createUserObject = (userObj, contactId, tenantId) =>{
    const user = {

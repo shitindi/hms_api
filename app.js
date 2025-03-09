@@ -9,6 +9,7 @@ const swaggerDocs = require('./swagger.js')
 const authRoute = require('./routes/Auth.route')
 const adminRoute = require('./routes/Admin.route')
 const lookupRoute = require('./routes/Lookup.route')
+const sysAdminRoute = require('./routes/Sys.Admin.route.js')
 require('dotenv').config()
 //require('./helpers/init_redis')
 
@@ -31,6 +32,7 @@ swaggerDocs(app, );
 app.use("/auth", authRoute)
 app.use("/admin", adminRoute)
 app.use("/lookups", lookupRoute)
+app.use("/sys_admi", sysAdminRoute)
 
 
 // Catch all routes

@@ -1,4 +1,6 @@
 const {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
+const {User} = require('../Auth/User')
+
 
 const PasswordHistory = db.define('auth_tbl_password_history', {
    user_id: {
@@ -23,5 +25,10 @@ const PasswordHistory = db.define('auth_tbl_password_history', {
     defaultValue: false
    }
 });
+
+// Password history
+
+User.hasMany(PasswordHistory, {foreignKey: {name: 'user_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+PasswordHistory.belongsTo(User, {foreignKey: {name: 'user_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
   module.exports = { PasswordHistory}

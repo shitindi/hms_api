@@ -1,4 +1,5 @@
 const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
+const {ContactType} = require('../Auth/ContactType')
 
 const Contact = db.define('auth_tbl_contact', {
     
@@ -25,7 +26,6 @@ const Contact = db.define('auth_tbl_contact', {
     },
     phone: {
        type: DataTypes.STRING(15),
-       unique: true,
        allowNull: true
     },
     position: {
@@ -36,12 +36,21 @@ const Contact = db.define('auth_tbl_contact', {
         type: DataTypes.STRING(200),
         allowNull: true
     },
+    contact_type: {
+      type: DataTypes.TINYINT,
+      allowNull: false
+    },
     created_by :{
         type: DataTypes.INTEGER,
         allowNull: true
      },
 
 })
+
+
+ContactType.hasMany(Contact, {foreignKey: {name: 'contact_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Contact.belongsTo(ContactType, { as: 'ContactType', foreignKey: {name: 'contact_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
 
 const createContactObject = (contactObj) => {
 
@@ -56,7 +65,6 @@ const createContactObject = (contactObj) => {
       address: contactObj.address,
       created_by : contactObj?.user_id,
   }
-
   return contact
 
 }

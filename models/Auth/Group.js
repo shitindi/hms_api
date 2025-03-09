@@ -1,5 +1,6 @@
 const {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
-
+const {Tenant } = require('../Auth/Tenant')
+const {User} = require('../Auth/User')
 
 const Group = db.define('auth_tbl_group', {
     group_name: {
@@ -24,6 +25,14 @@ const Group = db.define('auth_tbl_group', {
    }
 
 })
+
+// Group data
+User.hasMany(Group, { as:'CreatedBy' ,foreignKey: {name: 'created_by', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Group.belongsTo(User, {as:'CreatedBy' ,foreignKey: {name: 'created_by', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
+Tenant.hasMany(Group, {foreignKey: {name: 'tenant_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Group.belongsTo(Tenant, {foreignKey: {name: 'tenant_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
 
   module.exports = {
    Group

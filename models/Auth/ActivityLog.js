@@ -1,4 +1,7 @@
 const {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
+const {User} = require('../Auth/User')
+const {ModuleItem} = require('../Auth/ModuleItem')
+const {ActivityType} = require('../Auth/ActivityType')
 
 const ActivityLog = db.define('auth_tbl_user_activity', {
    user_id: {
@@ -26,6 +29,16 @@ const ActivityLog = db.define('auth_tbl_user_activity', {
     allowNull: false
    }
 })
+
+// Activity logs data
+User.hasMany(ActivityLog, {foreignKey: {name: 'user_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+ActivityLog.belongsTo(User, {foreignKey: {name: 'user_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
+ModuleItem.hasMany(ActivityLog, {foreignKey: {name: 'module_item_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+ActivityLog.belongsTo(ModuleItem, {foreignKey: {name: 'module_item_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
+ActivityType.hasMany(ActivityLog, {foreignKey: {name: 'activity_type', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+ActivityLog.belongsTo(ActivityType, {foreignKey: {name: 'activity_type', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 
 module.exports = {

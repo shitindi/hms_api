@@ -1,4 +1,6 @@
 const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
+const {User} = require('../Auth/User')
+const {ActivationType} = require('../Auth/ActivationType')
 const ActivationCode = db.define('auth_tbl_activation_code', {
 
     user_id: {
@@ -25,6 +27,14 @@ const ActivationCode = db.define('auth_tbl_activation_code', {
 
 }
 )
+
+
+// Activation code
+User.hasMany(ActivationCode, {foreignKey: {name: 'user_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+ActivationCode.belongsTo(User, {foreignKey: {name: 'user_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
+ActivationType.hasMany(ActivationCode, {foreignKey: {name: 'activation_type', allowNull: false},onDelete: 'NO ACTION',  onUpdate: 'CASCADE'})
+ActivationCode.belongsTo(ActivationType, {foreignKey: {name: 'activation_type', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 
   module.exports = { ActivationCode}

@@ -1,0 +1,32 @@
+2025-03-08 19:29:51: Register: ValidationError: "contact_id" is required
+ 
+2025-03-08 19:32:09: Register: ValidationError: "contact_id" is required
+ 
+2025-03-08 19:34:12: Register: ConflictError: ndinao@hotmail.com is already been registered
+ 
+2025-03-08 19:36:49: Register: SequelizeDatabaseError: Cannot add or update a child row: a foreign key constraint fails
+ 
+2025-03-08 19:42:27: Register: SequelizeDatabaseError: Cannot add or update a child row: a foreign key constraint fails
+ 
+2025-03-08 19:43:16: Register: TypeError: Assignment to constant variable.
+ 
+2025-03-08 19:47:27: Register: TypeError: Assignment to constant variable.
+ 
+2025-03-08 19:51:11: Register: SequelizeDatabaseError: Cannot add or update a child row: a foreign key constraint fails
+ 
+2025-03-08 20:02:20: generateVerificationEmail: SequelizeDatabaseError: Lock wait timeout exceeded; try restarting transaction
+ 
+2025-03-08 20:14:53: SendMail: Error: No recipients defined
+ 
+2025-03-08 20:30:10: verifyEmail: Error: WHERE parameter "user_token" has invalid "undefined" value
+ 
+2025-03-08 20:31:30: verifyEmail: Error: WHERE parameter "user_token" has invalid "undefined" value
+ 
+2025-03-08 20:40:04: verifyEmail: NotFoundError: Activation link is not valid
+ 
+2025-03-08 20:41:04: verifyEmail: NotFoundError: Activation link is not valid
+ 
+2025-03-08 20:43:03: verifyEmail: NotFoundError: Activation link is not valid
+ 
+2025-03-08 20:44:07: verifyEmail: NotFoundError: Activation link is not valid
+ 

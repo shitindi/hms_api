@@ -1,0 +1,121 @@
+### Login route
+POST  http://localhost:7000/auth/login
+Content-Type: application/json
+ 
+{
+    "email": "ndinao@hotmail.com",
+    "password":  "shitindi@123"
+}
+
+
+### Create group
+POST  http://localhost:7000/admin/group-edit
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEwLCJ0ZW5hbnRJZCI6Miwicm9sZXMiOltdLCJpYXQiOjE3NDE1MjMwNDQsImV4cCI6MTc0MTYwOTQ0NCwiYXVkIjoiMTAiLCJpc3MiOiJieXRld2FyZS5jby50eiJ9.-kGI9nOrJB9MoF1hW_8MbzrYDghO2qWA0lkrxM0s9aY
+Content-Type: application/json
+
+{
+  "id": 0,
+  "group_name": "Operator",
+  "tenant_id": 2,
+  "description": "Operator group",
+  "created_by": 10,
+  "is_active": true
+}
+
+### View Groups 
+GET  http://localhost:7000/admin/groups/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEwLCJ0ZW5hbnRJZCI6Miwicm9sZXMiOltdLCJpYXQiOjE3NDE1MjMwNDQsImV4cCI6MTc0MTYwOTQ0NCwiYXVkIjoiMTAiLCJpc3MiOiJieXRld2FyZS5jby50eiJ9.-kGI9nOrJB9MoF1hW_8MbzrYDghO2qWA0lkrxM0s9aY
+
+
+### Create Users Group
+POST  http://localhost:7000/admin/user-group-edit
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEwLCJ0ZW5hbnRJZCI6Miwicm9sZXMiOltdLCJpYXQiOjE3NDE1MjMwNDQsImV4cCI6MTc0MTYwOTQ0NCwiYXVkIjoiMTAiLCJpc3MiOiJieXRld2FyZS5jby50eiJ9.-kGI9nOrJB9MoF1hW_8MbzrYDghO2qWA0lkrxM0s9aY
+Content-Type: application/json
+
+{
+  "id": 0,
+  "tenant_id": 2,
+  "user_id": 10,
+  "group_id": 1,
+  "created_by": 10,
+  "is_active": true
+}
+
+### View User Groups 
+GET  http://localhost:7000/admin/user-groups/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEwLCJ0ZW5hbnRJZCI6Miwicm9sZXMiOltdLCJpYXQiOjE3NDE1MjMwNDQsImV4cCI6MTc0MTYwOTQ0NCwiYXVkIjoiMTAiLCJpc3MiOiJieXRld2FyZS5jby50eiJ9.-kGI9nOrJB9MoF1hW_8MbzrYDghO2qWA0lkrxM0s9aY
+
+
+### Create User
+POST  http://localhost:7000/admin/user-edit
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEwLCJ0ZW5hbnRJZCI6Miwicm9sZXMiOltdLCJpYXQiOjE3NDE1MjMwNDQsImV4cCI6MTc0MTYwOTQ0NCwiYXVkIjoiMTAiLCJpc3MiOiJieXRld2FyZS5jby50eiJ9.-kGI9nOrJB9MoF1hW_8MbzrYDghO2qWA0lkrxM0s9aY
+Content-Type: application/json
+
+{
+  "first_name": "John",
+  "middle_name": "Andy",
+  "last_name": "Silvester",
+  "email": "ndinao.shitindi@byteware.co.tz",
+  "mobile_no": "0779786152",
+  "phone": "255779786152",
+  "position": "Chief Executive Officer",
+  "address": "Mikocheni",
+  "created_by": 10,
+  "user_name": "ndinao.shitindi@byteware.co.tz",
+  "password": "ndinao@123",
+  "confirm_password": "ndinao@123",
+  "must_change_password": true,
+  "contact_type": 1,
+  "tenant_id": 2,
+  "user_status": 1
+}
+
+### View Users 
+GET  http://localhost:7000/admin/users/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEwLCJ0ZW5hbnRJZCI6Miwicm9sZXMiOltdLCJpYXQiOjE3NDE1MjMwNDQsImV4cCI6MTc0MTYwOTQ0NCwiYXVkIjoiMTAiLCJpc3MiOiJieXRld2FyZS5jby50eiJ9.-kGI9nOrJB9MoF1hW_8MbzrYDghO2qWA0lkrxM0s9aY
+
+
+### Create Group permission
+POST  http://localhost:7000/admin/group-permission-edit
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEwLCJ0ZW5hbnRJZCI6Miwicm9sZXMiOltdLCJpYXQiOjE3NDE1MjMwNDQsImV4cCI6MTc0MTYwOTQ0NCwiYXVkIjoiMTAiLCJpc3MiOiJieXRld2FyZS5jby50eiJ9.-kGI9nOrJB9MoF1hW_8MbzrYDghO2qWA0lkrxM0s9aY
+Content-Type: application/json
+
+{
+  "id": 0,
+  "tenant_id": 2,
+  "module_id": 1,
+  "group_id": 1,
+  "permission_type": 2,
+  "created_by": 10,
+  "is_active": true
+}
+
+### View Group permission 
+GET  http://localhost:7000/admin/group-permissions/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEwLCJ0ZW5hbnRJZCI6Miwicm9sZXMiOltdLCJpYXQiOjE3NDE1MjMwNDQsImV4cCI6MTc0MTYwOTQ0NCwiYXVkIjoiMTAiLCJpc3MiOiJieXRld2FyZS5jby50eiJ9.-kGI9nOrJB9MoF1hW_8MbzrYDghO2qWA0lkrxM0s9aY
+
+
+
+### Create User Permission
+POST  http://localhost:7000/admin/user-permission-edit
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEwLCJ0ZW5hbnRJZCI6Miwicm9sZXMiOltdLCJpYXQiOjE3NDE1MjMwNDQsImV4cCI6MTc0MTYwOTQ0NCwiYXVkIjoiMTAiLCJpc3MiOiJieXRld2FyZS5jby50eiJ9.-kGI9nOrJB9MoF1hW_8MbzrYDghO2qWA0lkrxM0s9aY
+Content-Type: application/json
+
+{
+  "id": 0,
+  "tenant_id": 2,
+  "module_id": 1,
+  "user_id": 10,
+  "permission_type": 1,
+  "created_by": 10,
+  "is_active": true
+}
+
+### View User permission 
+GET  http://localhost:7000/admin/user-permissions/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEwLCJ0ZW5hbnRJZCI6Miwicm9sZXMiOltdLCJpYXQiOjE3NDE1MjMwNDQsImV4cCI6MTc0MTYwOTQ0NCwiYXVkIjoiMTAiLCJpc3MiOiJieXRld2FyZS5jby50eiJ9.-kGI9nOrJB9MoF1hW_8MbzrYDghO2qWA0lkrxM0s9aY
+
+
+### View Tenants 
+GET  http://localhost:7000/admin/tenant-details
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEwLCJ0ZW5hbnRJZCI6Miwicm9sZXMiOltdLCJpYXQiOjE3NDE1MjMwNDQsImV4cCI6MTc0MTYwOTQ0NCwiYXVkIjoiMTAiLCJpc3MiOiJieXRld2FyZS5jby50eiJ9.-kGI9nOrJB9MoF1hW_8MbzrYDghO2qWA0lkrxM0s9aY

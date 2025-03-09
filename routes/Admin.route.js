@@ -23,7 +23,7 @@ const router = express.Router()
  *        description: Ok
  */
 
-router.get("/groups", verifyAccessToken, adminController.groupDetails)
+router.get("/groups/:id?", verifyAccessToken, adminController.groupDetails)
 
 /**
  * @openapi
@@ -46,6 +46,10 @@ router.get("/groups", verifyAccessToken, adminController.groupDetails)
  *              id:
  *                type: integer
  *              group_name:
+ *                type: string
+ *              tenant_id:
+ *                type: integer
+ *              desription:
  *                type: string
  *              created_by:
  *                type: integer
@@ -78,7 +82,7 @@ router.post("/group-edit", verifyAccessToken, adminController.editGroup)
  *        description: Ok, List of User(s)
  */
 
-router.get("/users", verifyAccessToken, adminController.userDetails)
+router.get("/users/:id?", verifyAccessToken, adminController.userDetails)
 
 
 /**
@@ -100,7 +104,8 @@ router.get("/users", verifyAccessToken, adminController.userDetails)
  *              - email
  *              - mobile_no
  *              - tenant_id
- *              - created_by * 
+ *              - created_by 
+ *              - contact_type
  *            properties:
  *              first_name:
  *                type: string
@@ -133,6 +138,9 @@ router.get("/users", verifyAccessToken, adminController.userDetails)
  *                default: true
  *              contact_id:
  *                type: integer
+ *              contact_type:
+ *                type: integer
+ *                default: 1
  *              tenant_id:
  *                type: integer
  *              user_status:
@@ -163,7 +171,7 @@ router.post("/user-edit", verifyAccessToken, adminController.editUser)
  *      200:
  *        description: Ok
  */
-router.get('/user-groups', verifyAccessToken, adminController.userGroupDetails)
+router.get('/user-groups/:id?', verifyAccessToken, adminController.userGroupDetails)
 
 /**
  * @openapi
@@ -222,7 +230,7 @@ router .post('/user-group-edit', verifyAccessToken, adminController.editUserGrou
  *      200:
  *        description: Ok
  */
-router.get("/group-permissions", verifyAccessToken,adminController.groupPermissionDetails)
+router.get("/group-permissions/:id?", verifyAccessToken,adminController.groupPermissionDetails)
 
 /**
  * @openapi
@@ -284,7 +292,7 @@ router.post("/group-permission-edit", verifyAccessToken, adminController.editGro
  *      200:
  *        description: Ok
  */
-router.get("/user-permissions", verifyAccessToken, adminController.userPermissionDetails)
+router.get("/user-permissions/:id?", verifyAccessToken, adminController.userPermissionDetails)
 
 /**
  * @openapi
@@ -346,6 +354,6 @@ router.post("/user-permission-edit", verifyAccessToken, adminController.editUser
  *      200:
  *        description: Ok
  */
-router.get("/tenant-details", verifyAccessToken, adminController.tenantDetails)
+router.get("/tenant-details/:id?", verifyAccessToken, adminController.tenantDetails)
 
 module.exports = router

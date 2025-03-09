@@ -1,4 +1,5 @@
 const {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
+const {User} = require('../Auth/User')
 
 const LoginAttempt = db.define('auth_tbl_login_attempt', {
    user_id: {
@@ -26,6 +27,12 @@ const LoginAttempt = db.define('auth_tbl_login_attempt', {
     allowNull: false
    }
 })
+
+
+// Login attempt
+User.hasMany(LoginAttempt, {foreignKey: {name: 'user_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+LoginAttempt.belongsTo(User, {foreignKey: {name: 'user_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
 
 
   module.exports = { LoginAttempt}

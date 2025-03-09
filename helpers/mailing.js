@@ -23,8 +23,6 @@ const sendMail = async (recEmail, textBody) => {
         }
     }
 
-    console.log('ServerConfig: ', serverConfig)
-
     const transporter = nodemailer.createTransport(serverConfig);
 
     //send mail with defined transport object
@@ -38,6 +36,7 @@ const sendMail = async (recEmail, textBody) => {
 }catch(error){
     console.log('sendMail: ', error)
     logData('SendMail: ' + error)
+    throw(error)
 }
 
 }

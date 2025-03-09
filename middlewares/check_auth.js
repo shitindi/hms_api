@@ -4,16 +4,17 @@ const {ActiveSession} = require('../models/Auth/ActiveSession')
 
 
 
-const verifyAccessToken = (req, res, next) => {
+const verifyAccessToken = async (req, res, next) => {
 
     if (!req.headers['authorization']) return next(createError.Unauthorized())
 
     const token = req.headers['authorization'].split(' ')[1]
     const secret = process.env.ACCESS_TOKEN_SECRET;
 
-    let  SessionData = ActiveSession.findOne(
+    let  SessionData = await ActiveSession.findOne(
         {user_token: token}
     );
+
 
     if (!SessionData){
         return  next(createError.Unauthorized())

@@ -1,5 +1,6 @@
 const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
-
+const {User} = require('../Auth/User')
+const {UserStatus} = require('../Auth/UserStatus')
 //Type of activation whether is phone, sms, or reset code
 const UserStatusHistory = db.define('auth_tbl_user_status_history', {
 
@@ -29,6 +30,12 @@ const UserStatusHistory = db.define('auth_tbl_user_status_history', {
 }
 )
 
+//User Status history
+User.hasMany(UserStatusHistory, {foreignKey: {name: 'user_id', allowNull: false},onDelete: 'NO ACTION',  onUpdate: 'CASCADE'})
+UserStatusHistory.belongsTo(User, {UserStatusHistory: {name: 'user_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
+UserStatus.hasMany(UserStatusHistory, {foreignKey: {name: 'status_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+UserStatusHistory.belongsTo(UserStatus, {foreignKey: {name: 'status_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 
   module.exports = { UserStatusHistory }
