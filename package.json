@@ -1,7 +1,7 @@
 {
-  "name": "authentication",
+  "name": "hms_api",
   "version": "1.0.0",
-  "description": "Authentication API",
+  "description": "Health Management System API",
   "main": "index.js",
   "scripts": {
     "start": "nodemon app.js"
@@ -16,10 +16,8 @@
     "http-errors": "^2.0.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
-    "mysql2": "^3.9.7",
     "nodemailer": "^6.10.0",
     "nodemon": "^3.1.9",
-    "redis": "^4.6.13",
     "sequelize": "^6.37.3",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
