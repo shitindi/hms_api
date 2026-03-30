@@ -6,7 +6,7 @@ const router = express.Router()
 
 /**
  * @openapi
- * '/lookup/activation-types':
+ * '/lookups/activation-types':
  *  get:
  *    tags:
  *    - Lookups
@@ -20,7 +20,7 @@ router.get("/activation-types", verifyAccessToken, lookupController.activationTy
 
 /**
  * @openapi
- * '/lookup/tenant-statuses':
+ * '/lookups/tenant-statuses':
  *  get:
  *    tags:
  *    - Lookups
@@ -33,7 +33,7 @@ router.get("/tenant-statuses", verifyAccessToken, lookupController.tenantStatuse
 
 /**
  * @openapi
- * '/lookup/user-statuses':
+ * '/lookups/user-statuses':
  *  get:
  *    tags:
  *    - Lookups
@@ -46,7 +46,7 @@ router.get("/user-statuses", verifyAccessToken, lookupController.userStatuses)
 
 /**
  * @openapi
- * '/lookup/permission-types':
+ * '/lookups/permission-types':
  *  get:
  *    tags:
  *    - Lookups
@@ -59,7 +59,7 @@ router.get("/permission-types", verifyAccessToken, lookupController.permissionTy
 
 /**
  * @openapi
- * '/lookup/modules':
+ * '/lookups/modules':
  *  get:
  *    tags:
  *    - Lookups
@@ -69,5 +69,83 @@ router.get("/permission-types", verifyAccessToken, lookupController.permissionTy
  *        description: Ok
  */
 router.get("/modules", verifyAccessToken, lookupController.appModules)
+
+/**
+ * @openapi
+ * '/lookups/regions':
+ *  get:
+ *    tags:
+ *    - Lookups
+ *    summary: Get list of regions
+ *    responses:
+ *      200:
+ *        description: Ok
+ */
+router.get("/regions", lookupController.Regions)
+
+/**
+ * @openapi
+ * '/lookups/payment-status':
+ *  get:
+ *    tags:
+ *    - Lookups
+ *    summary: Get payment statutes
+ *    responses:
+ *      200:
+ *        description: Ok
+ */
+router.get("/payment-status", verifyAccessToken, lookupController.paymentStatus)
+
+/**
+ * @openapi
+ * '/lookups/countries':
+ *  get:
+ *    tags:
+ *    - Lookups
+ *    summary: Get get list of countries
+ *    responses:
+ *      200:
+ *        description: Ok
+ */
+router.get("/countries", lookupController.Countries)
+
+/**
+ * @openapi
+ * '/lookups/contact-types':
+ *  get:
+ *    tags:
+ *    - Lookups
+ *    summary: Get get list of countries
+ *    responses:
+ *      200:
+ *        description: Ok
+ */
+router.get("/contact-types", lookupController.ContactTypes)
+
+/**
+ * @openapi
+ * '/lookups/tax-groups':
+ *  get:
+ *    tags:
+ *    - Lookups
+ *    summary: Get get list of tax groups
+ *    responses:
+ *      200:
+ *        description: Ok
+ */
+router.get("/tax-groups", lookupController.TaxGroups)
+
+/**
+ * @openapi
+ * '/lookups/get-all-lookups':
+ *  get:
+ *    tags:
+ *    - Lookups
+ *    summary: Get get list of tax groups
+ *    responses:
+ *      200:
+ *        description: Ok
+ */
+router.get("/get-all-lookups", lookupController.GetLookupsAll)
 
 module.exports = router

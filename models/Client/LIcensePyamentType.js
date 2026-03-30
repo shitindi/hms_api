@@ -1,6 +1,7 @@
+
 const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
 
-const TenantStatus = db.define('auth_lkp_tenant_status', {
+const LicensePaymentType = db.define('client_lkp_license_payment_type', {
 
     ID: {
         type: DataTypes.TINYINT,
@@ -11,9 +12,13 @@ const TenantStatus = db.define('auth_lkp_tenant_status', {
         type: DataTypes.STRING(30),
         allowNull: false,
         unique: true
-    }
+    },
+
 }
 )
 
 
-  module.exports = { TenantStatus}
+
+module.exports = {
+    LicensePaymentType
+}

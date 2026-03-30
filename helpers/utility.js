@@ -5,6 +5,40 @@ const getDbDateNow = () => {
     return new Date(curtDate.getTime() - (curtDate.getTimezoneOffset() * 60000)).toISOString().slice(0, 19).replace('T', ' ')
 }
 
+// Add months in current date and time db format
+const addMonthsDbDateNow = (timeOffset) => {
+    let curtDate = new Date(new Date().setMonth(new Date().getMonth() + timeOffset)) // new Date()
+    let laterTime = new  Date(curtDate.getTime() - (curtDate.getTimezoneOffset() * 60000)).toISOString().slice(0, 19).replace('T', ' ')
+
+    return laterTime
+}
+
+// Add months in current date and time db format
+const addDaysDbDateNow = (timeOffset) => {
+    let curtDate = new Date(new Date().setDate(new Date().getDate() + timeOffset)) // new Date()
+    let laterTime = new  Date(curtDate.getTime() - (curtDate.getTimezoneOffset() * 60000)).toISOString().slice(0, 19).replace('T', ' ')
+    
+    return laterTime
+}
+
+// Add months in current date and time db format
+const addMonthsDbDateFromDate = (date, timeOffset) => {
+    const futureDate = new Date(date)
+    let curtDate = new Date(new Date().setMonth(futureDate.getMonth() + timeOffset)) // new Date()
+    let laterTime = new  Date(curtDate.getTime() - (curtDate.getTimezoneOffset() * 60000)).toISOString().slice(0, 19).replace('T', ' ')
+    
+    return laterTime
+}
+
+const getDifferenceInDate = (date1, date2) => {
+    const dt1 = new Date(date1);
+    const dt2 = new Date(date2);
+    const diffTime = dt2 - dt1;
+    console.log(diffTime, date1, date2)
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays
+}
+
 // Add hours in current date and time db format
 const addHourDbDateNow = (timeOffset) => {
     let curtDate = new Date(new Date().setHours(new Date().getHours() + timeOffset)) // new Date()
@@ -36,5 +70,9 @@ module.exports = {
     addHourDbDateNow,
     getDbDateNow,
     getJSDateFromDb,
-    addMinutesDbDate
+    addMinutesDbDate,
+    addMonthsDbDateNow,
+    addDaysDbDateNow,
+    addMonthsDbDateFromDate,
+    getDifferenceInDate
 }

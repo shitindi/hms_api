@@ -26,33 +26,53 @@ const passReset= Joi.object({
     confirmPassword: Joi.ref('newPassword')
 }).with('newPassword','confirmPassword').options({stripUnknown: true})
 
+const tenantSchema = Joi.object({
+     tenant_name: Joi.string().required().min(2).max(100),
+     tenant_email: Joi.string().email().required().lowercase() ,
+     website: Joi.string().lowercase().max(100).allow(null),
+     tin_number: Joi.string().required().min(9).max(15),
+     vrn_number: Joi.string().min(9).max(15).allow(null),
+     tax_group: Joi.number().required().default(3),
+     Country_id: Joi.number().required(),
+     region_id: Joi.number().allow(null),
+     region_name: Joi.string().min(2).max(100),
+     tenant_Address: Joi.string().min(3).max(300).allow(null),
+     tenant_mobile: Joi.string().required().min(10).max(15),
+     tenant_phone: Joi.string().min(10).max(15).allow(null),
+     tenant_description: Joi.string().min(10).max(500).allow(null),
+}).options({stripUnknown: true})
+
+
+
 // Schema for contact object
 const contactSchema = Joi.object({
     //Contact model
-  //  id: Joi.number(),
+    id: Joi.number(),
     first_name: Joi.string().required().max(30).min(2),
-    middle_name: Joi.string().max(30).min(2),
+    middle_name: Joi.string().max(30).allow(null),
     last_name: Joi.string().required().max(30).min(2),
-    email: Joi.string().required().email().max(100),
+    email: Joi.string().email().max(100).allow(null),
     mobile_no:Joi.string().required().min(10).max(16),
-    phone: Joi.string().min(10).max(17),
-    position: Joi.string().max(100),
-    address: Joi.string().max(150),
-    contact_type: Joi.number().required().default(1),
-    created_by : Joi.number(),
+    phone: Joi.string().min(10).max(17).allow(null),
+    position: Joi.string().max(100).allow(null),
+    address: Joi.string().max(150).allow(null),
+    contact_type: Joi.number().default(1),
+    tenant_id: Joi.number().default(null),
+    created_by : Joi.number().required(),
 }).options({stripUnknown: true}).options({stripUnknown: true})
 
 // Schema for user details
 const userSchema = Joi.object({
     // User model
+    
     user_id: Joi.number(),
     user_name: Joi.string().email().required().max(100),
     password: Joi.string().min(6).max(16).required(),
     confirm_password: Joi.ref('password'),
     must_change_password: Joi.bool() ,
     //contact_id: Joi.number().required().default(0),
-    tenant_id: Joi.number(),
-    user_status: Joi.number().required().default(1)
+    tenant_id: Joi.number().default(0),
+    user_status: Joi.number().default(1)
     
 }).with('password','confirm_password').options({stripUnknown: true})
 
@@ -95,6 +115,8 @@ const userPermissionSchema = Joi.object({
        is_active: Joi.boolean().required().default(false)
 }).options({stripUnknown: true})
 
+
+
 module.exports = {
     authSchema,
     passUpdate,
@@ -105,5 +127,7 @@ module.exports = {
     groupSchema,
     userGroupSchema,
     groupPermissionSchema,
-    userPermissionSchema
+    userPermissionSchema,
+    tenantSchema,
+    
 }

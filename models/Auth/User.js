@@ -2,6 +2,7 @@ const {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
 const {Contact} = require('../Auth/Contact')
 const {Tenant } = require('../Auth/Tenant')
 const {UserStatus} = require('../Auth/UserStatus')
+const { TenantBranch } = require('../Client/TenantBranch')
 
 const User = db.define('auth_tbl_user', {
    user_name: {
@@ -45,7 +46,7 @@ const User = db.define('auth_tbl_user', {
    },
    tenant_id: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: false
    },
    activated_date: {
       type: DataTypes.DATE,
@@ -55,6 +56,9 @@ const User = db.define('auth_tbl_user', {
       type: DataTypes.TINYINT,
       defaultValue: 5,
       allowNull: false
+   },
+   default_branch: {
+      type: DataTypes.INTEGER
    }
 }
 )
@@ -62,6 +66,9 @@ const User = db.define('auth_tbl_user', {
 // User data
 User.hasMany(Contact, {foreignKey: {name: 'created_by', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Contact.belongsTo(User, { as: 'CreatedBy', foreignKey: {name: 'created_by', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
+// User.hasOne(Contact, {foreignKey: {name: 'contact_id', allowNull: false}, onDelete: 'NO ACTION',  onUpdate: 'CASCADE'})
+// Contact.belongsTo(User, { as: 'Contact', foreignKey: {name: 'contact_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 
 Contact.hasOne(User, {foreignKey: {name: 'contact_id', allowNull: false}, onDelete: 'NO ACTION',  onUpdate: 'CASCADE'})
@@ -73,20 +80,15 @@ User.belongsTo(Tenant, {foreignKey: {name: 'tenant_id', allowNull: false}, onDel
 UserStatus.hasMany(User, {foreignKey: {name: 'user_status', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 User.belongsTo(UserStatus, { as : 'UserSatus', foreignKey: {name: 'user_status', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
-  const createUserObject = (userObj, contactId, tenantId) =>{
-   const user = {
-   user_name: userObj.user_name,
-   password: userObj.password,
-   confirm_password: userObj.confirm_password,
-   must_change_password: userObj.must_change_password,
-   contact_id: contactId,
-   tenant_id: tenantId,
-   }
-   return user
-  }
+TenantBranch.hasMany(User, {foreignKey: {name: 'default_branch', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+User.belongsTo(TenantBranch, { as: 'DefaultBranch', foreignKey: {name: 'default_branch', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
+User.hasMany(TenantBranch, {foreignKey: {name: 'created_by', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+TenantBranch.belongsTo(User, {as: 'CreatedBy', foreignKey: {name: 'created_by', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
   
 
   module.exports = { 
-   User,
-   createUserObject
+   User
+   
 }

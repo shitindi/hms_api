@@ -2,10 +2,8 @@ const crypto = require('crypto');
 const {logData} = require('./logger')
 
 
-const encryptSymmetric = (key, plaintext) =>{
+const encryptSymmetric= (key, plaintext) =>{
     try{
-
-
     const iv = crypto.randomBytes(12).toString('base64');
 
     const cipher = crypto.createCipheriv(
@@ -13,12 +11,17 @@ const encryptSymmetric = (key, plaintext) =>{
         Buffer.from(key, 'utf8'),
         Buffer.from(iv, 'base64')
     );
+    
     let ciphertext = cipher.update(plaintext, 'utf8', 'base64');
+ //console.log('ciphertext 1: ', ciphertext)
+
+ 
     ciphertext +=cipher.final('base64');
     const tag = cipher.getAuthTag();
-
+     // console.log('ciphertext: ', ciphertext)
     return {ciphertext, iv, tag}
     }catch(err){
+        console.log('encryptSymmetric: ', err)
         logData('encryptSymmetric: ' + err)
         return null
     }
@@ -27,8 +30,8 @@ const encryptSymmetric = (key, plaintext) =>{
 const decryptSymmetric = (key, ciphertext, iv, tag) =>{
    try{
 
-   
-        const decipher = crypto.createDecipheriv(
+
+    const decipher = crypto.createDecipheriv(
             'aes-256-gcm',
             Buffer.from(key, 'utf8'),
             Buffer.from(iv, 'base64')

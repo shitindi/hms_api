@@ -1,8 +1,14 @@
 const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
 const {ContactType} = require('../Auth/ContactType')
+const { Tenant } = require('./Tenant')
 
 const Contact = db.define('auth_tbl_contact', {
-    
+
+
+    tenant_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    } ,
     first_name: {
        type: DataTypes.STRING(30),
        allowNull: false,
@@ -18,7 +24,7 @@ const Contact = db.define('auth_tbl_contact', {
     },
     email:{
      type: DataTypes.STRING(50),
-     unique: true
+     allowNull: true
     },
     mobile_no: {
       type: DataTypes.STRING(15),
@@ -47,31 +53,16 @@ const Contact = db.define('auth_tbl_contact', {
 
 })
 
+Contact.hasOne(Tenant, {foreignKey: {name: 'tenant_contact_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Tenant.belongsTo(Contact, {as: 'Contact',foreignKey: {  name: 'tenant_contact_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 ContactType.hasMany(Contact, {foreignKey: {name: 'contact_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Contact.belongsTo(ContactType, { as: 'ContactType', foreignKey: {name: 'contact_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
-
-const createContactObject = (contactObj) => {
-
-  const contact = {
-      first_name: contactObj.first_name,
-      middle_name: contactObj.middle_name,
-      last_name: contactObj.last_name,
-      email: contactObj.email,
-      mobile_no:contactObj.mobile_no,
-      phone: contactObj.phone,
-      position: contactObj.position,
-      address: contactObj.address,
-      created_by : contactObj?.user_id,
-  }
-  return contact
-
-}
-
+ Tenant.hasMany(Contact, {foreignKey: {name: 'tenant_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+ Contact.belongsTo(Tenant, {as: 'Contact',foreignKey: {  name: 'tenant_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 
   module.exports = { 
-   Contact,
-   createContactObject
+   Contact
 }

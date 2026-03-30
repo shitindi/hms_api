@@ -2,19 +2,21 @@
 const {logData} = require('../helpers/logger')
 const { ActiveSession: Session } = require('../models/Auth/ActiveSession')
 const {Op} = require('sequelize')
+const createError = require('http-errors');
 
 
 const JWT = require('jsonwebtoken')
-const createError = require('http-errors')
 
-const signAccessToken =  (userId, tenantId, roles = []) => {
+const signAccessToken =  (userName,userId, tenantId, roles = [1,2]) => {
     return new Promise((resolve, reject) => {
-        
+         roles = roles.length==0? [10000000] : roles
         const payload = {
             userId,
             tenantId,
-            roles
+            roles,
+            userName
         }
+        
         const secret = process.env.ACCESS_TOKEN_SECRET 
         const options = {
             expiresIn:  process.env.ACCESS_TOKEN_EXPIRE_IN,
@@ -24,8 +26,8 @@ const signAccessToken =  (userId, tenantId, roles = []) => {
         }
         JWT.sign(payload, secret, options, (err, token) => {
             if (err){
-                logData('signAccessToken'+ err)
-                reject(createError.InternalServerError())
+
+               reject(createError.InternalServerError())
             } 
             
             resolve(token)
@@ -55,7 +57,8 @@ const signRefreshToken = (userId, tenantId, roles = []) => {
         }
         JWT.sign(payload, secret, options,  (err, token) => {
             if (err){
-                logData('signAccessToken'+ err)
+
+                logData('signRefreshToken'+ err)
                 reject(createError.InternalServerError())
             } 
            
@@ -86,11 +89,11 @@ const verifyRefreshToken = async refreshToken => {
         const payload =  JWT.verify(refreshToken, secret)
 
         const userId = payload.aud
-
+         
         let User = await Session.findOne({
             where: {[Op.and] : {user_id: userId, refresh_token: refreshToken}}
         })
-        
+
         if (!User){
             throw createError.Unauthorized()
         }
@@ -135,6 +138,13 @@ const verifyRefreshToken = async refreshToken => {
 //     })
 
 //    })  
+}
+
+const verifyTenant = async (claimTenantId, postedTenantId) => {
+
+    if (claimTenantId != postedTenantId){
+        createError.Forbidden('Claims not matched')
+    }
 }
 
 module.exports = {

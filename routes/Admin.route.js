@@ -1,6 +1,7 @@
 const express = require('express')
 const adminController = require('../controllers/admin.controller')
 const {verifyAccessToken} = require('../middlewares/check_auth')
+const {verifyAccessTokenAdmin} = require('../middlewares/check_auth_sys')
 
 const router = express.Router()
 
@@ -27,7 +28,7 @@ router.get("/groups/:id?", verifyAccessToken, adminController.groupDetails)
 
 /**
  * @openapi
- * '/admin/group-edit':
+ * '/admin/group':
  *  post:
  *     tags:
  *     - Administration
@@ -62,7 +63,77 @@ router.get("/groups/:id?", verifyAccessToken, adminController.groupDetails)
  *      409:
  *        description: Conflict
  */
-router.post("/group-edit", verifyAccessToken, adminController.editGroup)
+router.post("/group", verifyAccessToken, adminController.editGroup)
+/**
+ * @openapi
+ * '/admin/contacts/{id}':
+ *  get:
+ *    tags:
+ *    - Administration
+ *    summary: Get contacts list
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        type: integer
+ *        required: false
+ *        description: Numeric group id, omit for all
+ *    responses:
+ *      200:
+ *        description: Ok
+ */
+router.get("/contacts/:id?", verifyAccessToken, adminController.contactDetails)
+ /**
+ * @openapi
+ * '/sales/contacts':
+ *  post:
+ *     tags:
+ *     - Administration
+ *     summary: Edit or Add contact details
+ *     requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *           schema:
+ *            type: object
+ *            required:
+ *              - first_name
+ *              - last_name
+ *              - mobile_no
+ *              - contact_type
+ *              - tenant_id
+ *              - created_by
+ *            properties:
+ *              id:
+ *                type: integer
+ *              tenant_id:
+ *                type: integer
+ *              first_name:
+ *                type: string
+ *              middle_name:
+ *                type: string
+ *              last_name:
+ *                type: string
+ *              email:
+ *                type: string
+ *              mobile_no:
+ *                type: string
+ *              phone:
+ *                type: string
+ *              position:
+ *                type: string
+ *              address:
+ *                type: string
+ *              contact_type:
+ *                type: integer
+ *              created_by:
+ *                type: integer
+ *     responses:
+ *      200:
+ *        description: Ok, with created or updated object
+ *      409:
+ *        description: Conflict
+ */
+router.post("/contact", verifyAccessToken, adminController.editContact)
 
 /**
  * @openapi
@@ -84,14 +155,13 @@ router.post("/group-edit", verifyAccessToken, adminController.editGroup)
 
 router.get("/users/:id?", verifyAccessToken, adminController.userDetails)
 
-
 /**
  * @openapi
- * '/admin/user-edit':
+ * '/admin/user':
  *  post:
  *     tags:
  *     - Administration
- *     summary: Edit or Add group details
+ *     summary: Edit or Add user details
  *     requestBody:
  *      required: true
  *      content:
@@ -107,6 +177,8 @@ router.get("/users/:id?", verifyAccessToken, adminController.userDetails)
  *              - created_by 
  *              - contact_type
  *            properties:
+ *              id:
+ *                type: integer
  *              first_name:
  *                type: string
  *              middle_name:
@@ -152,7 +224,7 @@ router.get("/users/:id?", verifyAccessToken, adminController.userDetails)
  *      409:
  *        description: Conflict
  */
-router.post("/user-edit", verifyAccessToken, adminController.editUser)
+router.post("/user", verifyAccessToken, adminController.editUser)
 
 /**
  * @openapi
@@ -175,7 +247,7 @@ router.get('/user-groups/:id?', verifyAccessToken, adminController.userGroupDeta
 
 /**
  * @openapi
- * '/admin/user-group-edit':
+ * '/admin/user-group':
  *  post:
  *     tags:
  *     - Administration
@@ -211,7 +283,7 @@ router.get('/user-groups/:id?', verifyAccessToken, adminController.userGroupDeta
  *      409:
  *        description: Conflict
  */
-router .post('/user-group-edit', verifyAccessToken, adminController.editUserGroup)
+router .post('/user-group', verifyAccessToken, adminController.editUserGroup)
 
 /**
  * @openapi
@@ -234,7 +306,7 @@ router.get("/group-permissions/:id?", verifyAccessToken,adminController.groupPer
 
 /**
  * @openapi
- * '/admin/group-permission-edit':
+ * '/admin/group-permission':
  *  post:
  *     tags:
  *     - Administration
@@ -273,7 +345,7 @@ router.get("/group-permissions/:id?", verifyAccessToken,adminController.groupPer
  *      409:
  *        description: Conflict
  */
-router.post("/group-permission-edit", verifyAccessToken, adminController.editGroupPermission)
+router.post("/group-permission", verifyAccessToken, adminController.editGroupPermission)
 
 /**
  * @openapi
@@ -296,7 +368,7 @@ router.get("/user-permissions/:id?", verifyAccessToken, adminController.userPerm
 
 /**
  * @openapi
- * '/admin/user-permission-edit':
+ * '/admin/user-permission':
  *  post:
  *     tags:
  *     - Administration
@@ -335,7 +407,7 @@ router.get("/user-permissions/:id?", verifyAccessToken, adminController.userPerm
  *      409:
  *        description: Conflict
  */
-router.post("/user-permission-edit", verifyAccessToken, adminController.editUserPermission)
+router.post("/user-permission", verifyAccessToken, adminController.editUserPermission)
 
 /**
  * @openapi
@@ -354,6 +426,78 @@ router.post("/user-permission-edit", verifyAccessToken, adminController.editUser
  *      200:
  *        description: Ok
  */
-router.get("/tenant-details/:id?", verifyAccessToken, adminController.tenantDetails)
+router.get("/tenant-details/:id?", verifyAccessTokenAdmin, adminController.tenantDetails)
+
+/**
+ * @openapi
+ * '/admin/tenant-branches/{id}':
+ *  get:
+ *    tags:
+ *    - Administration
+ *    summary: Get tenants branches list
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        type: integer
+ *        required: false
+ *        description: Numeric tenant id, omit for all
+ *    responses:
+ *      200:
+ *        description: Ok
+ */
+router.get("/tenant-branches/:id?", verifyAccessToken, adminController.tenantBranchDetails)
+
+/**
+ * @openapi
+ * '/admin/tenant-branch':
+ *  post:
+ *     tags:
+ *     - Administration
+ *     summary: Edit or Add tenant branch details
+ *     requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *           schema:
+ *            type: object
+ *            required:
+ *              - branch_name
+ *              - tenant_id
+ *              - created_by
+ *              - contact_person
+ *            properties:
+ *              id:
+ *                type: integer
+ *              branch_name:
+ *                type: string
+ *              tenant_id:
+ *                type: integer
+ *              desription:
+ *                type: string
+ *              created_by:
+ *                type: integer
+ *              is_active:
+ *                type: boolean
+ *                default: false
+ *              country_id:
+ *                type: integer
+ *              region_id:
+ *                type: integer
+ *              region_name:
+ *                type: string
+ *              address:
+ *                type: string
+ *              phone:
+ *                type: string
+ *              contact_person:
+ *                type: integer
+ *
+ *     responses:
+ *      200:
+ *        description: Ok, with created or updated object
+ *      409:
+ *        description: Conflict
+ */
+router.post("/tenant-branch", verifyAccessToken, adminController.editTenantBranch)
 
 module.exports = router

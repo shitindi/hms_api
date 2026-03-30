@@ -1,6 +1,6 @@
 const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
 
-const TenantStatus = db.define('auth_lkp_tenant_status', {
+const TenantType = db.define('auth_lkp_tenant_type', {
 
     ID: {
         type: DataTypes.TINYINT,
@@ -15,5 +15,6 @@ const TenantStatus = db.define('auth_lkp_tenant_status', {
 }
 )
 
-
-  module.exports = { TenantStatus}
+  module.exports = {
+    TenantType
+  }

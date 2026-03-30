@@ -1,6 +1,6 @@
 const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
 
-const TenantStatus = db.define('auth_lkp_tenant_status', {
+const TenantRegion = db.define('lkp_region', {
 
     ID: {
         type: DataTypes.TINYINT,
@@ -11,9 +11,19 @@ const TenantStatus = db.define('auth_lkp_tenant_status', {
         type: DataTypes.STRING(30),
         allowNull: false,
         unique: true
+    },
+
+    region_code: {
+        type: DataTypes.SMALLINT,
+        allowNull: false
     }
 }
+
 )
 
 
-  module.exports = { TenantStatus}
+
+
+module.exports = {
+    TenantRegion
+}

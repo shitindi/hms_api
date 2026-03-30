@@ -1,11 +1,13 @@
 const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
 
-const TenantStatus = db.define('auth_lkp_tenant_status', {
+
+const IDType = db.define('lookups_tbl_id_type', {
 
     ID: {
         type: DataTypes.TINYINT,
         allowNull: false,
         primaryKey:true,
+        autoIncrement:true
     },
     name: {
         type: DataTypes.STRING(30),
@@ -16,4 +18,5 @@ const TenantStatus = db.define('auth_lkp_tenant_status', {
 )
 
 
-  module.exports = { TenantStatus}
+
+  module.exports = { IDType}

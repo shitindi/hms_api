@@ -35,18 +35,25 @@ const { LicensePayment } = require('../models/Client/LicensePayment')
 const { LicensePaymentMethod } = require('../models/Client/LicensePaymentMethod')
 const { TenantCountry } = require('../models/Client/Countries')
 const { TenantLicenseHistory } = require('../models/Client/TenantLicenseHistory')
-const { TenantRegion } = require('../models/Lookup/Regions')
+const { TenantRegion } = require('../models/Client/Regions')
 const { TenantBranch } = require('../models/Client/TenantBranch')
-//const { Application } = require('../models/Client/Apps')
+const { Application } = require('../models/Client/Apps')
 const { LicensePaymentType } = require('../models/Client/LIcensePyamentType')
-const { IDType } = require('../models/Lookup/IDType')
-const { PaymentStatus } = require('../models/Main/PaymentStatus')
-const { Payment } = require('../models/Main/Payment')
-const { PaymentStatusHistory } = require('../models/Main/PaymentStatusHistory')
-const { Currrency } = require('../models/Lookup/Currency')
-const { Gender } = require('../models/Lookup/Gender')
-const { MaritalStatus } = require('../models/Lookup/MaritalStatus')
-const { BloodGroup } = require('../models/Lookup/BloodGroup')
+const { Category } = require('../models/sales/Category')
+const { IDType } = require('../models/lookup/IDType')
+const { PaymentStatus } = require('../models/sales/PaymentStatus')
+const { Customer } = require('../models/sales/Customer')
+const { CustomerType } = require('../models/sales/CustomerType')
+const { Inventory } = require('../models/sales/Inventory')
+const { Order } = require('../models/sales/Order')
+const { OrderItem } = require('../models/sales/OrderItem')
+const { Payment } = require('../models/sales/Payment')
+const { PaymentStatusHistory } = require('../models/sales/PaymentStatusHistory')
+const { Product } = require('../models/sales/Product')
+const { Supplier } = require('../models/sales/Supplier')
+const { Currrency } = require('../models/sales/Currrency')
+const { TaxGroup } = require('../models/lookup/TaxtGroup')
+const { orderStatus } = require('../models/sales/OrderSTatus')
 
 const seedAuthDatabase = async () => {
     try {
@@ -62,44 +69,39 @@ const seedAuthDatabase = async () => {
         const contactTypeCount = await ContactType.count()
         const tenantType = await TenantType.count()
         const packageCount = await LicensePackage.count()
-       // const appCount = await Application.count()
+        const appCount = await Application.count()
         const payTypeCount = await LicensePaymentType.count()
         const payMethodCount = await LicensePaymentMethod.count()
 
         const CurrrencyCount = await Currrency.count()
         const paymentStatusCount = await PaymentStatus.count()
 
-        const IdTypeCount = await IDType.count()
-        const GenderCount = await Gender.count()
-        const MaritalStatusCount = await MaritalStatus.count()
-        const BloodGroupCount = await BloodGroup.count()
+        const taxGroupCount = await TaxGroup.count()
 
+        const orderStatusCount = await orderStatus.count()
 
-        if (IdTypeCount == 0){
-            await IDType.bulkCreate([
-                { ID: 1, name: 'National Id' }, { ID: 2, name: 'Voter ID' }, { ID: 3, name: 'Driving License' }, { ID: 4, name: 'Passport' }
+        if (orderStatusCount == 0) {
+
+            await orderStatus.bulkCreate([
+                { id: 1, name: 'Not Paid' },
+                { id: 2, name: 'Paid Not delivered' },
+                { id: 3, name: 'Paid and delivered' }, 
             ])
         }
 
-        if (GenderCount == 0) {
-            await Gender.bulkCreate([
-                { ID: 1, name: 'Male' }, { ID: 2, name: 'Female' }
-            ])
-        }
 
-        if ( MaritalStatusCount == 0) {
-            await Gender.bulkCreate([
-                { ID: 1, name: 'Single' }, { ID: 2, name: 'Married' }, { ID: 3, name: 'Divorced' }, { ID: 4, name: 'Widowed' }, 
+        if (taxGroupCount == 0) {
+            console.log('taxGroupCount: ', taxGroupCount)
+            const taxtGroups = await TaxGroup.bulkCreate([
+                { id: 1, name: 'Standard' },
+                { id: 2, name: 'Special Rate' },
+                { id: 3, name: 'Zero Rated' },
+                { id: 4, name: 'Special Relief' },
+                { id: 5, name: 'Exempt item' }
             ])
-        }
 
-         if ( BloodGroupCount== 0) {
-            await Gender.bulkCreate([
-                { ID: 1, name: 'A+' }, { ID: 2, name: 'A-' }, { ID: 3, name: 'B+' }, { ID: 4, name: 'B-' }, 
-                 { ID: 5, name: 'O+' }, { ID: 6, name: 'O-' }, { ID: 7, name: 'AB+' }, { ID: 8, name: 'AB-' }, 
-            ])
+            console.log('Tax Groups: ', taxtGroups)
         }
-
 
         if (tenantType == 0) {
             await TenantType.bulkCreate([
@@ -161,7 +163,7 @@ const seedAuthDatabase = async () => {
 
         if (contactTypeCount == 0) {
             await ContactType.bulkCreate([
-                { ID: 1, name: 'Staff' }, { ID: 2, name: 'Pattient' }, { ID: 3, name: 'Other' }
+                { ID: 1, name: 'Staff' }, { ID: 2, name: 'Client' }, { ID: 3, name: 'Supplier' }, { ID: 4, name: 'Other' }
             ])
         }
 
@@ -206,11 +208,17 @@ const seedAuthDatabase = async () => {
                 id: 1, user_name: 'admim@mycompany.com', password: '', must_change_password: false, email_verified: true, sms_verified: true,
                 is_active: true, retry_count: 0, user_status: 1, contact_id: 6, tenant_id: 1
             }
-            user.password = await hashPassword('Admin@123')
+            user.password = await hashPassword('Developer@123')
 
             await User.create(user)
         }
 
+        if (appCount == 0) {
+
+            await Application.create({
+                ID: 1, name: 'Sales', description: 'Application for sales'
+            })
+        }
 
         if (packageCount == 1) {
 
@@ -230,7 +238,7 @@ const seedAuthDatabase = async () => {
         if (CurrrencyCount == 0) {
 
             await Currrency.bulkCreate([
-                { id: 1, code: 'TZS', name: 'Tanzania Shilings' }, { id: 2, code: 'USD', name: 'United States Dollar' }
+                { id: 1, code: 'USD', name: 'United States Dollar' }, { id: 2, code: 'TZS', name: 'Tanzania Shilings' }
             ])
         }
 

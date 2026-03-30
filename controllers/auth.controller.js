@@ -1,7 +1,8 @@
 //require('../models/Auth/Associations')
+const {Tenant: Tenants} = require('../models/Auth/Tenant')
 const {User: Users, createUserObject} = require('../models/Auth/User');
 const {Contact: Contacts, createContactObject} = require('../models/Auth/Contact')
-const { Op } = require('sequelize')
+const { Op, where } = require('sequelize')
 
 const {logData} = require('../helpers/logger')
 const { LoginAttempt } = require('../models/Auth/LoginAttempt')
@@ -10,8 +11,9 @@ const { SessionHistory} = require('../models/Auth/SessionHistory')
 const {PasswordHistory} = require('../models/Auth/PasswordHistory')
 
 const createError = require('http-errors');
-const { addHourDbDateNow, getDbDateNow, addMinutesDbDate, getJSDateFromDb } = require('../helpers/utility')
-const {authSchema, passUpdate, emailSchema, passReset, contactSchema, userSchema} = require('../helpers/auth_validation_schema')
+const { addHourDbDateNow, getDbDateNow, addMinutesDbDate, getJSDateFromDb, addMonthsDbDateNow, addDaysDbDateNow, addDaysDbDateFromDate, addMonthsDbDateFromDate, getDifferenceInDate } = require('../helpers/utility')
+const {authSchema, passUpdate, emailSchema, passReset, contactSchema, userSchema, tenantSchema} = require('../helpers/auth_validation_schema')
+const {licensePayment} = require('../helpers/client_validation_schema')
 const  hash = require('../helpers/hash_data')
 const {signAccessToken, signRefreshToken, verifyRefreshToken} = require('../helpers/jwt_helper');
 //const client = require('../helpers/init_redis');
@@ -26,8 +28,10 @@ const { UserPermission } = require('../models/Auth/UserPermission');
 const { GroupPermission } = require('../models/Auth/GroupPermission');
 const { UserGroup } = require('../models/Auth/UserGroup');
 const {Group} = require('../models/Auth/Group');
-const { PersmissionType } = require('../models/Auth/PermisionType');
 
+const {LicensePayment} = require('../models/Client/LicensePayment')
+const {TenantLicense} =  require('../models/Client/TenantLicense');
+const { TenantLicenseHistory } = require('../models/Client/TenantLicenseHistory');
 
 const register = async (req, res, next) => {
 
@@ -38,12 +42,28 @@ const register = async (req, res, next) => {
         //const user = await authSchema.validateAsync(req.body);   //This will throw error which will be catched in catch block
         let user = await userSchema.validateAsync(req.body)
         let contact = await contactSchema.validateAsync(req.body)
+        let tenant = await tenantSchema.validateAsync(req.body)
+        let payment = await licensePayment.validateAsync(req.body)
+
         
-        const Contact = await Contacts.findOne({
-            where: {email: contact.email}
+        // const Contact = await Contacts.findOne({
+        //     where: {email: contact.email}
+        // })
+
+        //if (Contact) throw createError.Conflict(`${contact.email} is already been registered`)
+
+        // Check if tenant already exists
+        let tenants = await Tenants.findOne({
+            where: {tenant_name: tenant.tenant_name}
         })
 
-        if (Contact) throw createError.Conflict(`${contact.email} is already been registered`)
+        if (tenants) throw createError.Conflict(`Business name ${tenant.tenant_name} already exists!`)
+
+          tenant.tenant_contact_id = contact.id
+        tenant.tenant_type=2
+        tenant.status_id=1
+
+        tenant = await Tenants.create(tenant, {transaction})
         
         // Check user if exists
         let User = await Users.findOne({
@@ -51,17 +71,24 @@ const register = async (req, res, next) => {
         }
         );
 
-        if (User) throw createError.Conflict(`${user.user_name} is already been registered`)
+        if (User) throw createError.Conflict(`${user.user_name} is already been registered!`)
 
         contact = await Contacts.create(contact, {transaction})
-    
+
+        await Tenants.update( tenant,
+           { where: {id: tenant.id}, fields: ['tenant_contact_id']},
+           {transaction}  
+        )
 
         const userPassword =  await hash.hashPassword(user.password)
         user.password = userPassword
         user.contact_id = contact.id
+        user.tenant_id = tenant.id
         const result= await Users.create(user, {transaction})
         
-            const accessToken = await signAccessToken(result.id)
+        // const accessToken = await signAccessToken(User.user_name,User.id, User.tenant_id, userPermissions)
+            const accessToken = await signAccessToken(user.user_name, result.id, result.tenant_id, [])
+           
             const refreshToken = await signRefreshToken(result.id)
 
             //Log first password usage
@@ -72,7 +99,6 @@ const register = async (req, res, next) => {
                 is_active: true
             
             }
-
             await PasswordHistory.create(passUsage, {transaction})
 
             const userStatHistory = {
@@ -85,14 +111,34 @@ const register = async (req, res, next) => {
            await UserStatusHistory.create(userStatHistory, {transaction})
 
            
+          payment .tenant_id = tenant.id
+          const paymentRes = await LicensePayment.create(payment, {transaction})
+
+
+          // create license
+          const license = {
+            tenant_id: tenant.id,
+            start_date: getDbDateNow(),
+            end_date: addMonthsDbDateNow(12) ,
+            package_id:  payment.package,
+            payment_id:paymentRes.id,
+            license_duration_month: 12,
+            is_active:1
+          }
+
+            await TenantLicense.create(license, {transaction})
+
+            // create license history
+            await TenantLicenseHistory.create(license, {transaction})
 
             //Create email verification link
             await generateVerificationEmail(result.id, contact.email, contact.email, transaction)
 
             await transaction.commit()
 
+            result.password = ""
             res.status(201).json({
-                message: "User created successfully",
+                message: "Account created successfully",
                 accessToken,
                 refreshToken,
                 data:result
@@ -109,6 +155,7 @@ const register = async (req, res, next) => {
 
 const generateVerificationEmail = async (userId, email, name, transaction) => {
     try{
+          
         // Generate tokens to be inserted into
         const token = getRandomString(64)
         const activationCode = {
@@ -121,39 +168,40 @@ const generateVerificationEmail = async (userId, email, name, transaction) => {
     await ActivationCodes.destroy({where: {user_id: userId}}, {transaction})
 
     await ActivationCodes.create(activationCode, {  transaction});
+        
 
     let tokenJson = {
         user_id: userId,
         token: token
     }
-    
     tokenText = JSON.stringify(tokenJson)
         
     const key =  process.env.CRYPTOGRAPHY_SECRET
     const serviceUrl = process.env.MAIL_ACTIVATION_URL
-    
+
     const crypoData =  encryp(key, tokenText)
-    
+
     const mailToken = {
         referer: crypoData.ciphertext,
         nonce: crypoData.iv,
         tag: crypoData.tag
     }
-    
+
     const tokenString = JSON.stringify(mailToken)
     
-    console.log('token stry: ', tokenString);
-    
+
     
     const tokenToBase64 = Buffer.from(tokenString).toString('base64')
-
+ 
     const activationLink = `${serviceUrl}?lnk=${tokenToBase64}`
 
+   
     let textBody =  `<p>Hi ${name}, </p>`
           textBody += '<p>Thanks  you for creating acount with us, please click the link bellow to activate your account </p>'
           textBody += `<p><a href="${activationLink}">Activate My Account</a></p>`
 
-    await sendMail(email, textBody)
+
+          await sendMail(email, textBody)
     
     }catch(err){
         logData('generateVerificationEmail: ' + err)
@@ -168,9 +216,13 @@ const  verifyEmail = async (req, res, next) => {
         const key =  process.env.CRYPTOGRAPHY_SECRET
 
         const tokenBase64 = req.query.lnk;
-        const tokenFromBase64 = Buffer.from(tokenBase64, 'base64').toString('ascii')
 
-        const cryptoObj = JSON.parse(tokenFromBase64)
+        
+
+        const tokenFromBase64 = Buffer.from(tokenBase64, 'base64').toString('utf8')
+
+        const cryptoObj = JSON.parse(tokenFromBase64.trim())
+        
         const plaintext = decrypt(key, cryptoObj.referer, cryptoObj.nonce, cryptoObj.tag);
 
         const tokenObj =   JSON.parse(plaintext)
@@ -194,6 +246,7 @@ const  verifyEmail = async (req, res, next) => {
         }
 
         if (User.email_verified == true){
+            res.redirect(req.baseUrl + '/login');
             throw createError.Forbidden("This email is already verified!")
         }
 
@@ -221,11 +274,14 @@ const  verifyEmail = async (req, res, next) => {
 
       await transaction.commit()
 
-        res.status(200).json({
-            message: "Email verified successfully",
-        })
+        // res.status(200).json({
+        //     message: "Email verified successfully",
+        // })
+
+        res.redirect(req.baseUrl + '/login');
     }catch(err){
        await transaction.rollback()
+       console.log(err)
         logData('verifyEmail: ' + err)
         next(err)
     }
@@ -233,6 +289,7 @@ const  verifyEmail = async (req, res, next) => {
 
 const login = async (req, res, next) => {
     try{
+       
         const login = await authSchema.validateAsync(req.body); 
 
         // Check user if exists
@@ -272,7 +329,7 @@ const login = async (req, res, next) => {
         if (User.retry_count >= passwordRetryCount){
             throw createError.Forbidden('Account is locked too many attempts')
         }
-        else if (User.email_verified != true){
+        else if (User.email_verified != true || User.sms_verified != true){
             throw createError.Forbidden('Account is not verified')
         }else if (User.is_active != true){
             throw createError.Forbidden('Account is not active')
@@ -282,7 +339,7 @@ const login = async (req, res, next) => {
         
         const userPermissions = await loadUserPermissions(User.id, User.tenant_id)
 
-        const accessToken = await signAccessToken(User.id, User.tenant_id, userPermissions)
+        const accessToken = await signAccessToken(User.user_name,User.id, User.tenant_id, userPermissions)
         const refreshToken = await signRefreshToken(User.id)
 
         //reset user login retry count
@@ -293,15 +350,50 @@ const login = async (req, res, next) => {
 
         await logSessionData(User.id, req.ip, accessToken, refreshToken);
 
+        let licensingInfo = await checkLicensingStatus(User.tenant_id)
+        
+
         res.status(200).json({
             message: "Logged in successfully",
             accessToken,
-            refreshToken
+            refreshToken,
+            licensingInfo
         })
     } catch(error){
+
         if (error.isJoi) return next(createError.BadRequest("invalid Username/Password"))
         next(error)
     }
+}
+
+const checkLicensingStatus = async (tenantId) =>{
+
+    const License = await TenantLicense.findOne({
+            where: {tenant_id:tenantId}
+        })
+
+        let licensingInfo = ''
+        if (License){
+
+            const dateDiff = getDifferenceInDate( new Date, new Date(License.end_date))
+
+            if(dateDiff > 0){
+                // license is still valid
+                licensingInfo = `License is active, expire on ${License.end_date}`
+                const thresholdDays = process.env.LICENSE_NOTIFY_BEFORE_DAYS
+                if(dateDiff < thresholdDays){
+                    licensingInfo =  `You license will expire in ${thresholdDays} days`
+                }
+            }else{
+                // License is expired
+                licensingInfo = 'You license is expired, please obtain new license to proceed'
+            }
+
+        }else{
+            licensingInfo ='Can not obtain your Licensing details '
+        }
+        return licensingInfo
+        
 }
 
 const changePassword = async (req, res, next) => {
@@ -527,7 +619,7 @@ const resetPassword = async(req, res, next) => {
            throw createError.NotFound('No user found with specified code')
         }
 
-        console.log('reset values: ', user)
+
         const newPassword = await hash.hashPassword(user.newPassword)
 
         User.password = newPassword
@@ -537,7 +629,6 @@ const resetPassword = async(req, res, next) => {
             {transaction}
         )
 
-        console.log('updated User: ', updateUser)
 
           //Log first password usage
           const passUsage = {
@@ -581,15 +672,15 @@ const refresh = async (req, res, next) => {
         const { refreshToken } = req.body
         if( !refreshToken) throw createError.BadRequest()
         const userId = await verifyRefreshToken(refreshToken)
-        
+
         //Generate a pair of refresh and access tokens
         const User = await Users.findOne({
-            where: {id: userId}, attributes: ['tenant_id'],
+            where: {id: userId}, attributes: ['user_name','tenant_id'],
         })
 
-        const userPermissions = await loadUserPermissions(User.id, User.tenant_id)
+        const userPermissions = await loadUserPermissions(userId, User.tenant_id)
 
-        const accessToken = await signAccessToken(userId, User.tenant_id, userPermissions)
+        const accessToken = await signAccessToken(User.user_name, userId, User.tenant_id, userPermissions)
         const newRefreshToken = await signRefreshToken(userId)
 
         let session = await ActiveSession.findOne({
@@ -604,8 +695,11 @@ const refresh = async (req, res, next) => {
         session.user_ip = req.ip
         ActiveSession.update(session.dataValues, {where: {user_id:userId}, fields: ['user_token','refresh_token', 'user_ip']})
 
-         res.status(200).json({accessToken, refreshToken: newRefreshToken})
+        let licensingInfo = checkLicensingStatus(User.tenant_id)
+
+         res.status(200).json({accessToken, refreshToken: newRefreshToken, licensingInfo})
     }catch(error){
+        console.log('REFRESH: ', error)
         next(error)
     }
 }
@@ -776,6 +870,72 @@ const loadUserPermissions = async(userId, tenantId) => {
     }
 }
 
+const updateLicense = async (req, res, next) => {
+    const transaction = await sequelize.transaction();
+
+    try {
+
+        let payment = await licensePayment.validateAsync(req.body)
+
+        const { userId, tenantId} =  req.jwtPayload;
+        
+        payment.tenant_id = tenantId
+      
+
+        const License = await TenantLicense.findOne({
+            where: { [Op.and]: { tenant_id: tenantId} }
+        });
+         
+        const paymentRes = await LicensePayment.create(payment, {transaction})
+
+
+          // check if same package then extend date, if different then add new date
+          const endDate = new Date(License.end_date)
+          if (payment.package_id == License.package_id){
+             if(  endDate > new Date()){
+                //Extend the license
+                License.end_date = addMonthsDbDateFromDate(endDate, 12)
+             }else{
+                License.start_date = new Date()
+                License.end_date = addMonthsDbDateNow(12)
+             }
+          }else{
+                License.package_id = payment.package_id
+                License.start_date = new Date()
+                License.end_date = addMonthsDbDateNow(12)
+          }
+
+            License.is_active= true
+            License.payment_id = paymentRes.id
+         
+            await TenantLicense.update(
+                payment,
+                {where: {tenant_id: tenantId}},
+                {transaction}
+            
+            )
+
+            // create license history
+            await TenantLicenseHistory.create(License, {transaction})
+
+
+         await transaction.commit()
+        res.status(200).json({
+            ...payment,
+            message: "License details updated successfuly!",
+        })
+
+       // const { userId, tenatId} =  req.jwtPayload;
+        await logUserActivity(userId, 6, 2, true, group.id)
+
+    } catch (err) {
+        await transaction.rollback()
+
+        logData('createLicenseUpdate: +' + err)
+        next(err)
+    }
+}
+
 module.exports = {
     register,
     login,
@@ -785,5 +945,6 @@ module.exports = {
     verifyEmail,
     requestForgotPasswordWeb,
     requestForgotPasswordApp,
-    resetPassword
+    resetPassword,
+    updateLicense
 }

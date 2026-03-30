@@ -1,6 +1,6 @@
 const express = require('express')
 const adminController = require('../controllers/sys.admin.controller')
-const {verifyAccessToken} = require('../middlewares/check_auth')
+const {verifyAccessTokenAdmin} = require('../middlewares/check_auth_sys')
 
 const router = express.Router()
 
@@ -23,7 +23,7 @@ const router = express.Router()
  *        description: Ok
  */
 
-router.get("/groups/:id?", verifyAccessToken, adminController.groupDetails)
+router.get("/groups/:id?", verifyAccessTokenAdmin, adminController.groupDetails)
 
 /**
  * @openapi
@@ -62,7 +62,7 @@ router.get("/groups/:id?", verifyAccessToken, adminController.groupDetails)
  *      409:
  *        description: Conflict
  */
-router.post("/group-edit", verifyAccessToken, adminController.editGroup)
+router.post("/group-edit", verifyAccessTokenAdmin, adminController.editGroup)
 
 /**
  * @openapi
@@ -82,7 +82,7 @@ router.post("/group-edit", verifyAccessToken, adminController.editGroup)
  *        description: Ok, List of User(s)
  */
 
-router.get("/users/:id?", verifyAccessToken, adminController.userDetails)
+router.get("/users/:id?", verifyAccessTokenAdmin, adminController.userDetails)
 
 
 /**
@@ -152,7 +152,7 @@ router.get("/users/:id?", verifyAccessToken, adminController.userDetails)
  *      409:
  *        description: Conflict
  */
-router.post("/user-edit", verifyAccessToken, adminController.editUser)
+router.post("/user-edit", verifyAccessTokenAdmin, adminController.editUser)
 
 /**
  * @openapi
@@ -171,7 +171,7 @@ router.post("/user-edit", verifyAccessToken, adminController.editUser)
  *      200:
  *        description: Ok
  */
-router.get('/user-groups/:id?', verifyAccessToken, adminController.userGroupDetails)
+router.get('/user-groups/:id?', verifyAccessTokenAdmin, adminController.userGroupDetails)
 
 /**
  * @openapi
@@ -211,7 +211,7 @@ router.get('/user-groups/:id?', verifyAccessToken, adminController.userGroupDeta
  *      409:
  *        description: Conflict
  */
-router .post('/user-group-edit', verifyAccessToken, adminController.editUserGroup)
+router .post('/user-group-edit', verifyAccessTokenAdmin, adminController.editUserGroup)
 
 /**
  * @openapi
@@ -230,7 +230,7 @@ router .post('/user-group-edit', verifyAccessToken, adminController.editUserGrou
  *      200:
  *        description: Ok
  */
-router.get("/group-permissions/:id?", verifyAccessToken,adminController.groupPermissionDetails)
+router.get("/group-permissions/:id?", verifyAccessTokenAdmin,adminController.groupPermissionDetails)
 
 /**
  * @openapi
@@ -273,7 +273,7 @@ router.get("/group-permissions/:id?", verifyAccessToken,adminController.groupPer
  *      409:
  *        description: Conflict
  */
-router.post("/group-permission-edit", verifyAccessToken, adminController.editGroupPermission)
+router.post("/group-permission-edit", verifyAccessTokenAdmin, adminController.editGroupPermission)
 
 /**
  * @openapi
@@ -292,7 +292,7 @@ router.post("/group-permission-edit", verifyAccessToken, adminController.editGro
  *      200:
  *        description: Ok
  */
-router.get("/user-permissions/:id?", verifyAccessToken, adminController.userPermissionDetails)
+router.get("/user-permissions/:id?", verifyAccessTokenAdmin, adminController.userPermissionDetails)
 
 /**
  * @openapi
@@ -335,25 +335,6 @@ router.get("/user-permissions/:id?", verifyAccessToken, adminController.userPerm
  *      409:
  *        description: Conflict
  */
-router.post("/user-permission-edit", verifyAccessToken, adminController.editUserPermission)
-
-/**
- * @openapi
- * '/sys_admin/tenant-details/{id}':
- *  get:
- *    tags:
- *    - System Administration
- *    summary: Get tenants list
- *    parameters:
- *      - in: path
- *        name: id
- *        type: integer
- *        required: false
- *        description: Numeric tenant id, omit for all
- *    responses:
- *      200:
- *        description: Ok
- */
-router.get("/tenant-details/:id?", verifyAccessToken, adminController.tenantDetails)
+router.post("/user-permission-edit", verifyAccessTokenAdmin, adminController.editUserPermission)
 
 module.exports = router

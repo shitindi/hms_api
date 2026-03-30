@@ -4,10 +4,9 @@ const {verifyAccessToken} = require('../middlewares/check_auth')
 
 const router = express.Router();
 
-
 /**
  * @openapi
- * '/aut/register':
+ * '/auth/register':
  *  post:
  *     tags:
  *     - Authentication
@@ -19,6 +18,14 @@ const router = express.Router();
  *           schema:
  *            type: object
  *            required:
+ *              - tenant_name
+ *              - tenant_email
+ *              - tin_number
+ *              - tax_group
+ *              - country_id
+ *              - tenant_mobile
+ *              - tenant_description
+ *              - user_name
  *              - first_name
  *              - last_name
  *              - email
@@ -26,7 +33,36 @@ const router = express.Router();
  *              - tenant_id
  *              - created_by
  *              - contact_type
- *            properties:
+ *              - payment_type
+ *              - payment_method
+ *              - amount
+ *            properties: 
+ *              tenant_name:
+ *                type: string
+ *              tenant_email:
+ *                type: string
+ *              website:
+ *                type: string
+ *              tin_number:
+ *                type: string
+ *              vrn_number:
+ *                type: string
+ *              tax_group:
+ *                type: integer
+ *              country_id:
+ *                type: integer
+ *              region_id:
+ *                type: integer
+ *              region_name:
+ *                type: string
+ *              tenant_Address:
+ *                type: string
+ *              tenant_mobile:
+ *                type: string
+ *              tenant_phone:
+ *                type: string
+ *              tenant_description:
+ *                type: string
  *              first_name:
  *                type: string
  *              middle_name:
@@ -65,14 +101,63 @@ const router = express.Router();
  *                type: integer
  *              user_status:
  *                type: integer
- *                default: 5         
+ *                default: 5  
+ *              payment_type:
+ *                type: integer
+ *              payment_method:
+ *                type: integer
+ *              amount:
+ *                type: integer 
+ *              package:
+ *                type: integer       
+ *     responses:
+ *      201:
+ *        description: Ok, with created or updated object
+ *      409:
+ *        description: Conflict
+ */
+router.post("/register", authController.register)
+
+ /**
+ * @openapi
+ * '/auth/buy-license':
+ *  post:
+ *     tags:
+ *     - Authentication
+ *     summary: Purchase license by package
+ *     requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *           schema:
+ *            type: object
+ *            required:
+ *              - payment_type
+ *              - payment_method
+ *              - amount
+ *              - tenant_id
+ *              - created_by
+ *            properties:
+ *              id:
+ *                type: integer
+ *              tenant_id:
+ *                type: integer
+ *              payment_type:
+ *                type: integer
+ *              payment_method:
+ *                type: integer
+ *              amount:
+ *                type: integer
+ *              package:
+ *                type: integer
  *     responses:
  *      200:
  *        description: Ok, with created or updated object
  *      409:
  *        description: Conflict
  */
-router.post("/register", authController.register)
+router.get("/buy-license", verifyAccessToken, authController.updateLicense)
+
 
 /**
  * @openapi
@@ -255,5 +340,6 @@ router.post("/forgot-password", authController.requestForgotPasswordApp)
 router.post("/reset-password", authController.resetPassword)
 
 router.get("/verifyEmail", authController.verifyEmail)
+
 
 module.exports = router;

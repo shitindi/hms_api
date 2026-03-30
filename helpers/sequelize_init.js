@@ -3,11 +3,11 @@ require('dotenv').config()
 
 
 const [host, port, db, user, secret] = [
-    process.env.MYSQL_HOST, process.env.MYSQL_PORT, process.env.MYSQL_DB, process.env.MYSQL_USER, process.env.MYSQL_SECRET
+    process.env.PGD_HOST, process.env.PGD_PORT, process.env.PGD_DB, process.env.PGD_USER, process.env.PGD_SECRET
 ]
 
 const sequelize = new Sequelize(db, user, secret, {
-    host: host,port: port,dialect: 'mysql',
+    host: host,port: port,dialect: 'postgres',
     define: {
       //  freezeTableName: true  // make global options instead of individual definition
     }
