@@ -59,6 +59,7 @@ const contactSchema = Joi.object({
     contact_type: Joi.number().default(1),
     tenant_id: Joi.number().default(null),
     created_by : Joi.number().required(),
+    gender_id: Joi.number().required(),
 }).options({stripUnknown: true}).options({stripUnknown: true})
 
 // Schema for user details
@@ -72,7 +73,8 @@ const userSchema = Joi.object({
     must_change_password: Joi.bool() ,
     //contact_id: Joi.number().required().default(0),
     tenant_id: Joi.number().default(0),
-    user_status: Joi.number().default(1)
+    user_status: Joi.number().default(1),
+    department_id: Joi.number()
     
 }).with('password','confirm_password').options({stripUnknown: true})
 

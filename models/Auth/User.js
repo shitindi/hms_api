@@ -3,6 +3,7 @@ const {Contact} = require('../Auth/Contact')
 const {Tenant } = require('../Auth/Tenant')
 const {UserStatus} = require('../Auth/UserStatus')
 const { TenantBranch } = require('../Client/TenantBranch')
+const { Department } = require('../Lookup/Department')
 
 const User = db.define('auth_tbl_user', {
    user_name: {
@@ -59,6 +60,10 @@ const User = db.define('auth_tbl_user', {
    },
    default_branch: {
       type: DataTypes.INTEGER
+   },
+   department_id: {
+      type: DataTypes.TINYINT,
+      
    }
 }
 )
@@ -86,7 +91,10 @@ User.belongsTo(TenantBranch, { as: 'DefaultBranch', foreignKey: {name: 'default_
 User.hasMany(TenantBranch, {foreignKey: {name: 'created_by', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 TenantBranch.belongsTo(User, {as: 'CreatedBy', foreignKey: {name: 'created_by', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
-  
+Department.hasMany(User, {foreignKey: {name: 'department_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+User.belongsTo(Department, {as: 'Department', foreignKey: {name: 'department_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
+
 
   module.exports = { 
    User

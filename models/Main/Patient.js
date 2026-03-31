@@ -21,10 +21,6 @@ const Patient = db.define('main_tbl_patient', {
     id_number: {
         type: DataTypes.STRING
     },
-    gender: {
-        type: DataTypes.TINYINT,
-        allowNull: false
-    },
     marital_status: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -48,6 +44,13 @@ const Patient = db.define('main_tbl_patient', {
     next_kin_phone: {
         type: DataTypes.STRING(15),
         allowNull: false
+    },
+    joining_date: {
+        type: DataTypes.DATEONLY
+    },
+    is_active: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
     }
 
 }
@@ -55,11 +58,6 @@ const Patient = db.define('main_tbl_patient', {
 
 IDType.hasMany(Patient, {foreignKey: {name: 'id_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Patient.belongsTo(IDType, {as: 'IdType',foreignKey: {  name: 'id_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-
-
-Gender.hasMany(Patient, {foreignKey: {name: 'gender_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-Patient.belongsTo(Gender, {as: 'Gender',foreignKey: {  name: 'gender_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-
 
 MaritalStatus.hasMany(Patient, {foreignKey: {name: 'marital_status_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Patient.belongsTo(MaritalStatus, {as: 'MaritalStatus',foreignKey: {  name: 'marital_status_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})

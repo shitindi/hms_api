@@ -1,5 +1,6 @@
 const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
 const {ContactType} = require('../Auth/ContactType')
+const { Gender } = require('../Lookup/Gender')
 const { Tenant } = require('./Tenant')
 
 const Contact = db.define('auth_tbl_contact', {
@@ -50,6 +51,9 @@ const Contact = db.define('auth_tbl_contact', {
         type: DataTypes.INTEGER,
         allowNull: true
      },
+     gender_id: {
+        
+     }
 
 })
 
@@ -61,6 +65,9 @@ Contact.belongsTo(ContactType, { as: 'ContactType', foreignKey: {name: 'contact_
 
  Tenant.hasMany(Contact, {foreignKey: {name: 'tenant_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
  Contact.belongsTo(Tenant, {as: 'Contact',foreignKey: {  name: 'tenant_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
+ Gender.hasMany(Contact, {foreignKey: {name: 'gender_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Contact.belongsTo(Gender, {as: 'Gender',foreignKey: {  name: 'gender_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 
   module.exports = { 

@@ -465,6 +465,7 @@ router.get("/tenant-branches/:id?", verifyAccessToken, adminController.tenantBra
  *              - tenant_id
  *              - created_by
  *              - contact_person
+ *              - gender_id
  *            properties:
  *              id:
  *                type: integer
@@ -491,6 +492,31 @@ router.get("/tenant-branches/:id?", verifyAccessToken, adminController.tenantBra
  *                type: string
  *              contact_person:
  *                type: integer
+ *              gender_id:
+ *                type: integer
+ * 
+ *              doctor_id:
+ *                type: integer
+ *              id_type:
+ *                type: integer
+ *              id_number:
+ *                type: integer
+ *              doctor_id_no:
+ *                type: string
+ *              license_number:
+ *                type: string
+ *              specialization:
+ *                type: integer
+ *              highest_qualification:
+ *                type: string
+ *              year_of_experience:
+ *                type: integer
+ *              employment_type:
+ *                type: integer
+ *              joining_date:
+ *                type: string
+ *              is_active:
+ *                type: boolean
  *
  *     responses:
  *      200:

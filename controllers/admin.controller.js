@@ -1,5 +1,6 @@
 const createError = require('http-errors');
-const { groupSchema, userSchema, contactSchema, userGroupSchema, groupPermissionSchema, userPermissionSchema } = require('../helpers/auth_validation_schema')
+const { groupSchema, userSchema, contactSchema, userGroupSchema, groupPermissionSchema, userPermissionSchema } = require('../helpers/validator/auth_validation_schema')
+const {doctorSchema} = require('../helpers/validator/doctor_validation_schema')
 const { Group: Groups } = require('../models/Auth/Group');
 const { User: Users, User } = require('../models/Auth/User')
 const { Contact: Contacts } = require('../models/Auth/Contact');
@@ -10,7 +11,7 @@ const { UserPermission: UserPermissions } = require('../models/Auth/UserPermissi
 const { PersmissionType } = require('../models/Auth/PermisionType')
 const { Module: Modules } = require('../models/Auth/Module')
 const { logData, logUserActivity, } = require('../helpers/logger');
-const { request } = require('express');
+//const { request } = require('express');
 const { Tenant: Tenants } = require('../models/Auth/Tenant');
 const { TenantStatus } = require('../models/Auth/TenantStatus')
 const { UserStatusHistory } = require('../models/Auth/UserStatusHistory')
@@ -21,7 +22,7 @@ const { sequelize } = require('../helpers/sequelize_init');
 const { getDbDateNow } = require('../helpers/utility');
 const { ContactType } = require('../models/Auth/ContactType');
 
-const { tenantBranchSchema } = require('../helpers/client_validation_schema')
+const { tenantBranchSchema } = require('../helpers/validator/client_validation_schema')
 const { TenantBranch } = require('../models/Client/TenantBranch')
 const { LicenseBranchCount } = require('../models/Client/LicenseBranchCount')
 const { LicenseUserCount } = require('../models/Client/LIcenseUserCount');
@@ -29,6 +30,8 @@ const { TenantCountry } = require('../models/Client/Countries');
 const { TenantRegion } = require('../models/Client/Regions');
 const { TenantLicense } = require('../models/Client/TenantLicense');
 const { LicensePackage } = require('../models/Client/LicensePackage');
+const { Department } = require('../models/Lookup/Department');
+const { Doctor: Doctors } = require('../models/Main/Doctor');
 
 const groupDetails = async (req, res, next) => {
 
@@ -395,6 +398,10 @@ const userDetails = async (req, res, next) => {
                 {
                     model: TenantBranch, as: 'DefaultBranch',
                     attributes: ['id', 'branch_name']
+                },
+                {
+                    model: Department, as: 'Department',
+                    attributes: ['id', 'name']
                 }
                 ]
             })
@@ -446,7 +453,12 @@ const editUser = async (req, res, next) => {
 
         let user = await userSchema.validateAsync(req.body)
         let contact = await contactSchema.validateAsync(req.body)
+        let doctor = await doctorSchema.validateAsync(req.body)
         const { user_id, tenantId } = req.jwtPayload;
+
+        let is_doctor = contact.contact_type ==1 ? true : false;
+        let existDoctor = null;
+        let Doctor = null;
 
         if (tenantId != user.tenant_id) {
             throw createError.Forbidden('Tenant specified is not valid')
@@ -463,6 +475,13 @@ const editUser = async (req, res, next) => {
             where: { id: user.user_id }
         });
 
+       
+        
+        if (is_doctor == true){
+            existDoctor = await Doctor.findOne({
+                where: {id: doctor.doctor_id}
+            })
+        }
 
 
         let action = 0;
@@ -481,6 +500,20 @@ const editUser = async (req, res, next) => {
                 const Contact = await Contacts.findOne({
                     where: { id: user?.contact_id ?? 0 }
                 })
+
+                if (existDoctor && existDoctor.id == doctor.doctor_id && doctor.user_id == existUser.id){
+                    await Doctors.update(
+                        doctor, {
+                            where: {[Op.and]: {id: existDoctor.id, user_id: existUser.id}}
+                        }
+                    )
+                }
+
+                if ( contact.contact_type != 1){
+                    Doctor.destroy({
+                        where: {user_id: existUser.id}
+                    })
+                }
 
                 if (Contact && Contact.id == existUser.contact_id) {
                     await Contacts.update(
@@ -554,6 +587,10 @@ const editUser = async (req, res, next) => {
 
 
             user = await Users.create(user, { transaction })
+
+            doctor.tenant_id = user.tenant_id
+            doctor.user_id = user.id
+            doctor = await Doctors.create(doctor, { transaction})
 
             //Log first password usage
             const passUsage = {
