@@ -183,15 +183,10 @@ const seedAuthDatabase = async () => {
                     { id: 9, item_name: 'Branch User Count', module_id: module.id, code: 109 },
                     { id: 10, item_name: 'Tenant details', module_id: module.id, code: 110 },
                     { id: 11, item_name: 'Tenant Branch details', module_id: module.id, code: 111 },
-                    { id: 12, item_name: 'Sales Product Categories', module_id: module.id, code: 112 },
-                    { id: 13, item_name: 'Customers', module_id: module.id, code: 113 },
-                    { id: 14, item_name: 'Customers Type', module_id: module.id, code: 114 },
-                    { id: 15, item_name: 'Inventory', module_id: module.id, code: 115 },
-                    { id: 16, item_name: 'Order', module_id: module.id, code: 116 },
-                    { id: 17, item_name: 'Payment', module_id: module.id, code: 117 },
-                    { id: 18, item_name: 'Product', module_id: module.id, code: 118 },
-                    { id: 19, item_name: 'Supplier', module_id: module.id, code: 119 },
-                    { id: 20, item_name: 'Contacts', module_id: module.id, code: 120 }
+                    { id: 12, item_name: 'Patient details', module_id: module.id, code: 112 },
+                    { id: 13, item_name: 'Doctors details', module_id: module.id, code: 113 },
+                    { id: 14, item_name: 'Apointment details', module_id: module.id, code: 114 },
+
 
 
                 ])

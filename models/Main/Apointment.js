@@ -5,6 +5,7 @@ const {AppointmentType} = require('../Lookup/AppointmentType')
 const {Doctor} = require('./Doctor')
 const {Priority} = require('../Lookup/Priority')
 const { Patient } = require('./Patient')
+const { User } = require('../Auth/User')
 
 const Appointment = db.define('main_tbl_apointment', {
 
@@ -57,9 +58,17 @@ const Appointment = db.define('main_tbl_apointment', {
     appointment_no: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    created_by: {
+        type: DataTypes.INTEGER,
+        allowNull: false
     }
 }
 )
+
+User.hasMany(Appointment, {foreignKey: {name: 'created_by', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Appointment.belongsTo(User, {as: 'CreatedBy',foreignKey: {  name: 'created_by', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
 
 AppointmentType.hasMany(Appointment, {foreignKey: {name: 'appointment_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Appointment.belongsTo(AppointmentType, {as: 'AppointmentType',foreignKey: {  name: 'appointment_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})

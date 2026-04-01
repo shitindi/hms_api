@@ -1,7 +1,7 @@
 const Joi = require('@hapi/joi')
 
 
-export const doctorSchema = Joi.object({
+const doctorSchema = Joi.object({
     id: Joi.number().allow(null),
     doctor_id: Joi.number().allow(null),
     tenant_id: Joi.number().required(),
@@ -17,4 +17,6 @@ export const doctorSchema = Joi.object({
     joining_date: Joi.date(),
     is_active: Joi.bool().default(false)
 
-})
+}).options({stripUnknown: true}).options({stripUnknown: true})
+
+module.exports = {doctorSchema}

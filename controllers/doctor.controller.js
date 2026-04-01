@@ -47,6 +47,15 @@ const doctorDetails = async (req, res, next) => {
                         model: EmploymentType, as: 'EmploymentType',
                         attributes: ['id', 'name']
                     },
+                    {
+                    model: Users, as: "CreatedBy",
+                    attributes: ['id', 'user_name'],
+                    include: [{
+                        model: Contacts,
+                        attributes: ['id', 'first_name', 'last_name']
+                    }]
+                },
+                
                     
                 ]
             })
@@ -80,7 +89,14 @@ const doctorDetails = async (req, res, next) => {
                     {
                         model: EmploymentType, as: 'EmploymentType',
                         attributes: ['id', 'name']
-                    },
+                    },{
+                     model: Users, as: "CreatedBy",
+                    attributes: ['id', 'user_name'],
+                    include: [{
+                        model: Contacts,
+                        attributes: ['id', 'first_name', 'last_name']
+                    }]
+                }
                     
                 ],
 
@@ -89,7 +105,7 @@ const doctorDetails = async (req, res, next) => {
            
         }
 
-        await logUserActivity(logged_user, 1, 4, true)
+        await logUserActivity(logged_user, 13, 4, true)
 
         res.status(200).json(doctorList)
     } catch (err) {

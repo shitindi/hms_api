@@ -55,10 +55,19 @@ const Doctor = db.define('main_tbl_doctor', {
     is_active: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
+    },
+    created_by: {
+        type: DataTypes.INTEGER,
+        allowNull: false
     }
 
 }
 )
+
+
+User.hasMany(Appointment, {foreignKey: {name: 'created_by', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Appointment.belongsTo(User, {as: 'CreatedBy',foreignKey: {  name: 'created_by', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
 
 IDType.hasMany(Doctor, {foreignKey: {name: 'id_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Doctor.belongsTo(IDType, {as: 'IdType',foreignKey: {  name: 'id_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
@@ -78,3 +87,6 @@ Doctor.belongsTo(User, {as: 'User',foreignKey: {  name: 'user_id', allowNull: tr
 
 
 module.exports = {Doctor}
+
+//RFP for revenue
+//

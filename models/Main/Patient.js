@@ -3,6 +3,8 @@ const { IDType } = require('../Lookup/IDType')
 const {Gender} = require('../Lookup/Gender')
 const {MaritalStatus} = require('../Lookup/MaritalStatus')
 const {BloodGroup} = require('../Lookup/BloodGroup')
+const { Contact } = require('../Auth/Contact')
+const { User } = require('../Auth/User')
 
 const Patient = db.define('main_tbl_patient', {
 
@@ -51,10 +53,20 @@ const Patient = db.define('main_tbl_patient', {
     is_active: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
+    },
+    created_by: {
+        type: DataTypes.INTEGER,
+        allowNull: false
     }
 
 }
 )
+
+User.hasMany(Patient, {foreignKey: {name: 'created_by', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Patient.belongsTo(User, {as: 'CreatedBy',foreignKey: {  name: 'created_by', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
+Contact.hasOne(Patient, {foreignKey: {name: 'contact_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Patient.belongsTo(Contact, {as: 'Contact',foreignKey: {  name: 'contact_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 IDType.hasMany(Patient, {foreignKey: {name: 'id_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Patient.belongsTo(IDType, {as: 'IdType',foreignKey: {  name: 'id_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
