@@ -25,7 +25,7 @@ const { ActivityLog } = require('../models/Auth/ActivityLog')
 const { ActivityType } = require('../models/Auth/ActivityType')
 const { ContactType } = require('../models/Auth/ContactType')
 
-//const { hashPassword } = require('./hash_data')
+const { hashPassword } = require('./hash_data')
 const { TenantType } = require('../models/Auth/TenantType')
 const { LicensePackage } = require('../models/Client/LicensePackage')
 const { LicenseBranchCount } = require('../models/Client/LicenseBranchCount')
@@ -43,7 +43,7 @@ const { IDType } = require('../models/Lookup/IDType')
 const { PaymentStatus } = require('../models/Main/PaymentStatus')
 const { Payment } = require('../models/Main/Payment')
 const { PaymentStatusHistory } = require('../models/Main/PaymentStatusHistory')
-const { Currrency } = require('../models/Lookup/Currency')
+//const { Currency } = require('../models/Lookup/Currency')
 const { Gender } = require('../models/Lookup/Gender')
 const { MaritalStatus } = require('../models/Lookup/MaritalStatus')
 const { BloodGroup } = require('../models/Lookup/BloodGroup')
@@ -58,6 +58,12 @@ const { Doctor } = require('../models/Main/Doctor')
 const { Insurer } = require('../models/Main/Insurer')
 const { Patient } = require('../models/Main/Patient')
 const { PatientInsurer } = require('../models/Main/PatientInsurer')
+const { Order } = require('../models/Main/Order')
+const { OrderStatus } = require('../models/Lookup/OrderStatus')
+const { Currrency } = require('../models/Lookup/Currency')
+const { BillingOption } = require('../models/Lookup/BillingtOption')
+const { PatientActivity } = require('../models/Lookup/PatientActivity')
+const { PatientJourney } = require('../models/Main/PatientJourney')
 
 const seedAuthDatabase = async () => {
     try {
@@ -73,7 +79,7 @@ const seedAuthDatabase = async () => {
         const contactTypeCount = await ContactType.count()
         const tenantType = await TenantType.count()
         const packageCount = await LicensePackage.count()
-       // const appCount = await Application.count()
+        // const appCount = await Application.count()
         const payTypeCount = await LicensePaymentType.count()
         const payMethodCount = await LicensePaymentMethod.count()
 
@@ -93,25 +99,60 @@ const seedAuthDatabase = async () => {
         const AppointmentTypeCount = await AppointmentType.count()
         const AppointmentStatusCount = await AppointmentStatus.count()
 
-          if (PriorityCount == 0){
-            await IDType.bulkCreate([
+        const TenantRegionsCount = await TenantRegion.count()
+        const BillingOptionCount = await BillingOption.count()
+        const PattientActivitiesCount = await PatientActivity.count()
+
+        if (PattientActivitiesCount == 0) {
+            await PatientActivity.bulkCreate([
+                { ID: 1, name: "Reception" , is_active: true},
+                { ID: 2, name: "Doctor appointment" , is_active: true},
+                { ID: 3, name: "Initial Assessment" , is_active: true},
+                { ID: 4, name: "Doctor consulation" , is_active: true},
+                { ID: 5, name: "Medicine prescription" , is_active: true},
+                { ID: 6, name: "Laboratory or diagnosting testing" , is_active: true},
+                { ID: 7, name: "Clinical procedure" , is_active: true},
+                { ID: 8, name: "Doctor review of results" , is_active: true},
+                { ID: 9, name: "Pharmacy" , is_active: true},
+                { ID: 10, name: "Billing and payments" , is_active: true},
+                { ID: 11, name: "Admission" , is_active: true},
+                { ID: 12, name: "Discharge" , is_active: true},
+                { ID: 13, name: "Closed" , is_active: false},
+            ])
+        }
+
+        if (BillingOptionCount == 0) {
+            await BillingOption.bulkCreate([
+                { ID: 1, name: 'Cash' }, { ID: 2, name: 'Insured' }, { ID: 3, name: 'Billing' },
+            ])
+        }
+
+        if (TenantRegionsCount == 0) {
+            await TenantRegion.bulkCreate([
+                { ID: 1, name: 'Dar es Salaam', region_code: 1 }, { ID: 2, name: 'Moshi', region_code: 2 },
+                { ID: 3, name: 'Mbeya', region_code: 3 }
+            ])
+        }
+
+        if (PriorityCount == 0) {
+            await Priority.bulkCreate([
                 { ID: 1, name: 'Normal' }, { ID: 2, name: 'Urgent' }, { ID: 3, name: 'High priority' }
             ])
         }
 
-          if (AppointmentTypeCount == 0){
-            await IDType.bulkCreate([
+        if (AppointmentTypeCount == 0) {
+            await AppointmentType.bulkCreate([
                 { ID: 1, name: 'Consultation' }, { ID: 2, name: 'Follow-up' }, { ID: 3, name: 'Review' }, { ID: 4, name: 'Emergency review' }
             ])
         }
 
-          if (AppointmentStatusCount == 0){
-            await IDType.bulkCreate([
+        if (AppointmentStatusCount == 0) {
+            await AppointmentStatus.bulkCreate([
                 { ID: 1, name: 'Waiting' }, { ID: 2, name: 'Confirmed' }, { ID: 3, name: 'Checked-in' }, { ID: 4, name: 'Canceled' }
             ])
         }
 
-        if (IdTypeCount == 0){
+        if (IdTypeCount == 0) {
             await IDType.bulkCreate([
                 { ID: 1, name: 'National Id' }, { ID: 2, name: 'Voter ID' }, { ID: 3, name: 'Driving License' }, { ID: 4, name: 'Passport' }
             ])
@@ -123,35 +164,35 @@ const seedAuthDatabase = async () => {
             ])
         }
 
-        if ( MaritalStatusCount == 0) {
-            await Gender.bulkCreate([
-                { ID: 1, name: 'Single' }, { ID: 2, name: 'Married' }, { ID: 3, name: 'Divorced' }, { ID: 4, name: 'Widowed' }, 
+        if (MaritalStatusCount == 0) {
+            await MaritalStatus.bulkCreate([
+                { ID: 1, name: 'Single' }, { ID: 2, name: 'Married' }, { ID: 3, name: 'Divorced' }, { ID: 4, name: 'Widowed' },
             ])
         }
 
-         if ( BloodGroupCount== 0) {
-            await Gender.bulkCreate([
-                { ID: 1, name: 'A+' }, { ID: 2, name: 'A-' }, { ID: 3, name: 'B+' }, { ID: 4, name: 'B-' }, 
-                 { ID: 5, name: 'O+' }, { ID: 6, name: 'O-' }, { ID: 7, name: 'AB+' }, { ID: 8, name: 'AB-' }, 
+        if (BloodGroupCount == 0) {
+            await BloodGroup.bulkCreate([
+                { ID: 1, name: 'A+' }, { ID: 2, name: 'A-' }, { ID: 3, name: 'B+' }, { ID: 4, name: 'B-' },
+                { ID: 5, name: 'O+' }, { ID: 6, name: 'O-' }, { ID: 7, name: 'AB+' }, { ID: 8, name: 'AB-' },
             ])
         }
 
 
-       if ( DepartmentCount == 0) {
-            await Gender.bulkCreate([
-                { ID: 1, name: 'General Medicine' }, { ID: 2, name: 'Cardiology' }, { ID: 3, name: 'Gynecology' }, 
+        if (DepartmentCount == 0) {
+            await Department.bulkCreate([
+                { ID: 1, name: 'General Medicine' }, { ID: 2, name: 'Cardiology' }, { ID: 3, name: 'Gynecology' },
             ])
         }
 
-        if ( SpecializationCount == 0) {
-            await Gender.bulkCreate([
-                { ID: 1, name: 'General Medicine' }, { ID: 2, name: 'Cardiology' }, { ID: 3, name: 'Gynecology' }, 
+        if (SpecializationCount == 0) {
+            await Specialization.bulkCreate([
+                { ID: 1, name: 'General Medicine' }, { ID: 2, name: 'Cardiology' }, { ID: 3, name: 'Gynecology' },
             ])
         }
-        
-        if ( EmploymentTypeCount == 0) {
-            await Gender.bulkCreate([
-                { ID: 1, name: 'Full time' }, { ID: 2, name: 'Part time' }, { ID: 3, name: 'Visiting Consultant' }, 
+
+        if (EmploymentTypeCount == 0) {
+            await EmploymentType.bulkCreate([
+                { ID: 1, name: 'Full time' }, { ID: 2, name: 'Part time' }, { ID: 3, name: 'Visiting Consultant' },
             ])
         }
 
@@ -210,9 +251,9 @@ const seedAuthDatabase = async () => {
 
         if (contactTypeCount == 0) {
             await ContactType.bulkCreate([
-                { ID: 1, name: 'Medical staff' , is_active: true},
-                { ID: 2, name: 'Administration' , is_active: true}, { ID: 3, name: 'Pattient', is_active: false }, 
-                
+                { ID: 1, name: 'Medical staff', is_active: true },
+                { ID: 2, name: 'Administration', is_active: true }, { ID: 3, name: 'Pattient', is_active: false },
+
             ])
         }
 
@@ -245,17 +286,17 @@ const seedAuthDatabase = async () => {
         if (usersCount == 0) {
             /*
             const  cont = await Contact.create(
-                {    first_name: 'Ndinao',middle_name: 'Andrew', last_name: 'Shitindi',email: 'ndinao@hotmail.com', 
+                {    first_name: 'Ndinao',middle_name: 'Andrew', last_name: 'Shitindi',email: 'ndinao@hotmail.com', gender_id:1,
                     mobile_no: '0715432268',  phone: '0779786152', position: 'Senior Software Developer',address: 'Buyuni chanika', contact_type:1 }
             )
     
             const tenant = await Tenant.create(
                 { tenant_name: 'Byteware inc',status_id: 1,contact_id: cont.id, tenant_type:1}
             )
-         */
+        */
             const user = {
                 id: 1, user_name: 'admim@mycompany.com', password: '', must_change_password: false, email_verified: true, sms_verified: true,
-                is_active: true, retry_count: 0, user_status: 1, contact_id: 6, tenant_id: 1
+                is_active: true, retry_count: 0, user_status: 1, contact_id: 1, tenant_id: 1
             }
             user.password = await hashPassword('Admin@123')
 
@@ -302,8 +343,12 @@ const updateAuthDbSchema = async () => {
 
     try {
 
+              await Patient.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl main_tbl_patient: ' + err))
 
-        
+            return
+
 
         await LicensePaymentType.sync({ alter: true })
             .then(data => { })
@@ -359,43 +404,64 @@ const updateAuthDbSchema = async () => {
             .then(data => { })
             .catch(err => console.log('error Create table tbl sales_lkp_payment_status: ' + err))
 
-        await AppointmentStatus.sync({ alter: true})
-            .then(data =>{})
+        await AppointmentStatus.sync({ alter: true })
+            .then(data => { })
             .catch(err => console.log('error create table lookup_tbl_appointment_status: ' + err))
-         
-        await AppointmentType.sync({ alter: true})
-            .then(data =>{})
+
+        await AppointmentType.sync({ alter: true })
+            .then(data => { })
             .catch(err => console.log('error create table lookup_tbl_appointment_type: ' + err))
 
-        await BloodGroup.sync({ alter: true})
-        .then(data =>{})
-        .catch(err => console.log('error create table lookup_tbl_blood_group: ' + err))
+        await BloodGroup.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error create table lookup_tbl_blood_group: ' + err))
 
-        await Department.sync({ alter: true})
-            .then(data =>{})
+        await Department.sync({ alter: true })
+            .then(data => { })
             .catch(err => console.log('error create table lookup_tbl_department: ' + err))
 
-        await EmploymentType.sync({ alter: true})
-            .then(data =>{})
+        await EmploymentType.sync({ alter: true })
+            .then(data => { })
             .catch(err => console.log('error create table lookup_tbl_employment_type: ' + err))
 
-        await Gender.sync({ alter: true})
-            .then(data =>{})
+        await Gender.sync({ alter: true })
+            .then(data => { })
             .catch(err => console.log('error create table lookup_tbl_gender: ' + err))
 
-        await MaritalStatus.sync({ alter: true})
-            .then(data =>{})
+        await MaritalStatus.sync({ alter: true })
+            .then(data => { })
             .catch(err => console.log('error create table lookup_tbl_marital_status: ' + err))
 
-        await Specialization.sync({ alter: true})
-            .then(data =>{})
+        await Specialization.sync({ alter: true })
+            .then(data => { })
             .catch(err => console.log('error create table lookup_tbl_specialization: ' + err))
 
-            await Priority.sync({ alter: true})
-            .then(data =>{})
+        await Priority.sync({ alter: true })
+            .then(data => { })
             .catch(err => console.log('error create table lookup_tbl_appointment_priority: ' + err))
 
+        await Currrency.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error create table lookup_tbl_currency: ' + err))
 
+        await OrderStatus.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl lookup_tbl_order_status: ' + err))
+
+     await BillingOption.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl lookups_tbl_billing_option: ' + err))
+
+                 await  PatientActivity.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl main_tbl_patient_activities : ' + err))
+
+
+
+
+         await PatientJourney.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('Create tbl main_tbl_patient_journey: ' + err))
 
         await Tenant.sync({ alter: true })
             .then(data => { })
@@ -511,9 +577,9 @@ const updateAuthDbSchema = async () => {
 
 
 
-            
+
         // Main Details
-       
+
 
         await Payment.sync({ alter: true })
             .then(data => { })
@@ -527,7 +593,7 @@ const updateAuthDbSchema = async () => {
             .then(data => { })
             .catch(err => console.log('error Create table tbl main_tbl_apointment: ' + err))
 
-             await Doctor.sync({ alter: true })
+        await Doctor.sync({ alter: true })
             .then(data => { })
             .catch(err => console.log('error Create table tbl main_tbl_doctor: ' + err))
 
@@ -535,13 +601,18 @@ const updateAuthDbSchema = async () => {
             .then(data => { })
             .catch(err => console.log('error Create table tbl main_tbl_insure: ' + err))
 
-         await Patient.sync({ alter: true })
+        await Patient.sync({ alter: true })
             .then(data => { })
             .catch(err => console.log('error Create table tbl main_tbl_patient: ' + err))
 
         await PatientInsurer.sync({ alter: true })
             .then(data => { })
             .catch(err => console.log('error Create table tbl main_tbl_patient_insurer: ' + err))
+
+        await Order.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl main_tbl_order: ' + err))
+
 
 
     } catch (error) {
@@ -551,7 +622,7 @@ const updateAuthDbSchema = async () => {
 }
 
 
-//updateAuthDbSchema()
+updateAuthDbSchema()
 //seedAuthDatabase()
 
 module.exports = {

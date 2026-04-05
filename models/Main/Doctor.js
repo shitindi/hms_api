@@ -17,7 +17,7 @@ const Doctor = db.define('main_tbl_doctor', {
         allowNull: false
     },
     id_type: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: true,
     },
     id_number: {
@@ -30,10 +30,10 @@ const Doctor = db.define('main_tbl_doctor', {
         type: DataTypes.STRING
     },
     department: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
     },
     specialization: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: false
     },
     hightest_qualification: {
@@ -41,11 +41,11 @@ const Doctor = db.define('main_tbl_doctor', {
         allowNull: false
     },
     year_of_experience: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: false
     },
     employment_type: {
-        Type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: false
     },
     joining_date: {
@@ -65,8 +65,8 @@ const Doctor = db.define('main_tbl_doctor', {
 )
 
 
-User.hasMany(Appointment, {foreignKey: {name: 'created_by', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-Appointment.belongsTo(User, {as: 'CreatedBy',foreignKey: {  name: 'created_by', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+User.hasMany(Doctor, {foreignKey: {name: 'created_by', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Doctor.belongsTo(User, {as: 'CreatedBy',foreignKey: {  name: 'created_by', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 
 IDType.hasMany(Doctor, {foreignKey: {name: 'id_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})

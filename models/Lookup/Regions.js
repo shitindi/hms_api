@@ -3,7 +3,7 @@ const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
 const TenantRegion = db.define('lkp_region', {
 
     ID: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: false,
         primaryKey:true,
     },

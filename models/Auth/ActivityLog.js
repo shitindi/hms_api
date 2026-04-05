@@ -13,7 +13,7 @@ const ActivityLog = db.define('auth_tbl_user_activity', {
     allowNull: false
    },
    activity_type: {
-    type: DataTypes.TINYINT,
+    type: DataTypes.SMALLINT,
     allowNull: false
    },
    record_id: {

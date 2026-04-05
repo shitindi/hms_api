@@ -1,6 +1,7 @@
 const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
 
-const UserStatus = db.define('auth_lkp_user_status', {
+
+const BillingOption = db.define('lookups_tbl_billing_option', {
 
     ID: {
         type: DataTypes.SMALLINT,
@@ -18,4 +19,4 @@ const UserStatus = db.define('auth_lkp_user_status', {
 
 
 
-  module.exports = { UserStatus}
+  module.exports = { BillingOption}

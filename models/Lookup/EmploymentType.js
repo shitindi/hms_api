@@ -4,7 +4,7 @@ const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
 const EmploymentType = db.define('lookups_tbl_employment_type', {
 
     ID: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: false,
         primaryKey:true,
         autoIncrement:true

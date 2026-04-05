@@ -54,7 +54,7 @@ const User = db.define('auth_tbl_user', {
       allowNull: true
    },
    user_status: {
-      type: DataTypes.TINYINT,
+      type: DataTypes.SMALLINT,
       defaultValue: 5,
       allowNull: false
    },
@@ -62,7 +62,7 @@ const User = db.define('auth_tbl_user', {
       type: DataTypes.INTEGER
    },
    department_id: {
-      type: DataTypes.TINYINT,
+      type: DataTypes.SMALLINT,
       
    }
 }
@@ -72,15 +72,11 @@ const User = db.define('auth_tbl_user', {
 User.hasMany(Contact, {foreignKey: {name: 'created_by', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Contact.belongsTo(User, { as: 'CreatedBy', foreignKey: {name: 'created_by', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
-// User.hasOne(Contact, {foreignKey: {name: 'contact_id', allowNull: false}, onDelete: 'NO ACTION',  onUpdate: 'CASCADE'})
-// Contact.belongsTo(User, { as: 'Contact', foreignKey: {name: 'contact_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-
-
 Contact.hasOne(User, {foreignKey: {name: 'contact_id', allowNull: false}, onDelete: 'NO ACTION',  onUpdate: 'CASCADE'})
 User.belongsTo(Contact, { as: 'Contact', foreignKey: {name: 'contact_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 Tenant.hasMany(User, {foreignKey: {name: 'tenant_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-User.belongsTo(Tenant, {foreignKey: {name: 'tenant_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+User.belongsTo(Tenant, {as: 'Tenant',  foreignKey: {name: 'tenant_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 UserStatus.hasMany(User, {foreignKey: {name: 'user_status', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 User.belongsTo(UserStatus, { as : 'UserSatus', foreignKey: {name: 'user_status', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
@@ -91,8 +87,8 @@ User.belongsTo(TenantBranch, { as: 'DefaultBranch', foreignKey: {name: 'default_
 User.hasMany(TenantBranch, {foreignKey: {name: 'created_by', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 TenantBranch.belongsTo(User, {as: 'CreatedBy', foreignKey: {name: 'created_by', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
-Department.hasMany(User, {foreignKey: {name: 'department_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-User.belongsTo(Department, {as: 'Department', foreignKey: {name: 'department_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Department.hasMany(User, {foreignKey: {name: 'department_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+User.belongsTo(Department, {as: 'Department', foreignKey: {name: 'department_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 
 

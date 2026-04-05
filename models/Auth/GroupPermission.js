@@ -19,7 +19,7 @@ const GroupPermission = db.define('auth_tbl_group_permission', {
       allowNull: false
    },
    permission_type: {
-    type: DataTypes.TINYINT,
+    type: DataTypes.SMALLINT,
     allowNull: false
    },
    created_by: {

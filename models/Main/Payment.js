@@ -3,8 +3,8 @@ const { sequelize : db, DataTypes } = require( '../../helpers/sequelize_init')
 const { Tenant } =require( '../Auth/Tenant')
 const { User } = require('../Auth/User')
 const { LicensePaymentType } = require('../Client/LIcensePyamentType')
-const {Currrency} = require('../sales/Currrency')
-const {Order} = require('../sales/Order')
+const {Currrency} = require('../Lookup/Currency')
+const { Order } = require('./Order')
 const { PaymentStatus } = require('./PaymentStatus')
 
 const Payment = db.define('sales_tbl_payment', {
@@ -14,7 +14,7 @@ const Payment = db.define('sales_tbl_payment', {
         allowNull: false
     },
     payment_method: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: false
     },
     amount: {
@@ -22,7 +22,7 @@ const Payment = db.define('sales_tbl_payment', {
         allowNull: false
     },
     currency_id: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull:false
     }
     ,
@@ -38,7 +38,7 @@ const Payment = db.define('sales_tbl_payment', {
         type: DataTypes.DATE
     },
     payment_status: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull:false
     },
     created_by: {

@@ -18,7 +18,7 @@ const UserPermission = db.define('auth_tbl_user_permission', {
       allowNull: false
    },
    permission_type: {
-    type: DataTypes.TINYINT,
+    type: DataTypes.SMALLINT,
     allowNull: false
    },
    created_by: {

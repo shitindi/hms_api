@@ -1,6 +1,7 @@
 const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
 
-const UserStatus = db.define('auth_lkp_user_status', {
+
+const PatientActivity = db.define('main_tbl_patient_activities', {
 
     ID: {
         type: DataTypes.SMALLINT,
@@ -9,13 +10,18 @@ const UserStatus = db.define('auth_lkp_user_status', {
         autoIncrement:true
     },
     name: {
-        type: DataTypes.STRING(30),
+        type: DataTypes.STRING(100),
         allowNull: false,
         unique: true
+    },
+    is_active: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
     }
 }
 )
 
 
 
-  module.exports = { UserStatus}
+  module.exports = { PatientActivity}

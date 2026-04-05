@@ -44,7 +44,7 @@ const Contact = db.define('auth_tbl_contact', {
         allowNull: true
     },
     contact_type: {
-      type: DataTypes.TINYINT,
+      type: DataTypes.SMALLINT,
       allowNull: false
     },
     created_by :{
@@ -52,7 +52,8 @@ const Contact = db.define('auth_tbl_contact', {
         allowNull: true
      },
      gender_id: {
-        
+        type: DataTypes.SMALLINT,
+        allowNull: false
      }
 
 })

@@ -15,7 +15,7 @@ const UserStatusHistory = db.define('auth_tbl_user_status_history', {
         allowNull: false
     },
     status_id: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: false
     },
     description: {

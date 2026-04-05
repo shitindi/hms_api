@@ -21,7 +21,8 @@ npm i nodemon
 #sequelize init
 
 7. // Install mysql lib
-npm i mysql2
+//npm i mysql2
+npm install pg
 
 8. // Generate models
 #sequelize model:generate --name User --attributes name:string, email:string, password:string

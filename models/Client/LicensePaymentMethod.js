@@ -5,7 +5,7 @@ const { User } = require('../Auth/User')
 const LicensePaymentMethod = db.define('client_lkp_license_payment_method', {
 
     ID: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: false,
         primaryKey:true,
     },

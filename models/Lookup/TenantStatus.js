@@ -3,7 +3,7 @@ const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
 const TenantStatus = db.define('auth_lkp_tenant_status', {
 
     ID: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: false,
         primaryKey:true,
     },

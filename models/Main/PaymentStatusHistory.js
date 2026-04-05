@@ -12,7 +12,7 @@ const PaymentStatusHistory = db.define('sales_lkp_payment_status_history', {
         allowNull: false,
     },
     status: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: false,
     },
     status_date: {

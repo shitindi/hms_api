@@ -1,8 +1,9 @@
 const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
 const {TenantStatus} = require('../Auth/TenantStatus')
 const {TenantRegion} = require('../Lookup/Regions')
-const {TenantCountry} = require('../Lookup/Country')
+const {TenantCountry} = require('../Client/Countries')
 const { TenantType } = require('./TenantType')
+const { Contact } = require('./Contact')
 
 const Tenant = db.define('auth_tbl_tenant', {
     
@@ -25,14 +26,14 @@ const Tenant = db.define('auth_tbl_tenant', {
         allowNull: true
     },
     tax_group: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
     },
-    Country_id: {
+    country_id: {
         type: DataTypes.SMALLINT,
         allowNull: true
     },
     region_id: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: true
     },
     region_name: {
@@ -54,7 +55,7 @@ const Tenant = db.define('auth_tbl_tenant', {
     },
     
     tenant_status_id: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: false,
         defaultValue: 1
     },
@@ -76,8 +77,8 @@ const Tenant = db.define('auth_tbl_tenant', {
 TenantStatus.hasMany(Tenant, {foreignKey: {name: 'status_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Tenant.belongsTo(TenantStatus, { as: 'TenantStatus',  foreignKey: {name: 'status_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
-TenantCountry.hasMany(Tenant, {foreignKey: {name: 'Country_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-Tenant.belongsTo(TenantCountry, {as: 'Country', foreignKey: {name: 'Country_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+TenantCountry.hasMany(Tenant, {foreignKey: {name: 'country_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Tenant.belongsTo(TenantCountry, {as: 'Country', foreignKey: {name: 'country_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 TenantRegion.hasMany(Tenant, {foreignKey: {name: 'region_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Tenant.belongsTo(TenantRegion, { as: 'Region', foreignKey: {name: 'region_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})

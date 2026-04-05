@@ -1,8 +1,9 @@
 const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
 
-const UserStatus = db.define('auth_lkp_user_status', {
 
-    ID: {
+const OrderStatus = db.define('lookup_tbl_order_status', {
+
+    id: {
         type: DataTypes.SMALLINT,
         allowNull: false,
         primaryKey:true,
@@ -17,5 +18,4 @@ const UserStatus = db.define('auth_lkp_user_status', {
 )
 
 
-
-  module.exports = { UserStatus}
+  module.exports = { OrderStatus}

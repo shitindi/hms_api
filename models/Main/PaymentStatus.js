@@ -4,7 +4,7 @@ const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
 const PaymentStatus = db.define('sales_lkp_payment_status', {
 
     id: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: false,
         primaryKey:true,
         autoIncrement:true

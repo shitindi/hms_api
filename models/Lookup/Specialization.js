@@ -4,7 +4,7 @@ const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
 const Specialization = db.define('lookups_tbl_specialization', {
 
     ID: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: false,
         primaryKey:true,
         autoIncrement:true

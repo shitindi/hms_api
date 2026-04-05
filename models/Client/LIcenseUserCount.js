@@ -3,7 +3,7 @@ const { User } = require('../Auth/User')
 
 const LicenseUserCount = db.define('client_tbl_license_user_count', {
     ID: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: false,
         primaryKey:true,
     },

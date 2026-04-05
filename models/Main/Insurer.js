@@ -1,5 +1,5 @@
 const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
-const { Tenant } = require('./Tenant')
+
 
 const Insurer = db.define('main_tbl_insure', {
     

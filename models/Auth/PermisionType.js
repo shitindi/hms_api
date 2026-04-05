@@ -3,7 +3,7 @@ const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
 const PersmissionType = db.define('auth_lkp_permision_type', {
 
     ID: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: false,
         primaryKey:true,
         autoIncrement:true

@@ -25,11 +25,11 @@ const TenantLicense = db.define('client_tbl_license', {
         allowNull: false
     },
     user_count_id: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: true
     },
     branch_count_id: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: true
     },
     payment_id: {

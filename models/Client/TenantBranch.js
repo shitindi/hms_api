@@ -1,8 +1,8 @@
 const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
 const {Tenant} = require('../Auth/Tenant')
 const {Contact} = require('../Auth/Contact')
-const {TenantCountry} = require('./Countries')
-const {TenantRegion} = require('./Regions')
+const {TenantCountry} = require('../Client/Countries')
+const {TenantRegion} = require('../Lookup/Regions')
 
 const TenantBranch = db.define('client_tbl_tenant_branch', {
 
@@ -19,7 +19,7 @@ const TenantBranch = db.define('client_tbl_tenant_branch', {
         allowNull: true
     },
     region_id: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: true
     },
     region_name: {

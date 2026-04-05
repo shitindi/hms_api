@@ -30,11 +30,11 @@ const TenantLicenseHistory = db.define('client_tbl_license_history', {
         allowNull: false
     },
     user_count_id: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: true
     },
     branch_count_id: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: true
     },
     license_duration_month: {

@@ -10,7 +10,7 @@ const TenantStatusHistory = db.define('auth_tbl_tenant_status_history', {
     },
     
     status_id: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: false,
     },
     comment: {

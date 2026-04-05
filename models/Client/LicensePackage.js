@@ -1,6 +1,6 @@
 const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
 const { User } = require('../Auth/User')
-const {Application} = require('./Apps')
+//const {Application} = require('./Apps')
 
 const LicensePackage = db.define('client_tbl_license_packages', {
 
@@ -27,7 +27,7 @@ const LicensePackage = db.define('client_tbl_license_packages', {
         allowNull: false
     },
     app_id: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: false
     },
     created_by: {
@@ -44,11 +44,8 @@ const LicensePackage = db.define('client_tbl_license_packages', {
 )
 
 // License packages data
-Application.hasMany(LicensePackage, {foreignKey: {name: 'app_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-LicensePackage.belongsTo(Application, { as: 'Application', foreignKey: {name: 'app_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-
 User.hasMany(LicensePackage, {foreignKey: {name: 'created_by', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-LicensePackage.belongsTo(Application, { as: 'CreatedBy', foreignKey: {name: 'created_by', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'} )
+LicensePackage.belongsTo(User, { as: 'CreatedBy', foreignKey: {name: 'created_by', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'} )
 
 module.exports = {
     LicensePackage

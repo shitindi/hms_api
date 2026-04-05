@@ -17,11 +17,11 @@ const Appointment = db.define('main_tbl_apointment', {
         type: DataTypes.INTEGER,
     },
     visit_type: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: false
     },
     department_id: {
-        type: DataTypes.TINYINT
+        type: DataTypes.SMALLINT
     },
     doctor_id: {
         type: DataTypes.INTEGER,
@@ -32,7 +32,7 @@ const Appointment = db.define('main_tbl_apointment', {
         allowNull: false
     },
     priority: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: false,
         defaultValue: 1
     },
@@ -40,7 +40,7 @@ const Appointment = db.define('main_tbl_apointment', {
         type: DataTypes.STRING,
     },
     appointment_status:{
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: false,
         defaultValue: 1
     },

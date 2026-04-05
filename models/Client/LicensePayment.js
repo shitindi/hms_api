@@ -12,11 +12,11 @@ const LicensePayment= db.define('client_lkp_license_payment', {
         type: DataTypes.INTEGER
     },
     payment_type: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: false
     },
     payment_method: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: false
     },
     amount: {
@@ -24,11 +24,11 @@ const LicensePayment= db.define('client_lkp_license_payment', {
         allowNull: false
     },
     additional_user: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: true
     },
     additional_branch: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.SMALLINT,
         allowNull: true
     }
 }
