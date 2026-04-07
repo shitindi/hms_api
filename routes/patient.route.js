@@ -1,10 +1,11 @@
-const adminController = require('../controllers/admin.controller')
 const patientController = require('../controllers/patient.controller')
-
+const {verifyAccessToken} = require('../middlewares/check_auth')
+const express = require('express')
+const router = express.Router();
 
 /**
  * @openapi
- * '/health/patients/{id}':
+ * '/patients/patients/{id}':
  *  get:
  *    tags:
  *    - Health Management
@@ -25,7 +26,7 @@ router.get("/patients/:id?", verifyAccessToken, patientController.patientDetails
 
 /**
  * @openapi
- * '/health/patient':
+ * '/patients/patient':
  *  post:
  *     tags:
  *     - Health Management
@@ -79,7 +80,8 @@ router.get("/patients/:id?", verifyAccessToken, patientController.patientDetails
  *                type: integer   
  *              gender_id:
  *                type: integer
-
+ *              registration_no:
+ *                type: string
  *              id_type:
  *                type: integer
  *              id_number:
@@ -109,3 +111,5 @@ router.get("/patients/:id?", verifyAccessToken, patientController.patientDetails
  *        description: Conflict
  */
 router.post("/patient", verifyAccessToken, patientController.editPatient)
+
+module.exports = router;

@@ -357,7 +357,7 @@ const GetLookupsAll = async(req, res, next) => {
         const billing_options = await BillingOption.findAll()
         const insurers = await Insurer.findAll()
 
-        console.log('CUSTOMER TYPE: ', customer_types)
+
         
         res.status(200).json({
             activation_types,
@@ -369,8 +369,6 @@ const GetLookupsAll = async(req, res, next) => {
             payment_statuses,
             countries,
             contact_types,
-            tax_groups,
-            customer_types,
             order_statutes,
 
             appointment_statuses,

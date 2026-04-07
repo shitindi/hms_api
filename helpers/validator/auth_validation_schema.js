@@ -71,7 +71,7 @@ const userSchema = Joi.object({
     password: Joi.string().min(6).max(16).required(),
     confirm_password: Joi.ref('password'),
     must_change_password: Joi.bool() ,
-    //contact_id: Joi.number().required().default(0),
+    contact_id: Joi.number().required().default(0),
     tenant_id: Joi.number().default(0),
     user_status: Joi.number().default(1),
     department_id: Joi.number()

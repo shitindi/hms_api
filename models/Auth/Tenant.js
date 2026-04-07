@@ -71,8 +71,11 @@ const Tenant = db.define('auth_tbl_tenant', {
 });
 
 // Tenant data
+ //Tenant.hasMany(Contact, {foreignKey: {name: 'tenant_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+ //Contact.belongsTo(Tenant, {as: 'Tenant',foreignKey: {  name: 'tenant_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
-
+//Contact.hasOne(Tenant, {foreignKey: {name: 'tenant_contact_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+//Tenant.belongsTo(Contact, {as: 'Contact',foreignKey: {  name: 'tenant_contact_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 TenantStatus.hasMany(Tenant, {foreignKey: {name: 'status_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Tenant.belongsTo(TenantStatus, { as: 'TenantStatus',  foreignKey: {name: 'status_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})

@@ -58,14 +58,10 @@ const Contact = db.define('auth_tbl_contact', {
 
 })
 
-Contact.hasOne(Tenant, {foreignKey: {name: 'tenant_contact_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-Tenant.belongsTo(Contact, {as: 'Contact',foreignKey: {  name: 'tenant_contact_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 ContactType.hasMany(Contact, {foreignKey: {name: 'contact_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Contact.belongsTo(ContactType, { as: 'ContactType', foreignKey: {name: 'contact_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
- Tenant.hasMany(Contact, {foreignKey: {name: 'tenant_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
- Contact.belongsTo(Tenant, {as: 'Contact',foreignKey: {  name: 'tenant_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
  Gender.hasMany(Contact, {foreignKey: {name: 'gender_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Contact.belongsTo(Gender, {as: 'Gender',foreignKey: {  name: 'gender_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})

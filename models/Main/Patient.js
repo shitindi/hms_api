@@ -14,6 +14,11 @@ const Patient = db.define('main_tbl_patient', {
         type:DataTypes.INTEGER,
         allowNull: false
     }, 
+    registration_no: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: true
+    },
     contact_id: {
         type: DataTypes.INTEGER,
         allowNull: false
@@ -28,7 +33,6 @@ const Patient = db.define('main_tbl_patient', {
     marital_status: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        defaultValue: 1
     },
     birth_date: {
         type: DataTypes.DATEONLY,
@@ -59,7 +63,7 @@ const Patient = db.define('main_tbl_patient', {
     ,
     insurer_id: {
         type: DataTypes.SMALLINT,
-        allowNull: false
+        allowNull: true
     },
     insurance_number: {
         type: DataTypes.STRING,
@@ -86,17 +90,17 @@ Patient.belongsTo(Contact, {as: 'Contact',foreignKey: {  name: 'contact_id', all
 IDType.hasMany(Patient, {foreignKey: {name: 'id_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Patient.belongsTo(IDType, {as: 'IdType',foreignKey: {  name: 'id_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
-MaritalStatus.hasMany(Patient, {foreignKey: {name: 'marital_status_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-Patient.belongsTo(MaritalStatus, {as: 'MaritalStatus',foreignKey: {  name: 'marital_status_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+MaritalStatus.hasMany(Patient, {foreignKey: {name: 'marital_status', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Patient.belongsTo(MaritalStatus, {as: 'MaritalStatus',foreignKey: {  name: 'marital_status', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
-BloodGroup.hasMany(Patient, {foreignKey: {name: 'blood_group_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-Patient.belongsTo(BloodGroup, {as: 'BloodGroup',foreignKey: {  name: 'blood_group_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+BloodGroup.hasMany(Patient, {foreignKey: {name: 'blood_group', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Patient.belongsTo(BloodGroup, {as: 'BloodGroup',foreignKey: {  name: 'blood_group', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
-PatientActivity.hasMany(Patient, {foreignKey: {name: 'current_activity', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-Patient.belongsTo(PatientActivity, {as: 'CurrentActivity',foreignKey: {  name: 'current_activity', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+PatientActivity.hasMany(Patient, {foreignKey: {name: 'current_activity', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Patient.belongsTo(PatientActivity, {as: 'CurrentActivity',foreignKey: {  name: 'current_activity', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
-Insurer.hasMany(Patient, {foreignKey: {name: 'insurer_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-Patient.belongsTo(Insurer, {as: 'Insurer',foreignKey: {  name: 'insurer_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Insurer.hasMany(Patient, {foreignKey: {name: 'insurer_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Patient.belongsTo(Insurer, {as: 'Insurer',foreignKey: {  name: 'insurer_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 
 module.exports = { Patient}

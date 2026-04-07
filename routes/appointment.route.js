@@ -1,9 +1,11 @@
 const appointmentController = require('../controllers/apointment.controller')
-
+const {verifyAccessToken} = require('../middlewares/check_auth')
+const express = require('express')
+const router = express.Router();
 
 /**
  * @openapi
- * '/health/appointments/{id}':
+ * '/appointments/appointments/{id}':
  *  get:
  *    tags:
  *    - Health Management
@@ -24,7 +26,7 @@ router.get("/appointments/:id?", verifyAccessToken, appointmentController.appoin
 
 /**
  * @openapi
- * '/health/appointment':
+ * '/appointments/appointment':
  *  post:
  *     tags:
  *     - Health Management
@@ -76,3 +78,5 @@ router.get("/appointments/:id?", verifyAccessToken, appointmentController.appoin
  *        description: Conflict
  */
 router.post("/appointment", verifyAccessToken, appointmentController.editAppointment)
+
+module.exports = router;

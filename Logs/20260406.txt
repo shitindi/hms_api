@@ -1,0 +1,2 @@
+2026-04-06 20:49:06: createPatient: +ValidationError: "insurer_id" must be a number
+ 

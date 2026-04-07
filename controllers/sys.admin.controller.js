@@ -1,6 +1,6 @@
 const createError = require('http-errors');
-const { groupSchema, userSchema, contactSchema, userGroupSchema, groupPermissionSchema, userPermissionSchema } = require('../helpers/auth_validation_schema')
-const {licensePackage, paymentMethod, licenseCount, branchCount} = require('../helpers/client_validation_schema')
+const { groupSchema, userSchema, contactSchema, userGroupSchema, groupPermissionSchema, userPermissionSchema } = require('../helpers/validator/auth_validation_schema')
+const {licensePackage, paymentMethod, licenseCount, branchCount} = require('../helpers/validator/client_validation_schema')
 const { Group: Groups } = require('../models/Auth/Group');
 const { User: Users } = require('../models/Auth/User')
 const { Contact: Contacts } = require('../models/Auth/Contact');
@@ -24,7 +24,7 @@ const { ContactType } = require('../models/Auth/ContactType');
 
 const {LicensePackage} = require('../models/Client/LicensePackage');
 const {LicensePaymentMethod} = require('../models/Client/LicensePaymentMethod')
-const { Application } = require('../models/Client/Apps');
+//const { Application } = require('../models/Client/Apps');
 const {LicenseUserCount} = require('../models/Client/LIcenseUserCount')
 const {LicenseBranchCount} = require ('../models/Client/LicenseBranchCount')
 const groupDetails = async (req, res, next) => {
@@ -702,7 +702,6 @@ const licencePackageDetails = async (req, res, next) => {
         const packageId = req.params.id;
         //const { userId, tenantId} =  req.jwtPayload;
         let packageList = [];
-          console.log('Here we go: ', packageId)
 
         if (packageId && packageId > 0) {
             // parameter is passed
@@ -717,10 +716,10 @@ const licencePackageDetails = async (req, res, next) => {
                     }]
                 },
             ],
-            include: [{
-                model: Application, as : "Application",
-                attributes: ["id", "name"]
-            }]
+            // include: [{
+            //     model: Application, as : "Application",
+            //     attributes: ["id", "name"]
+            // }]
             })
 
         } else {
@@ -736,10 +735,10 @@ const licencePackageDetails = async (req, res, next) => {
                     }]
                 },
             ],
-            include: [{
-                model: Application, as : "Application",
-                attributes: ["id", "name"]
-            }]
+            // include: [{
+            //     model: Application, as : "Application",
+            //     attributes: ["id", "name"]
+            // }]
             })
         }
 

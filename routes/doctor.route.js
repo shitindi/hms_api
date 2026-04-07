@@ -1,10 +1,12 @@
 const adminController = require('../controllers/admin.controller')
 const doctorController = require('../controllers/doctor.controller')
+const {verifyAccessToken} = require('../middlewares/check_auth')
 
-
+const express = require('express')
+const router = express.Router();
 /**
  * @openapi
- * '/health/doctors/{id}':
+ * '/doctors/doctors/{id}':
  *  get:
  *    tags:
  *    - Health Management
@@ -25,7 +27,7 @@ router.get("/doctor/:id?", verifyAccessToken, doctorController.doctorDetails)
 
 /**
  * @openapi
- * '/health/doctor':
+ * '/doctors/doctor':
  *  post:
  *     tags:
  *     - Health Management
@@ -121,3 +123,5 @@ router.get("/doctor/:id?", verifyAccessToken, doctorController.doctorDetails)
  *        description: Conflict
  */
 router.post("/doctor", verifyAccessToken, adminController.editUser)
+
+module.exports = router;

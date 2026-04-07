@@ -12,8 +12,8 @@ const {PasswordHistory} = require('../models/Auth/PasswordHistory')
 
 const createError = require('http-errors');
 const { addHourDbDateNow, getDbDateNow, addMinutesDbDate, getJSDateFromDb, addMonthsDbDateNow, addDaysDbDateNow, addDaysDbDateFromDate, addMonthsDbDateFromDate, getDifferenceInDate } = require('../helpers/utility')
-const {authSchema, passUpdate, emailSchema, passReset, contactSchema, userSchema, tenantSchema} = require('../helpers/auth_validation_schema')
-const {licensePayment} = require('../helpers/client_validation_schema')
+const {authSchema, passUpdate, emailSchema, passReset, contactSchema, userSchema, tenantSchema} = require('../helpers/validator/auth_validation_schema')
+const {licensePayment} = require('../helpers/validator/client_validation_schema')
 const  hash = require('../helpers/hash_data')
 const {signAccessToken, signRefreshToken, verifyRefreshToken} = require('../helpers/jwt_helper');
 //const client = require('../helpers/init_redis');
@@ -289,9 +289,9 @@ const  verifyEmail = async (req, res, next) => {
 
 const login = async (req, res, next) => {
     try{
-       
         const login = await authSchema.validateAsync(req.body); 
 
+       
         // Check user if exists
         let User = await Users.findOne({
             where: { user_name: login.email }
@@ -360,6 +360,7 @@ const login = async (req, res, next) => {
             licensingInfo
         })
     } catch(error){
+                console.error('LOGIN: ', error)
 
         if (error.isJoi) return next(createError.BadRequest("invalid Username/Password"))
         next(error)

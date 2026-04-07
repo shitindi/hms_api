@@ -102,6 +102,13 @@ const seedAuthDatabase = async () => {
         const TenantRegionsCount = await TenantRegion.count()
         const BillingOptionCount = await BillingOption.count()
         const PattientActivitiesCount = await PatientActivity.count()
+        const InsurerCount = await Insurer.count()
+
+        if (InsurerCount==0){
+            await Insurer.bulkCreate([
+                {id:1, name:'NHIF'},{id:2, name: 'Diamond'}, {id:3, name:'Strategis'}
+            ])
+        }
 
         if (PattientActivitiesCount == 0) {
             await PatientActivity.bulkCreate([
@@ -116,8 +123,8 @@ const seedAuthDatabase = async () => {
                 { ID: 9, name: "Pharmacy" , is_active: true},
                 { ID: 10, name: "Billing and payments" , is_active: true},
                 { ID: 11, name: "Admission" , is_active: true},
-                { ID: 12, name: "Discharge" , is_active: true},
-                { ID: 13, name: "Closed" , is_active: false},
+                { ID: 12, name: "Discharged" , is_active: true},
+                { ID: 13, name: "Permitted" , is_active: false},
             ])
         }
 

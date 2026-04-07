@@ -10,6 +10,9 @@ const authRoute = require('./routes/Auth.route')
 const adminRoute = require('./routes/Admin.route')
 const lookupRoute = require('./routes/Lookup.route')
 const sysAdminRoute = require('./routes/Sys.Admin.route.js')
+const appointmentRoute = require('./routes/appointment.route.js')
+const doctorroute = require('./routes/doctor.route.js')
+const patientRoute = require('./routes/patient.route.js')
 require('dotenv').config()
 //require('./helpers/init_redis')
 
@@ -18,8 +21,22 @@ app.use(morgan('env'))
 app.use(express.json())
 app.set('trust proxy', true)
 
+// configure CORS
+app.use((req, res, next) => {
+     res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+     res.header("Access-Control-Allow-Credentials", true);
+     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  
+  // Handle preflight OPTIONS requests
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  next();
+}
+)
 //Handle form data encoded in url
-app.unsubscribe(express.urlencoded({extended: true}))
+//app.unsubscribe(express.urlencoded({extended: true}))
 
 const PORT = process.env.PORT || 7000
 
@@ -33,7 +50,9 @@ app.use("/auth", authRoute)
 app.use("/admin", adminRoute)
 app.use("/lookups", lookupRoute)
 app.use("/sys_admi", sysAdminRoute)
-
+app.use("/appointments", appointmentRoute)
+app.use("/doctors", doctorroute)
+app.use("/patients", patientRoute)
 
 // Catch all routes
 app.use (async (req, res, next) =>{

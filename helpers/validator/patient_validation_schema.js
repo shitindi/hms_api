@@ -4,7 +4,9 @@ const patientSchema = Joi.object({
     
     id: Joi.number().allow(null),
     tenant_id: Joi.number().required(), 
-    contact_id: Joi.number().required(),
+    contact_id: Joi.number().allow(null),
+    created_by: Joi.number().required(),
+    registration_no: Joi.string().max(20).allow(null),
     id_type: Joi.number().allow(null),
     id_number: Joi.number().allow(null),
     marital_status: Joi.number().required(true).default(1),
@@ -18,6 +20,6 @@ const patientSchema = Joi.object({
     insurer_id: Joi.number().allow(null),
     insurance_number: Joi.string().min(5).max(20).allow(null),
     is_active: Joi.bool().required().default(true)
-})
+}).options({stripUnknown: true}).options({stripUnknown: true})
 
 module.exports = { patientSchema}
