@@ -22,7 +22,7 @@ const router = express.Router();
  *        description: Ok, List of User(s)
  */
 
-router.get("/doctor/:id?", verifyAccessToken, doctorController.doctorDetails)
+router.get("/doctors/:id?", verifyAccessToken, doctorController.doctorDetails)
 
 
 /**

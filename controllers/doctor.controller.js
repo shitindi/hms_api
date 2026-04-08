@@ -6,6 +6,7 @@ const { Department } = require('../models/Lookup/Department');
 const { Specialization } = require('../models/Lookup/Specialization');
 const { EmploymentType } = require('../models/Lookup/EmploymentType');
 const { logData, logUserActivity, } = require('../helpers/logger');
+const { Gender } = require('../models/Lookup/Gender');
 
 
 
@@ -23,34 +24,36 @@ const doctorDetails = async (req, res, next) => {
                 include: [
                     {
                         model: Users, as: 'User',
-                        attributes: { exclude: ['password', 'contact_id'] },
                         include: [
                             {
                                 model: Contacts, as: 'Contact',
-                                attributes: { exclude: ['createdAt', 'updatedAt', 'contact_type', 'created_by'] },
+                                include: [
+                                    {
+                                        model: Gender, as: 'Gender'
+                                    }
+                                ]
                             }
                         ]
                     }
                     ,
                     {
                         model: IDType, as: 'IdType',
-                        attributes: ['id', 'name']
+                        attributes: ['ID', 'name']
                     },
                     {
                         model: Department, as: 'Department',
-                        attributes: ['id', 'name']
+                        attributes: ['ID', 'name']
                     },
                     {
                         model: Specialization, as: 'Specialization',
-                        attributes: ['id', 'name']
+                        attributes: ['ID', 'name']
                     },
                     {
                         model: EmploymentType, as: 'EmploymentType',
-                        attributes: ['id', 'name']
+                        attributes: ['ID', 'name']
                     },
                     {
                     model: Users, as: "CreatedBy",
-                    attributes: ['id', 'user_name'],
                     include: [{
                         model: Contacts,
                         attributes: ['id', 'first_name', 'last_name']
@@ -64,35 +67,37 @@ const doctorDetails = async (req, res, next) => {
             doctorList = await Doctors.findAll({
                 where: { tenant_id: tenantId },
                 include: [
-                    {
+                   {
                         model: Users, as: 'User',
-                        attributes: { exclude: ['password', 'contact_id'] },
                         include: [
                             {
                                 model: Contacts, as: 'Contact',
-                                attributes: { exclude: ['createdAt', 'updatedAt', 'contact_type', 'created_by'] },
+                                include: [
+                                    {
+                                        model: Gender, as: 'Gender'
+                                    }
+                                ]
                             }
                         ]
                     }
                     ,
                     {
                         model: IDType, as: 'IdType',
-                        attributes: ['id', 'name']
+                        attributes: ['ID', 'name']
                     },
                     {
                         model: Department, as: 'Department',
-                        attributes: ['id', 'name']
+                        attributes: ['ID', 'name']
                     },
                     {
                         model: Specialization, as: 'Specialization',
-                        attributes: ['id', 'name']
+                        attributes: ['ID', 'name']
                     },
                     {
                         model: EmploymentType, as: 'EmploymentType',
-                        attributes: ['id', 'name']
+                        attributes: ['ID', 'name']
                     },{
                      model: Users, as: "CreatedBy",
-                    attributes: ['id', 'user_name'],
                     include: [{
                         model: Contacts,
                         attributes: ['id', 'first_name', 'last_name']

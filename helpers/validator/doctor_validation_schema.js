@@ -10,7 +10,8 @@ const doctorSchema = Joi.object({
     id_number: Joi.string().max(20).min(3).allow(null),
     doctor_id_no: Joi.string().max(20).min(3).allow(null),
     license_number: Joi.string().max(20).min(3).allow(null),
-    specialization: Joi.number(),
+    department: Joi.number().allow(null),
+    specialization: Joi.number().allow(null),
     hightest_qualification: Joi.string().max(100).min(3).allow(null),
     year_of_experience: Joi.number(),
     employment_type: Joi.number(),
@@ -20,3 +21,11 @@ const doctorSchema = Joi.object({
 }).options({stripUnknown: true}).options({stripUnknown: true})
 
 module.exports = {doctorSchema}
+
+/*
+    user_name: entity.user_name,
+    password: entity.password,
+    confirm_password: entity.confirm_password,
+    must_change_password: entity?.must_change_password ?? false,
+    user_status: entity?.user_status ?? 1,
+*/

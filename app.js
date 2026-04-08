@@ -38,7 +38,7 @@ app.use((req, res, next) => {
 //Handle form data encoded in url
 //app.unsubscribe(express.urlencoded({extended: true}))
 
-const PORT = process.env.PORT || 7000
+const PORT = process.env.PORT || 8000
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
