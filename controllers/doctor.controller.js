@@ -24,6 +24,7 @@ const doctorDetails = async (req, res, next) => {
                 include: [
                     {
                         model: Users, as: 'User',
+                        attributes: { exclude: ['password'] },
                         include: [
                             {
                                 model: Contacts, as: 'Contact',
@@ -53,22 +54,24 @@ const doctorDetails = async (req, res, next) => {
                         attributes: ['ID', 'name']
                     },
                     {
-                    model: Users, as: "CreatedBy",
-                    include: [{
-                        model: Contacts,
-                        attributes: ['id', 'first_name', 'last_name']
-                    }]
-                },
-                
-                    
+                        model: Users, as: "CreatedBy",
+                        include: [{
+                            model: Contacts,
+                            attributes: ['id', 'first_name', 'last_name']
+                        }]
+                    },
+
+
                 ]
             })
         } else {
             doctorList = await Doctors.findAll({
                 where: { tenant_id: tenantId },
                 include: [
-                   {
+                    {
                         model: Users, as: 'User',
+                        attributes: { exclude: ['password'] },
+
                         include: [
                             {
                                 model: Contacts, as: 'Contact',
@@ -96,19 +99,19 @@ const doctorDetails = async (req, res, next) => {
                     {
                         model: EmploymentType, as: 'EmploymentType',
                         attributes: ['ID', 'name']
-                    },{
-                     model: Users, as: "CreatedBy",
-                    include: [{
-                        model: Contacts,
-                        attributes: ['id', 'first_name', 'last_name']
-                    }]
-                }
-                    
+                    }, {
+                        model: Users, as: "CreatedBy",
+                        include: [{
+                            model: Contacts,
+                            attributes: ['id', 'first_name', 'last_name']
+                        }]
+                    }
+
                 ],
 
             })
 
-           
+
         }
 
         await logUserActivity(logged_user, 13, 4, true)

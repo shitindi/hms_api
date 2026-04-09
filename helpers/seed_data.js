@@ -64,6 +64,7 @@ const { Currrency } = require('../models/Lookup/Currency')
 const { BillingOption } = require('../models/Lookup/BillingtOption')
 const { PatientActivity } = require('../models/Lookup/PatientActivity')
 const { PatientJourney } = require('../models/Main/PatientJourney')
+const { licensePackage } = require('./validator/client_validation_schema')
 
 const seedAuthDatabase = async () => {
     try {
@@ -104,27 +105,88 @@ const seedAuthDatabase = async () => {
         const PattientActivitiesCount = await PatientActivity.count()
         const InsurerCount = await Insurer.count()
 
-        if (InsurerCount==0){
+        //Initial license details
+        const LicensePaymentsCount = await LicensePayment.count()
+        const TenantLicenseCount = await TenantLicense.count()
+        const LicensePackageCount = await LicensePackage.count()
+        const LisenseUserCounts = await LicenseUserCount.count()
+
+        if (LicensePaymentsCount == 0) {
+            await LicensePayment.create({
+                id: 1,
+                tenant_id: 1,
+                payment_type: 1,
+                payment_method: 1,
+                amount: 1000000,
+                additional_user: 1000,
+                additional_branch: 100
+            })
+        }
+
+        if (LicensePackageCount == 0) {
+            LicensePackage.create({
+                id: 1,
+                package_name: 'Demo package',
+                description: 'Demo package for web app',
+                user_count: 1000,
+                branch_count: 100,
+                price: 1000000,
+                created_by: 1,
+                is_active: true
+
+            })
+        }
+          if ( LisenseUserCounts == 0){
+            await LicenseUserCount.create({
+                 ID: 1,
+                    description: 'Addition of extra users',
+                    user_count: 1000,
+                    price: 1000000,
+                    is_active: true,
+                    created_by: 1
+            })
+        }
+
+        if (TenantLicenseCount == 0 ) {
+            await TenantLicense.create(
+                {
+                    id: 1,
+                    tenant_id: 1, 
+                    start_date: '2026-04-02 ',
+                     end_date: '2027-04-02 ',
+                    package_id: 1, 
+                    user_count_id: 1,
+                    payment_id:1,
+                    license_duration_month: 12,
+                    is_active: true
+                }
+            )
+        }
+
+      
+
+
+        if (InsurerCount == 0) {
             await Insurer.bulkCreate([
-                {id:1, name:'NHIF'},{id:2, name: 'Diamond'}, {id:3, name:'Strategis'}
+                { id: 1, name: 'NHIF' }, { id: 2, name: 'Diamond' }, { id: 3, name: 'Strategis' }
             ])
         }
 
         if (PattientActivitiesCount == 0) {
             await PatientActivity.bulkCreate([
-                { ID: 1, name: "Reception" , is_active: true},
-                { ID: 2, name: "Doctor appointment" , is_active: true},
-                { ID: 3, name: "Initial Assessment" , is_active: true},
-                { ID: 4, name: "Doctor consulation" , is_active: true},
-                { ID: 5, name: "Medicine prescription" , is_active: true},
-                { ID: 6, name: "Laboratory or diagnosting testing" , is_active: true},
-                { ID: 7, name: "Clinical procedure" , is_active: true},
-                { ID: 8, name: "Doctor review of results" , is_active: true},
-                { ID: 9, name: "Pharmacy" , is_active: true},
-                { ID: 10, name: "Billing and payments" , is_active: true},
-                { ID: 11, name: "Admission" , is_active: true},
-                { ID: 12, name: "Discharged" , is_active: true},
-                { ID: 13, name: "Permitted" , is_active: false},
+                { ID: 1, name: "Reception", is_active: true },
+                { ID: 2, name: "Doctor appointment", is_active: true },
+                { ID: 3, name: "Initial Assessment", is_active: true },
+                { ID: 4, name: "Doctor consulation", is_active: true },
+                { ID: 5, name: "Medicine prescription", is_active: true },
+                { ID: 6, name: "Laboratory or diagnosting testing", is_active: true },
+                { ID: 7, name: "Clinical procedure", is_active: true },
+                { ID: 8, name: "Doctor review of results", is_active: true },
+                { ID: 9, name: "Pharmacy", is_active: true },
+                { ID: 10, name: "Billing and payments", is_active: true },
+                { ID: 11, name: "Admission", is_active: true },
+                { ID: 12, name: "Discharged", is_active: true },
+                { ID: 13, name: "Permitted", is_active: false },
             ])
         }
 
@@ -350,11 +412,11 @@ const updateAuthDbSchema = async () => {
 
     try {
 
-              await Patient.sync({ alter: true })
+        await Patient.sync({ alter: true })
             .then(data => { })
             .catch(err => console.log('error Create table tbl main_tbl_patient: ' + err))
 
-            return
+        return
 
 
         await LicensePaymentType.sync({ alter: true })
@@ -455,18 +517,18 @@ const updateAuthDbSchema = async () => {
             .then(data => { })
             .catch(err => console.log('error Create table tbl lookup_tbl_order_status: ' + err))
 
-     await BillingOption.sync({ alter: true })
+        await BillingOption.sync({ alter: true })
             .then(data => { })
             .catch(err => console.log('error Create table tbl lookups_tbl_billing_option: ' + err))
 
-                 await  PatientActivity.sync({ alter: true })
+        await PatientActivity.sync({ alter: true })
             .then(data => { })
             .catch(err => console.log('error Create table tbl main_tbl_patient_activities : ' + err))
 
 
 
 
-         await PatientJourney.sync({ alter: true })
+        await PatientJourney.sync({ alter: true })
             .then(data => { })
             .catch(err => console.log('Create tbl main_tbl_patient_journey: ' + err))
 

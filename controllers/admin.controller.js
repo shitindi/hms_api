@@ -469,10 +469,10 @@ const editUser = async (req, res, next) => {
         user.created_by = user_id
 
         const User = await Users.findOne({
-            where: { user_name: user.user_name }
+            where: { user_name: user.user_name , tenant_id: contact.tenant_id}
         });
         const existUser = await Users.findOne({
-            where: { id: user.user_id }
+            where: { id: user.user_id , tenant_id: contact.tenant_id}
         });
 
        
@@ -498,7 +498,7 @@ const editUser = async (req, res, next) => {
                 );
 
                 const Contact = await Contacts.findOne({
-                    where: { id: user?.contact_id ?? 0 }
+                    where: { id: user?.contact_id ?? -1}
                 })
 
                 if (existDoctor && existDoctor.id == doctor.doctor_id && doctor.user_id == existUser.id){

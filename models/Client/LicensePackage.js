@@ -28,7 +28,6 @@ const LicensePackage = db.define('client_tbl_license_packages', {
     },
     app_id: {
         type: DataTypes.SMALLINT,
-        allowNull: false
     },
     created_by: {
         type: DataTypes.INTEGER,
