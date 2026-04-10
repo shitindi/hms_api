@@ -47,7 +47,7 @@ const tenantSchema = Joi.object({
 // Schema for contact object
 const contactSchema = Joi.object({
     //Contact model
-    id: Joi.number(),
+    id: Joi.number().allow(null),
     first_name: Joi.string().required().max(30).min(2),
     middle_name: Joi.string().max(30).allow(null),
     last_name: Joi.string().required().max(30).min(2),
@@ -71,8 +71,8 @@ const userSchema = Joi.object({
     password: Joi.string().min(6).max(16).required(),
     confirm_password: Joi.ref('password'),
     must_change_password: Joi.bool() ,
-    contact_id: Joi.number().required().default(0),
-    tenant_id: Joi.number().default(0),
+    contact_id: Joi.number().allow(null),
+    tenant_id: Joi.number().allow(null),
     user_status: Joi.number().default(1),
     department_id: Joi.number()
     

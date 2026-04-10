@@ -454,6 +454,7 @@ const editUser = async (req, res, next) => {
         let user = await userSchema.validateAsync(req.body)
         let contact = await contactSchema.validateAsync(req.body)
         let doctor = await doctorSchema.validateAsync(req.body)
+
         const { user_id, tenantId } = req.jwtPayload;
 
         let is_doctor = contact.contact_type ==1 ? true : false;
@@ -464,6 +465,7 @@ const editUser = async (req, res, next) => {
             throw createError.Forbidden('Tenant specified is not valid')
         }
 
+        user.user_id = user?.user_id ? user.user_id : -1
         user.tenant_id = tenantId
         contact.tenant_id = tenantId
         user.created_by = user_id
@@ -478,7 +480,7 @@ const editUser = async (req, res, next) => {
        
         
         if (is_doctor == true){
-            existDoctor = await Doctor.findOne({
+            existDoctor = await Doctors.findOne({
                 where: {id: doctor.doctor_id}
             })
         }
@@ -510,7 +512,7 @@ const editUser = async (req, res, next) => {
                 }
 
                 if ( contact.contact_type != 1){
-                    Doctor.destroy({
+                    Doctors.destroy({
                         where: {user_id: existUser.id}
                     })
                 }
@@ -556,7 +558,7 @@ const editUser = async (req, res, next) => {
             }
 
             const UserCount = await LicenseUserCount.findOne({
-                where: { id: License.user_count_id }
+                where: { ID: License.user_count_id }
             })
 
             const availableUsersCount = Package.user_count ?? 0

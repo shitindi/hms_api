@@ -55,8 +55,9 @@ const doctorDetails = async (req, res, next) => {
                     },
                     {
                         model: Users, as: "CreatedBy",
+                         attributes: { exclude: ['password'] },
                         include: [{
-                            model: Contacts,
+                            model: Contacts, as: 'Contact',
                             attributes: ['id', 'first_name', 'last_name']
                         }]
                     },
@@ -101,8 +102,9 @@ const doctorDetails = async (req, res, next) => {
                         attributes: ['ID', 'name']
                     }, {
                         model: Users, as: "CreatedBy",
+                         attributes: { exclude: ['password'] },
                         include: [{
-                            model: Contacts,
+                            model: Contacts, as: 'Contact',
                             attributes: ['id', 'first_name', 'last_name']
                         }]
                     }

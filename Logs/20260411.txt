@@ -1,0 +1,4 @@
+2026-04-10 22:56:06: logUserActivity: SequelizeValidationError: notNull Violation: auth_tbl_user_activity.user_id cannot be null
+ 
+2026-04-10 22:56:06: editUser: SequelizeUniqueConstraintError: Validation error
+ 

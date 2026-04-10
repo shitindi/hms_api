@@ -9,7 +9,7 @@ const User = db.define('auth_tbl_user', {
    user_name: {
     type: DataTypes.STRING(100),
     allowNull: false,
-    unique: true
+    //unique: true
    },
    password: {
     type: DataTypes.STRING(100),

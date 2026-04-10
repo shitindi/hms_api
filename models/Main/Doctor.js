@@ -72,12 +72,12 @@ Doctor.belongsTo(User, {as: 'CreatedBy',foreignKey: {  name: 'created_by', allow
 IDType.hasMany(Doctor, {foreignKey: {name: 'id_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Doctor.belongsTo(IDType, {as: 'IdType',foreignKey: {  name: 'id_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
-Department.hasMany(Doctor, {foreignKey: {name: 'department_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-Doctor.belongsTo(Department, {as: 'Department',foreignKey: {  name: 'department_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Department.hasMany(Doctor, {foreignKey: {name: 'department', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Doctor.belongsTo(Department, {as: 'Department',foreignKey: {  name: 'department', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 
-Specialization.hasMany(Doctor, {foreignKey: {name: 'specialization_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-Doctor.belongsTo(Specialization, {as: 'Specialization',foreignKey: {  name: 'specialization_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Specialization.hasMany(Doctor, {foreignKey: {name: 'specialization', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Doctor.belongsTo(Specialization, {as: 'Specialization',foreignKey: {  name: 'specialization', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 EmploymentType.hasMany(Doctor, {foreignKey: {name: 'employment_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Doctor.belongsTo(EmploymentType, {as: 'EmploymentType',foreignKey: {  name: 'employment_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})

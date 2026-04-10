@@ -111,6 +111,17 @@ const seedAuthDatabase = async () => {
         const LicensePackageCount = await LicensePackage.count()
         const LisenseUserCounts = await LicenseUserCount.count()
 
+         if ( LisenseUserCounts == 0){
+            await LicenseUserCount.create({
+                 ID: 1,
+                    description: 'Addition of extra users',
+                    user_count: 1000,
+                    price: 1000000,
+                    is_active: true,
+                    created_by: 1
+            })
+        }
+
         if (LicensePaymentsCount == 0) {
             await LicensePayment.create({
                 id: 1,
@@ -118,8 +129,7 @@ const seedAuthDatabase = async () => {
                 payment_type: 1,
                 payment_method: 1,
                 amount: 1000000,
-                additional_user: 1000,
-                additional_branch: 100
+                additional_user: 1,
             })
         }
 
@@ -136,16 +146,7 @@ const seedAuthDatabase = async () => {
 
             })
         }
-          if ( LisenseUserCounts == 0){
-            await LicenseUserCount.create({
-                 ID: 1,
-                    description: 'Addition of extra users',
-                    user_count: 1000,
-                    price: 1000000,
-                    is_active: true,
-                    created_by: 1
-            })
-        }
+         
 
         if (TenantLicenseCount == 0 ) {
             await TenantLicense.create(
@@ -412,9 +413,10 @@ const updateAuthDbSchema = async () => {
 
     try {
 
-        await Patient.sync({ alter: true })
+           await Doctor.sync({ alter: true })
             .then(data => { })
-            .catch(err => console.log('error Create table tbl main_tbl_patient: ' + err))
+            .catch(err => console.log('error Create table tbl main_tbl_doctor: ' + err))
+
 
         return
 
@@ -691,7 +693,7 @@ const updateAuthDbSchema = async () => {
 }
 
 
-updateAuthDbSchema()
+//updateAuthDbSchema()
 //seedAuthDatabase()
 
 module.exports = {
