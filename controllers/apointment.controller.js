@@ -13,6 +13,7 @@ const { Op } = require('sequelize');
 const { User } = require('../models/Auth/User');
 const { Contact } = require('../models/Auth/Contact');
 const { appointmentSchema } = require('../helpers/validator/apointment_validation_schema');
+const { Department } = require('../models/Lookup/Department');
 
 
 const appointmentDetails = async (req, res, next) => {
@@ -20,6 +21,7 @@ const appointmentDetails = async (req, res, next) => {
     try {
         const appointmentId = req.params.id;
         const { userId, tenantId } = req.jwtPayload;
+
         let appointments = null;
 
         if (appointmentId && appointmentId > 0) {
@@ -37,6 +39,8 @@ const appointmentDetails = async (req, res, next) => {
                             attributes: ['id', 'first_name', 'last_name']
                         }]
                     }]
+                },  {
+                    model: Department, as: 'Department',
                 },
                 {
                     model: AppointmentType, as: 'AppointmentType',
@@ -59,7 +63,7 @@ const appointmentDetails = async (req, res, next) => {
                     model: User, as: "CreatedBy",
                     attributes: ['id', 'user_name'],
                     include: [{
-                        model: Contact,
+                        model: Contact, as: 'Contact',
                         attributes: ['id', 'first_name', 'last_name']
                     }]
                 }
@@ -70,8 +74,8 @@ const appointmentDetails = async (req, res, next) => {
 
         } else {
             // no parameter is passed
-            appointments = await Suppliers.findAll({
-                where: {  id: appointmentId, tenant_id: tenantId },
+            appointments = await Appointments.findAll({
+                where: {  tenant_id: tenantId },
                 include: [{
                     model: Doctor, as: "Doctor",
                     attributes: ['id'],
@@ -84,6 +88,9 @@ const appointmentDetails = async (req, res, next) => {
                         }]
                     }]
                 },
+                 {
+                    model: Department, as: 'Department',
+                },
                 {
                     model: AppointmentType, as: 'AppointmentType',
                 },
@@ -105,7 +112,7 @@ const appointmentDetails = async (req, res, next) => {
                     model: User, as: "CreatedBy",
                     attributes: ['id', 'user_name'],
                     include: [{
-                        model: Contact,
+                        model: Contact, as: 'Contact',
                         attributes: ['id', 'first_name', 'last_name']
                     }]
                 }
@@ -145,7 +152,7 @@ const editAppointment = async (req, res, next) => {
         });
 
         const existAppointment = await Appointments.findOne({
-            where: { [Op.and]: { id: appointment.id, tenant_id: appointment.tenant_id } }
+            where: { [Op.and]: { id: appointment?.id ?? -1, tenant_id: appointment.tenant_id } }
         });
 
         let action = 0;
@@ -153,7 +160,7 @@ const editAppointment = async (req, res, next) => {
         if (existAppointment) {
             // if ID is present then is for update
             if (appointment.id > 0 && appointment.id == existSupplier.id) {
-                Appointment.update(
+                Appointments.update(
                     appointment, { where: { id: existAppointment.id } }
                 )
 
@@ -174,7 +181,7 @@ const editAppointment = async (req, res, next) => {
         await logUserActivity(userId, 14, action, true, appointment.id)
 
         res.status(200).json({
-            ...supplier,
+            ...appointment,
             message: "Appointment details updated successfuly!",
         })
 

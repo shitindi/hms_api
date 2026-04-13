@@ -341,7 +341,7 @@ const GetLookupsAll = async(req, res, next) => {
 
 
         const order_statutes = await OrderStatus.findAll()
-        const  appointment_statuses = await AppointmentType.findAll()
+        const  appointment_statuses = await AppointmentStatus.findAll()
         const appointment_types = await AppointmentType.findAll()
         const blood_groups = await BloodGroup.findAll()
         const curriences = await Currrency.findAll()

@@ -6,6 +6,7 @@ const {Doctor} = require('./Doctor')
 const {Priority} = require('../Lookup/Priority')
 const { Patient } = require('./Patient')
 const { User } = require('../Auth/User')
+const { Department } = require('../Lookup/Department')
 
 const Appointment = db.define('main_tbl_apointment', {
 
@@ -34,7 +35,6 @@ const Appointment = db.define('main_tbl_apointment', {
     priority: {
         type: DataTypes.SMALLINT,
         allowNull: false,
-        defaultValue: 1
     },
     appointment_reason: {
         type: DataTypes.STRING,
@@ -42,7 +42,6 @@ const Appointment = db.define('main_tbl_apointment', {
     appointment_status:{
         type: DataTypes.SMALLINT,
         allowNull: false,
-        defaultValue: 1
     },
     notification_notes: {
         type: DataTypes.STRING
@@ -66,12 +65,17 @@ const Appointment = db.define('main_tbl_apointment', {
 }
 )
 
+Department.hasMany(Appointment, {foreignKey: {name: 'department_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Appointment.belongsTo(Department, {as: 'Department',foreignKey: {  name: 'department_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
+
+
 User.hasMany(Appointment, {foreignKey: {name: 'created_by', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Appointment.belongsTo(User, {as: 'CreatedBy',foreignKey: {  name: 'created_by', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 
-AppointmentType.hasMany(Appointment, {foreignKey: {name: 'appointment_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-Appointment.belongsTo(AppointmentType, {as: 'AppointmentType',foreignKey: {  name: 'appointment_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+AppointmentType.hasMany(Appointment, {foreignKey: {name: 'visit_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Appointment.belongsTo(AppointmentType, {as: 'AppointmentType',foreignKey: {  name: 'visit_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 
 Priority.hasMany(Appointment, {foreignKey: {name: 'priority', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})

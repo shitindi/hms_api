@@ -323,7 +323,7 @@ const login = async (req, res, next) => {
             );
                 throw createError.Forbidden('User account locked')
            }
-             throw createError.Unauthorized('Username/password not valid')
+             throw createError.Unauthorized('Username or password is not valid')
         }
             
         if (User.retry_count >= passwordRetryCount){
@@ -362,7 +362,7 @@ const login = async (req, res, next) => {
     } catch(error){
                 console.error('LOGIN: ', error)
 
-        if (error.isJoi) return next(createError.BadRequest("invalid Username/Password"))
+        if (error.isJoi) return next(createError.BadRequest(error?.details[0]?.message ?? 'Validation error'))
         next(error)
     }
 }

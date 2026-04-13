@@ -321,8 +321,8 @@ const seedAuthDatabase = async () => {
 
         if (contactTypeCount == 0) {
             await ContactType.bulkCreate([
-                { ID: 1, name: 'Medical staff', is_active: true },
-                { ID: 2, name: 'Administration', is_active: true }, { ID: 3, name: 'Pattient', is_active: false },
+                { ID: 1, name: 'Doctor', is_active: true }, { ID: 2, name: 'Administration', is_active: true },
+                 { ID: 3, name: 'Pattient', is_active: false },  { ID: 4, name: 'Medical staff', is_active: false }
 
             ])
         }
@@ -413,10 +413,9 @@ const updateAuthDbSchema = async () => {
 
     try {
 
-           await Doctor.sync({ alter: true })
+          await Appointment.sync({ alter: true })
             .then(data => { })
-            .catch(err => console.log('error Create table tbl main_tbl_doctor: ' + err))
-
+            .catch(err => console.log('error Create table tbl main_tbl_apointment: ' + err))
 
         return
 
@@ -693,7 +692,7 @@ const updateAuthDbSchema = async () => {
 }
 
 
-//updateAuthDbSchema()
+updateAuthDbSchema()
 //seedAuthDatabase()
 
 module.exports = {
