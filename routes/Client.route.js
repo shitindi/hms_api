@@ -9,7 +9,7 @@ const router = express.Router()
  *  get:
  *    tags:
  *    - Clients Administration
- *    summary: Get tenants list
+ *    summary: Get Clients list
  *    parameters:
  *      - in: path
  *        name: id
@@ -34,7 +34,7 @@ router.get("/tenant-details/:id?", verifyAccessTokenAdmin, adminController.tenan
  *        name: id
  *        type: integer
  *        required: false
- *        description: Numeric tenant id, omit for all
+ *        description: Numeric Client id, omit for all
  *    responses:
  *      200:
  *        description: Ok

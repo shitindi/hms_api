@@ -19,7 +19,7 @@ const router = express.Router();
  *        description: Numeric user id, omit for all
  *    responses:
  *      200:
- *        description: Ok, List of User(s)
+ *        description: Ok, List of Doctor(s)
  */
 
 router.get("/doctors/:id?", verifyAccessToken, doctorController.doctorDetails)

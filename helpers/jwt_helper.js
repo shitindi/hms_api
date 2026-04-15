@@ -7,14 +7,16 @@ const createError = require('http-errors');
 
 const JWT = require('jsonwebtoken')
 
-const signAccessToken =  (userName,userId, tenantId, roles = [1,2]) => {
+const signAccessToken =  (User, roles = [1,2]) => {
+    const [userName,userId, tenantId, defaultRole ] =  [User.user_name,User.id, User.tenant_id, User.default_role] 
     return new Promise((resolve, reject) => {
          roles = roles.length==0? [10000000] : roles
         const payload = {
             userId,
             tenantId,
             roles,
-            userName
+            userName,
+            defaultRole
         }
         
         const secret = process.env.ACCESS_TOKEN_SECRET 

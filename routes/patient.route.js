@@ -15,10 +15,10 @@ const router = express.Router();
  *        name: id
  *        type: integer
  *        required: false
- *        description: Numeric user id, omit for all
+ *        description: Numeric Patient id, omit for all
  *    responses:
  *      200:
- *        description: Ok, List of User(s)
+ *        description: Ok, List of Patients(s)
  */
 
 router.get("/patients/:id?", verifyAccessToken, patientController.patientDetails)
@@ -30,7 +30,7 @@ router.get("/patients/:id?", verifyAccessToken, patientController.patientDetails
  *  post:
  *     tags:
  *     - Health Management
- *     summary: Edit or Add user details
+ *     summary: Edit or Add Patient details
  *     requestBody:
  *      required: true
  *      content:

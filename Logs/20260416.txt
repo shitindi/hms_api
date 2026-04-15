@@ -1,0 +1,2 @@
+2026-04-15 23:09:27: appointmentDetails: SequelizeEagerLoadingError: lookups_tbl_gender is not associated to main_tbl_patient!
+ 

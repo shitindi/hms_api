@@ -9,20 +9,33 @@ const router = express.Router();
  *  get:
  *    tags:
  *    - Health Management
- *    summary: Get User list
+ *    summary: Get appointment list
  *    parameters:
  *      - in: path
  *        name: id
  *        type: integer
  *        required: false
- *        description: Numeric user id, omit for all
+ *        description: Numeric Appointment id, omit for all
  *    responses:
  *      200:
- *        description: Ok, List of User(s)
+ *        description: Ok, List of Appointment(s)
  */
 
 router.get("/appointments/:id?", verifyAccessToken, appointmentController.appointmentDetails)
 
+/**
+ * @openapi
+ * '/appointments/by-doctor':
+ *  get:
+ *    tags:
+ *    - Health Management
+ *    summary: Get Appointment list by doctor
+ *    responses:
+ *      200:
+ *        description: Ok, get List of appointments to a specific doctor
+ */
+
+router.get("/by-doctor", verifyAccessToken, appointmentController.appointmentsViewByDoctor)
 
 /**
  * @openapi
@@ -30,7 +43,7 @@ router.get("/appointments/:id?", verifyAccessToken, appointmentController.appoin
  *  post:
  *     tags:
  *     - Health Management
- *     summary: Edit or Add user details
+ *     summary: Edit or Add Appointment details
  *     requestBody:
  *      required: true
  *      content:
@@ -78,5 +91,31 @@ router.get("/appointments/:id?", verifyAccessToken, appointmentController.appoin
  *        description: Conflict
  */
 router.post("/appointment", verifyAccessToken, appointmentController.editAppointment)
+
+/**
+ * @openapi
+ * '/appointments/check-in':
+ *  post:
+ *     tags:
+ *     - Health Management
+ *     summary: Check in patient for consultation
+ *     requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *           schema:
+ *            type: object
+ *            required:
+ *              - id
+ *            properties:
+ *              id:
+ *                type: integer
+ *     responses:
+ *      200:
+ *        description: Ok, with created or updated object
+ *      409:
+ *        description: Conflict
+ */
+router.post("/check-in", verifyAccessToken, appointmentController.checkinAppointment)
 
 module.exports = router;

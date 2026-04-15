@@ -65,6 +65,7 @@ const { BillingOption } = require('../models/Lookup/BillingtOption')
 const { PatientActivity } = require('../models/Lookup/PatientActivity')
 const { PatientJourney } = require('../models/Main/PatientJourney')
 const { licensePackage } = require('./validator/client_validation_schema')
+const { DefaultRole } = require('../models/Auth/DefaultRole')
 
 const seedAuthDatabase = async () => {
     try {
@@ -111,14 +112,24 @@ const seedAuthDatabase = async () => {
         const LicensePackageCount = await LicensePackage.count()
         const LisenseUserCounts = await LicenseUserCount.count()
 
-         if ( LisenseUserCounts == 0){
+        const DefaultRolesCount = await DefaultRole.count()
+
+        if (DefaultRolesCount == 0){
+            await DefaultRole.bulkCreate([
+                {ID: 1, name: 'ADMIN'}, {ID: 2, name: 'DOCTOR'},
+                 {ID: 3, name: 'PHARMACIST'}, {ID: 4, name: 'RECEPTIONIST'},
+                  {ID: 5, name: 'CASHIER'}, {ID: 6, name: 'WARD STAFF'},
+            ])
+        }
+
+        if (LisenseUserCounts == 0) {
             await LicenseUserCount.create({
-                 ID: 1,
-                    description: 'Addition of extra users',
-                    user_count: 1000,
-                    price: 1000000,
-                    is_active: true,
-                    created_by: 1
+                ID: 1,
+                description: 'Addition of extra users',
+                user_count: 1000,
+                price: 1000000,
+                is_active: true,
+                created_by: 1
             })
         }
 
@@ -146,25 +157,25 @@ const seedAuthDatabase = async () => {
 
             })
         }
-         
 
-        if (TenantLicenseCount == 0 ) {
+
+        if (TenantLicenseCount == 0) {
             await TenantLicense.create(
                 {
                     id: 1,
-                    tenant_id: 1, 
+                    tenant_id: 1,
                     start_date: '2026-04-02 ',
-                     end_date: '2027-04-02 ',
-                    package_id: 1, 
+                    end_date: '2027-04-02 ',
+                    package_id: 1,
                     user_count_id: 1,
-                    payment_id:1,
+                    payment_id: 1,
                     license_duration_month: 12,
                     is_active: true
                 }
             )
         }
 
-      
+
 
 
         if (InsurerCount == 0) {
@@ -218,7 +229,8 @@ const seedAuthDatabase = async () => {
 
         if (AppointmentStatusCount == 0) {
             await AppointmentStatus.bulkCreate([
-                { ID: 1, name: 'Waiting' }, { ID: 2, name: 'Confirmed' }, { ID: 3, name: 'Checked-in' }, { ID: 4, name: 'Canceled' }
+                { ID: 1, name: 'Waiting' }, { ID: 2, name: 'Confirmed' }, { ID: 3, name: 'Checked-in' },
+                { ID: 4, name: 'Canceled' }, { ID: 5, name: 'Completed' } , { ID: 6, name: 'Overdue' }
             ])
         }
 
@@ -322,7 +334,7 @@ const seedAuthDatabase = async () => {
         if (contactTypeCount == 0) {
             await ContactType.bulkCreate([
                 { ID: 1, name: 'Doctor', is_active: true }, { ID: 2, name: 'Administration', is_active: true },
-                 { ID: 3, name: 'Pattient', is_active: false },  { ID: 4, name: 'Medical staff', is_active: false }
+                { ID: 3, name: 'Pattient', is_active: false }, { ID: 4, name: 'Medical staff', is_active: false }
 
             ])
         }
@@ -374,7 +386,7 @@ const seedAuthDatabase = async () => {
         }
 
 
-        if (packageCount == 1) {
+        if (packageCount == 0) {
 
             await LicensePackage.create(
                 { id: 1, package_name: 'demo pack', description: 'Demo package for review', user_count: '1', branch_count: '0', price: 0, app_id: 1, created_by: 1, is_active: 0 },
@@ -413,9 +425,10 @@ const updateAuthDbSchema = async () => {
 
     try {
 
-          await Appointment.sync({ alter: true })
+   await User.sync({ alter: true })
             .then(data => { })
-            .catch(err => console.log('error Create table tbl main_tbl_apointment: ' + err))
+            .catch(err => console.log('Create tbl User: ' + err))
+
 
         return
 
@@ -682,6 +695,11 @@ const updateAuthDbSchema = async () => {
         await Order.sync({ alter: true })
             .then(data => { })
             .catch(err => console.log('error Create table tbl main_tbl_order: ' + err))
+
+        await DefaultRole.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl lookups_tbl_default_roles: ' + err))
+
 
 
 

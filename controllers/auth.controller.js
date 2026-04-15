@@ -291,6 +291,7 @@ const login = async (req, res, next) => {
     try{
         const login = await authSchema.validateAsync(req.body); 
 
+        
        
         // Check user if exists
         let User = await Users.findOne({
@@ -303,6 +304,7 @@ const login = async (req, res, next) => {
 
             throw createError.NotFound("User not registered")
         }
+     
 
         const isMatch = await hash.isPasswordmatch(login.password, User.password)
 
@@ -339,7 +341,7 @@ const login = async (req, res, next) => {
         
         const userPermissions = await loadUserPermissions(User.id, User.tenant_id)
 
-        const accessToken = await signAccessToken(User.user_name,User.id, User.tenant_id, userPermissions)
+        const accessToken = await signAccessToken(User, userPermissions)
         const refreshToken = await signRefreshToken(User.id)
 
         //reset user login retry count
@@ -360,7 +362,7 @@ const login = async (req, res, next) => {
             licensingInfo
         })
     } catch(error){
-                console.error('LOGIN: ', error)
+             logData('Login: ' + error)
 
         if (error.isJoi) return next(createError.BadRequest(error?.details[0]?.message ?? 'Validation error'))
         next(error)

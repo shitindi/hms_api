@@ -4,6 +4,7 @@ const {Tenant } = require('../Auth/Tenant')
 const {UserStatus} = require('../Auth/UserStatus')
 const { TenantBranch } = require('../Client/TenantBranch')
 const { Department } = require('../Lookup/Department')
+const { DefaultRole } = require('./DefaultRole')
 
 const User = db.define('auth_tbl_user', {
    user_name: {
@@ -29,8 +30,7 @@ const User = db.define('auth_tbl_user', {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false
-    }
-    ,
+    } ,
    is_active: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
@@ -55,7 +55,6 @@ const User = db.define('auth_tbl_user', {
    },
    user_status: {
       type: DataTypes.SMALLINT,
-      defaultValue: 5,
       allowNull: false
    },
    default_branch: {
@@ -64,9 +63,16 @@ const User = db.define('auth_tbl_user', {
    department_id: {
       type: DataTypes.SMALLINT,
       
+   },
+   default_role: {
+      type: DataTypes.SMALLINT
    }
 }
 )
+
+DefaultRole.hasMany(User, {foreignKey: {name: 'default_role', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+User.belongsTo(DefaultRole, { as: 'DefaultRole', foreignKey: {name: 'default_role', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
 
 // User data
 User.hasMany(Contact, {foreignKey: {name: 'created_by', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
