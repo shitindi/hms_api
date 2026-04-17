@@ -66,6 +66,15 @@ const getJSDateFromDb = (dbDate) =>{
     return d
 }
 
+const getDateOnly = (date) => {
+
+const year = date.getFullYear();
+const month = date.getMonth() + 1; // Months are 0-indexed
+const day = date.getDate();
+
+return `${year}-${month}-${day}`;
+}
+
 module.exports = {
     addHourDbDateNow,
     getDbDateNow,
@@ -74,5 +83,7 @@ module.exports = {
     addMonthsDbDateNow,
     addDaysDbDateNow,
     addMonthsDbDateFromDate,
-    getDifferenceInDate
+    getDifferenceInDate,
+    getDateOnly
+    
 }

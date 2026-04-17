@@ -66,6 +66,7 @@ const { PatientActivity } = require('../models/Lookup/PatientActivity')
 const { PatientJourney } = require('../models/Main/PatientJourney')
 const { licensePackage } = require('./validator/client_validation_schema')
 const { DefaultRole } = require('../models/Auth/DefaultRole')
+const { PatientVital } = require('../models/Main/PatientVital')
 
 const seedAuthDatabase = async () => {
     try {
@@ -114,11 +115,11 @@ const seedAuthDatabase = async () => {
 
         const DefaultRolesCount = await DefaultRole.count()
 
-        if (DefaultRolesCount == 0){
+        if (DefaultRolesCount == 0) {
             await DefaultRole.bulkCreate([
-                {ID: 1, name: 'ADMIN'}, {ID: 2, name: 'DOCTOR'},
-                 {ID: 3, name: 'PHARMACIST'}, {ID: 4, name: 'RECEPTIONIST'},
-                  {ID: 5, name: 'CASHIER'}, {ID: 6, name: 'WARD STAFF'},
+                { ID: 1, name: 'ADMIN' }, { ID: 2, name: 'DOCTOR' },
+                { ID: 3, name: 'PHARMACIST' }, { ID: 4, name: 'RECEPTIONIST' },
+                { ID: 5, name: 'CASHIER' }, { ID: 6, name: 'WARD STAFF' },
             ])
         }
 
@@ -230,7 +231,7 @@ const seedAuthDatabase = async () => {
         if (AppointmentStatusCount == 0) {
             await AppointmentStatus.bulkCreate([
                 { ID: 1, name: 'Waiting' }, { ID: 2, name: 'Confirmed' }, { ID: 3, name: 'Checked-in' },
-                { ID: 4, name: 'Canceled' }, { ID: 5, name: 'Completed' } , { ID: 6, name: 'Overdue' }
+                { ID: 4, name: 'Canceled' }, { ID: 5, name: 'Completed' }, { ID: 6, name: 'Overdue' }
             ])
         }
 
@@ -425,12 +426,13 @@ const updateAuthDbSchema = async () => {
 
     try {
 
-   await User.sync({ alter: true })
+       await PatientVital.sync({ alter: true })
             .then(data => { })
-            .catch(err => console.log('Create tbl User: ' + err))
+            .catch(err => console.log('error Create table tbl main_tbl_patient_vital: ' + err))
 
 
-        return
+        
+            return
 
 
         await LicensePaymentType.sync({ alter: true })
@@ -700,7 +702,9 @@ const updateAuthDbSchema = async () => {
             .then(data => { })
             .catch(err => console.log('error Create table tbl lookups_tbl_default_roles: ' + err))
 
-
+        await PatientVital.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl main_tbl_patient_vital: ' + err))
 
 
     } catch (error) {

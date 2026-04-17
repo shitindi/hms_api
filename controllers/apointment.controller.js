@@ -1,5 +1,7 @@
 
 const createError = require('http-errors');
+const { Sequelize } = require('sequelize');
+
 
 const { logData, logUserActivity, } = require('../helpers/logger');
 
@@ -18,10 +20,11 @@ const { Gender } = require('../models/Lookup/Gender');
 const { BloodGroup } = require('../models/Lookup/BloodGroup');
 const { PatientActivity } = require('../models/Lookup/PatientActivity');
 const { Insurer } = require('../models/Main/Insurer');
+const { getDateOnly } = require('../helpers/utility');
+const { PatientVital } = require('../models/Main/PatientVital');
 
 
 const appointmentDetails = async (req, res, next) => {
-
     try {
         const appointmentId = req.params.id;
         const { userId, tenantId } = req.jwtPayload;
@@ -52,6 +55,10 @@ const appointmentDetails = async (req, res, next) => {
                     model: Priority, as: 'Priority'
                 },
                 {
+                    model: PatientVital, as: 'PatientVital'
+                }
+                ,
+                {
                     model: AppointmentStatus, as: 'AppointmentStatus'
                 },
                 {
@@ -60,19 +67,19 @@ const appointmentDetails = async (req, res, next) => {
                         model: Contact, as: "Contact",
                         include: [
                             {
-                        model: Gender, as: 'Gender'
-                        }
-                    ]
+                                model: Gender, as: 'Gender'
+                            }
+                        ]
                     },
                     {
                         model: BloodGroup, as: 'BloodGroup'
-                    },{
+                    }, {
                         model: Insurer, as: 'Insurer'
                     },
                     {
                         model: PatientActivity, as: 'CurrentActivity'
                     }
-                ]
+                    ]
                 },
                 {
                     model: User, as: "CreatedBy",
@@ -170,7 +177,9 @@ const appointmentsViewByDoctor = async (req, res, next) => {
 
         // parameter is passed
         const appointments = await Appointments.findAll({
-            where: { tenant_id: tenantId, doctor_id: doctorId, appointment_status: [2, 3] },
+            where: { [Op.and]: [{ tenant_id: tenantId, doctor_id: doctorId, appointment_status: [2, 3]},
+                 Sequelize.where( Sequelize.cast(Sequelize.col('appointment_date'), 'date'), getDateOnly(new Date()))]
+             },
             include: [
                 {
                     model: Department, as: 'Department',
@@ -327,9 +336,9 @@ const checkinAppointment = async (req, res, next) => {
             // if ID is present then is for update
             if (appointmentId > 0 && appointmentId == Appointment.id) {
                 const currentStatus = Appointment.appointment_status
-                Appointment .appointment_status=3
+                Appointment.appointment_status = 3
                 await Appointment.save()
-            
+
 
                 const status = 3
                 let patient = await Patient.findOne({

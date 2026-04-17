@@ -112,4 +112,88 @@ router.get("/patients/:id?", verifyAccessToken, patientController.patientDetails
  */
 router.post("/patient", verifyAccessToken, patientController.editPatient)
 
+/**
+ * @openapi
+ * '/patients/update-status':
+ *  post:
+ *     tags:
+ *     - Health Management
+ *     summary: Update Patient Activity status
+ *     requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *           schema:
+ *            type: object
+ *            required:
+ *              - patient_id
+ *              - current_activity
+ *            properties:
+ *              patient_id:
+ *                type: integer
+ *              current_activity:
+ *                type: integer
+ *     responses:
+ *      200:
+ *        description: Ok, with created or updated object
+ *      409:
+ *        description: Conflict
+ */
+router.post("/update-status", verifyAccessToken, patientController.changeActivityStatus)
+
+/**
+ * @openapi
+ * '/patients/vital':
+ *  post:
+ *     tags:
+ *     - Health Management
+ *     summary: Update Patient Vitals details 
+ *     requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *           schema:
+ *            type: object
+ *            required:
+ *              - tenant_id
+ *              - apointment_id
+ *              - temperature
+ *              - weight_kg
+ *            properties:
+ *              id:
+ *                TYPE: integer
+ *              tenant_id:
+ *                type: integer
+ *              apointment_id:
+ *                type: integer
+ *              temperature:
+ *                type: number
+ *              bp_systolic:
+ *                type: integer
+ *              bp_diastolic:
+ *                type: integer
+ *              pulse_rate:
+ *                type: integer
+ *              respiratory_rate:
+ *                type: integer
+ *              oxygen_saturation:
+ *                type: integer
+ *              weight_kg:
+ *                type: integer
+ *              height_cm:
+ *                type: integer
+ *              blood_glucose:
+ *                type: integer
+ *              notes:
+ *                type: string
+ *              created_by:
+ *                type: integer
+ *     responses:
+ *      200:
+ *        description: Ok, with created or updated object
+ *      409:
+ *        description: Conflict
+ */
+router.post("/vital", verifyAccessToken, patientController.editPatientVitals)
+
 module.exports = router;

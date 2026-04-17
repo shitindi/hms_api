@@ -87,7 +87,7 @@ const register = async (req, res, next) => {
         const result= await Users.create(user, {transaction})
         
         // const accessToken = await signAccessToken(User.user_name,User.id, User.tenant_id, userPermissions)
-            const accessToken = await signAccessToken(user.user_name, result.id, result.tenant_id, [])
+            const accessToken = await signAccessToken(result, [])
            
             const refreshToken = await signRefreshToken(result.id)
 
@@ -678,12 +678,12 @@ const refresh = async (req, res, next) => {
 
         //Generate a pair of refresh and access tokens
         const User = await Users.findOne({
-            where: {id: userId}, attributes: ['user_name','tenant_id'],
+            where: {id: userId}, attributes: ['id','user_name','tenant_id'],
         })
 
         const userPermissions = await loadUserPermissions(userId, User.tenant_id)
 
-        const accessToken = await signAccessToken(User.user_name, userId, User.tenant_id, userPermissions)
+        const accessToken = await signAccessToken(User, userPermissions)
         const newRefreshToken = await signRefreshToken(userId)
 
         let session = await ActiveSession.findOne({
@@ -702,7 +702,7 @@ const refresh = async (req, res, next) => {
 
          res.status(200).json({accessToken, refreshToken: newRefreshToken, licensingInfo})
     }catch(error){
-        console.log('REFRESH: ', error)
+         logData('REFRESH: ' + error)
         next(error)
     }
 }

@@ -18,7 +18,6 @@ const signAccessToken =  (User, roles = [1,2]) => {
             userName,
             defaultRole
         }
-        
         const secret = process.env.ACCESS_TOKEN_SECRET 
         const options = {
             expiresIn:  process.env.ACCESS_TOKEN_EXPIRE_IN,

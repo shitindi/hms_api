@@ -5,7 +5,7 @@ const { logData, logUserActivity, } = require('../helpers/logger');
 
 const { sequelize } = require('../helpers/sequelize_init');
 const { contactSchema } = require("../helpers/validator/auth_validation_schema");
-const {patientSchema} = require('../helpers/validator/patient_validation_schema')
+const {patientSchema, patientVitals} = require('../helpers/validator/patient_validation_schema')
 const {Patient: Patients} = require('../models/Main/Patient')
 const {Contact: Contacts} = require('../models/Auth/Contact');
 const { IDType } = require('../models/Lookup/IDType');
@@ -15,6 +15,8 @@ const { PatientActivity } = require('../models/Lookup/PatientActivity');
 const { Insurer } = require('../models/Main/Insurer');
 const { User } = require('../models/Auth/User');
 const { Gender } = require('../models/Lookup/Gender');
+const { PatientVital } = require('../models/Main/PatientVital');
+const { getDateOnly } = require('../helpers/utility');
 
 const patientDetails = async (req, res, next) => {
 
@@ -189,7 +191,108 @@ const editPatient = async (req, res, next) => {
     }
 }
 
+const changeActivityStatus = async (req, res, next) => {
+    try {
+
+        let patientId = await req.body?.patient_id ?? -1
+        let statusId = await req.body?.current_activity ?? 13
+
+        const { userId, tenantId } = req.jwtPayload;
+
+        const Patient = await Patients.findOne({
+            where: {
+                
+                id: patientId , tenant_id: tenantId
+            }, order: [['id', 'ASC']],
+        });
+
+        let action = 0;
+        // Exist same group name in same tenant
+        if (Patient) {
+
+            // if ID is present then is for update
+            if (patientId > 0 && patientId == Patient.id) {
+                Patient.current_activity = statusId
+                await Patient.save()
+
+                action = 2
+            }
+
+
+        } else {
+            // Otherwise create new group
+            next(createError.NotFound('Could not find specified Patient'))
+        }
+
+
+        await logUserActivity(userId, 12, action, true, patientId)
+
+        res.status(200).json({
+            ...{patient_id: patientId, current_activity: statusId},
+            message: "Patiend updated in  successfuly!",
+        })
+
+
+
+    } catch (err) {
+
+        console.error('ERROR: ', err)
+        logData('changeActivityStatus: +' + err)
+        next(err)
+    }
+}
+
+const editPatientVitals = async (req, res, next) => {
+    try {
+
+        let vitals = await patientVitals.validateAsync(req.body)
+
+        const { userId, tenantId } = req.jwtPayload;
+
+
+
+      
+        const existsVitals = await PatientVital.findOne({
+            where: { [Op.and]: { id: vitals?.id ?? -1 } }
+        });
+
+        let action = 0;
+
+        if (existsVitals) {
+            // if ID is present then is for update
+            if (vitals.id > 0 && vitals.id == existsVitals.id) {
+                await PatientVital.update(
+                    vitals, { where: { id: existsVitals.id } }
+                )
+                action = 2
+            }
+
+
+        } else {
+           vitals.date_taken = getDateOnly(new Date())
+            vitals = await PatientVital.create(vitals)
+            action = 1
+        }
+
+        await logUserActivity(userId, 12, action, true, vitals.id)
+
+
+        res.status(200).json({
+            ...vitals,
+            message: "Vitals details updated successfuly!",
+        })
+
+        // const { userId, tenatId} =  req.jwtPayload;
+
+    } catch (err) {
+        logData('editPatientVitals: +' + err)
+        next(err)
+    }
+}
+
 module.exports = {
     patientDetails,
-    editPatient
+    editPatient,
+    changeActivityStatus,
+    editPatientVitals
 }
