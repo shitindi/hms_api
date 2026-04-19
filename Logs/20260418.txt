@@ -1,10 +1,152 @@
-2026-04-17 22:17:26: editPatientVitals: +ValidationError: "tenant_id" is required
+2026-04-18 17:01:33: verifyRefreshToken: 
  
-2026-04-17 22:18:41: editPatientVitals: +ValidationError: "tenant_id" is required
+2026-04-18 17:01:33: REFRESH: UnauthorizedError: Unauthorized
  
-2026-04-17 22:20:28: editPatientVitals: +ValidationError: "apointment_id" is required
+2026-04-18 17:01:33: verifyRefreshToken: 
  
-2026-04-17 22:21:34: editPatientVitals: +Error: WHERE parameter "id" has invalid "undefined" value
+2026-04-18 17:01:33: REFRESH: UnauthorizedError: Unauthorized
  
-2026-04-17 22:22:28: editPatientVitals: +Error: WHERE parameter "id" has invalid "undefined" value
+2026-04-18 17:01:33: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:01:33: verifyRefreshToken: 
+ 
+2026-04-18 17:01:33: verifyRefreshToken: 
+ 
+2026-04-18 17:01:33: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:01:33: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:01:33: verifyRefreshToken: 
+ 
+2026-04-18 17:01:33: verifyRefreshToken: 
+ 
+2026-04-18 17:01:33: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:01:33: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:01:33: verifyRefreshToken: 
+ 
+2026-04-18 17:07:36: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:07:36: verifyRefreshToken: 
+ 
+2026-04-18 17:07:36: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:07:36: verifyRefreshToken: 
+ 
+2026-04-18 17:07:36: verifyRefreshToken: 
+ 
+2026-04-18 17:07:36: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:07:36: verifyRefreshToken: 
+ 
+2026-04-18 17:07:36: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:07:36: verifyRefreshToken: 
+ 
+2026-04-18 17:07:36: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:07:36: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:07:36: verifyRefreshToken: 
+ 
+2026-04-18 17:07:36: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:07:36: verifyRefreshToken: 
+ 
+2026-04-18 17:12:47: verifyRefreshToken: 
+ 
+2026-04-18 17:12:47: verifyRefreshToken: 
+ 
+2026-04-18 17:12:47: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:12:47: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:12:47: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:12:47: verifyRefreshToken: 
+ 
+2026-04-18 17:13:34: verifyRefreshToken: 
+ 
+2026-04-18 17:13:34: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:13:34: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:13:34: verifyRefreshToken: 
+ 
+2026-04-18 17:13:34: verifyRefreshToken: 
+ 
+2026-04-18 17:13:34: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:13:34: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:13:34: verifyRefreshToken: 
+ 
+2026-04-18 17:13:34: verifyRefreshToken: 
+ 
+2026-04-18 17:13:34: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:13:34: verifyRefreshToken: 
+ 
+2026-04-18 17:13:34: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:13:34: verifyRefreshToken: 
+ 
+2026-04-18 17:13:34: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:15:55: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:15:55: verifyRefreshToken: 
+ 
+2026-04-18 17:15:55: verifyRefreshToken: 
+ 
+2026-04-18 17:15:55: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:15:55: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:15:55: verifyRefreshToken: 
+ 
+2026-04-18 17:15:55: verifyRefreshToken: 
+ 
+2026-04-18 17:15:55: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:15:55: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:15:55: verifyRefreshToken: 
+ 
+2026-04-18 17:15:55: verifyRefreshToken: 
+ 
+2026-04-18 17:15:55: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:15:55: verifyRefreshToken: 
+ 
+2026-04-18 17:15:55: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:16:06: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:16:06: verifyRefreshToken: 
+ 
+2026-04-18 17:16:06: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:16:06: verifyRefreshToken: 
+ 
+2026-04-18 17:16:06: verifyRefreshToken: 
+ 
+2026-04-18 17:16:06: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:16:06: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:16:06: verifyRefreshToken: 
+ 
+2026-04-18 17:16:07: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:16:07: verifyRefreshToken: 
+ 
+2026-04-18 17:16:07: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:16:07: verifyRefreshToken: 
+ 
+2026-04-18 17:16:07: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-04-18 17:16:07: verifyRefreshToken: 
  
