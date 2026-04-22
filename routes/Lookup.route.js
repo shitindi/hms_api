@@ -302,7 +302,33 @@ router.get("/billing-options", lookupController.BillingOptions)
  *      200:
  *        description: Ok
  */
-router.get("/activities", lookupController.OrderStatuses)
+router.get("/activities", lookupController.PatientActivities)
+
+/**
+ * @openapi
+ * '/lookups/lab-test-categories':
+ *  get:
+ *    tags:
+ *    - Lookups
+ *    summary: Get get list of Hospital Lab test categories
+ *    responses:
+ *      200:
+ *        description: Ok
+ */
+router.get("/lab-test-categories", lookupController.LabTestCategories)
+
+/**
+ * @openapi
+ * '/lookups/lab-test-catalogs':
+ *  get:
+ *    tags:
+ *    - Lookups
+ *    summary: Get get list of Hospital Lab test categories
+ *    responses:
+ *      200:
+ *        description: Ok
+ */
+router.get("/lab-test-catalogs", lookupController.LabTestCatalogs)
 
 
 /**

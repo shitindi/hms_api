@@ -67,6 +67,10 @@ const { PatientJourney } = require('../models/Main/PatientJourney')
 const { licensePackage } = require('./validator/client_validation_schema')
 const { DefaultRole } = require('../models/Auth/DefaultRole')
 const { PatientVital } = require('../models/Main/PatientVital')
+const { LabTestCategory } = require('../models/Lookup/LabTestCategory')
+const { LabTestCatalog } = require('../models/Main/LabTestCatalog')
+const { LabResultStatus } = require('../models/Lookup/LabResultStatus')
+const { LabRequest } = require('../models/Main/LabRequest')
 
 const seedAuthDatabase = async () => {
     try {
@@ -114,6 +118,23 @@ const seedAuthDatabase = async () => {
         const LisenseUserCounts = await LicenseUserCount.count()
 
         const DefaultRolesCount = await DefaultRole.count()
+        const LabTestCategoryCount = await LabTestCategory.count()
+        const LabResultStatusCount = await LabResultStatus.count()
+
+        if (LabResultStatusCount == 0 ){
+            await LabResultStatus.bulkCreate([
+                {id:1, name: 'Normal'}, {id: 2, name: 'High'},
+                {id: 3, name: 'Low'}, {id: 4, name: 'Abnormal'}
+            ])
+        }
+        if (LabTestCategoryCount == 0) {
+            await LabTestCategory.bulkCreate([
+                { id: 1, name: 'Hematology' }, { id: 2, name: 'Biochemistry' },
+                { id: 3, name: 'Microbiology' }, { id: 4, name: 'Urine' },
+                { id: 5, name: 'Stool' }, { id: 6, name: 'Hormonal' },
+                { id: 7, name: 'Cardiac' },
+            ])
+        }
 
         if (DefaultRolesCount == 0) {
             await DefaultRole.bulkCreate([
@@ -426,13 +447,16 @@ const updateAuthDbSchema = async () => {
 
     try {
 
-       await PatientVital.sync({ alter: true })
+        await LabResultStatus.sync({ alter: true })
             .then(data => { })
-            .catch(err => console.log('error Create table tbl main_tbl_patient_vital: ' + err))
+            .catch(err => console.log('error Create table tbl lookups_tbl_lab_result_status: ' + err))
+
+        await LabRequest.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl main_tbl_lab_request: ' + err))
 
 
-        
-            return
+        return
 
 
         await LicensePaymentType.sync({ alter: true })
@@ -540,6 +564,10 @@ const updateAuthDbSchema = async () => {
         await PatientActivity.sync({ alter: true })
             .then(data => { })
             .catch(err => console.log('error Create table tbl main_tbl_patient_activities : ' + err))
+
+        await LabTestCategory.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl lookups_tbl_lab_test_category: ' + err))
 
 
 
@@ -706,6 +734,11 @@ const updateAuthDbSchema = async () => {
             .then(data => { })
             .catch(err => console.log('error Create table tbl main_tbl_patient_vital: ' + err))
 
+        await LabTestCatalog.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl main_tbl_lab_test_catalog: ' + err))
+
+
 
     } catch (error) {
         console.log('updateDatabse: ' + error)
@@ -714,8 +747,8 @@ const updateAuthDbSchema = async () => {
 }
 
 
-updateAuthDbSchema()
-//seedAuthDatabase()
+//updateAuthDbSchema()
+seedAuthDatabase()
 
 module.exports = {
     seedAuthDatabase,

@@ -29,6 +29,9 @@ const {Priority} = require('../models/Lookup/Priority');
 const { BillingOption } = require('../models/Lookup/BillingtOption');
 const { PatientActivity } = require('../models/Lookup/PatientActivity');
 const { Insurer } = require('../models/Main/Insurer');
+const { LabTestCategory } = require('../models/Lookup/LabTestCategory');
+const { LabTestCatalog } = require('../models/Main/LabTestCatalog');
+const { LabResultStatus } = require('../models/Lookup/LabResultStatus');
 
 
 // Authentication lookup
@@ -327,6 +330,46 @@ const InsuranceCompanies = async(req, res, next) => {
 }
 
 
+const LabTestCategories = async(req, res, next) => {
+    try{
+        const categories = await LabTestCategory.findAll()
+
+        res.status(200).json(categories)
+    }catch(err){
+        logData('LabTestCategories: ' + err)
+        next(err)
+    }
+}
+
+const LabTestCatalogs = async(req, res, next) => {
+    try{
+        const catalogs = await LabTestCatalog.findAll({
+            include: [
+                {
+                    model: LabTestCategory, as: 'Category'
+                }
+            ]
+        })
+
+        res.status(200).json(catalogs)
+    }catch(err){
+        logData('LabTestCatalogs: ' + err)
+        next(err)
+    }
+}
+
+const LabResultStatuses = async(req, res, next) => {
+    try{
+        const statuses = await LabResultStatuses.findAll()
+
+        res.status(200).json(categories)
+    }catch(err){
+        logData('LabResultStatuses: ' + err)
+        next(err)
+    }
+}
+
+
 const GetLookupsAll = async(req, res, next) => {
     try{
         const activation_types = await ActivationType.findAll()
@@ -356,8 +399,8 @@ const GetLookupsAll = async(req, res, next) => {
         const patient_activities = await PatientActivity.findAll()
         const billing_options = await BillingOption.findAll()
         const insurers = await Insurer.findAll()
-
-
+        const lab_test_categories = await LabTestCategory.findAll()
+        const lab_result_statuses = await LabResultStatus.findAll()
         
         res.status(200).json({
             activation_types,
@@ -385,7 +428,9 @@ const GetLookupsAll = async(req, res, next) => {
 
             patient_activities,
             billing_options,
-            insurers
+            insurers,
+            lab_test_categories,
+            lab_result_statuses
         })
 
     }catch(err){
@@ -424,6 +469,9 @@ module.exports = {
 
     BillingOptions,
     PatientActivities,
-    InsuranceCompanies
+    InsuranceCompanies,
+    PatientActivities,
+    LabTestCatalogs,
+LabTestCategories
     
 }
