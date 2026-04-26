@@ -343,7 +343,10 @@ const LabTestCategories = async(req, res, next) => {
 
 const LabTestCatalogs = async(req, res, next) => {
     try{
+         const { userId, tenantId } = req.jwtPayload;
+
         const catalogs = await LabTestCatalog.findAll({
+            where: {tenant_id: tenantId},
             include: [
                 {
                     model: LabTestCategory, as: 'Category'
@@ -360,7 +363,7 @@ const LabTestCatalogs = async(req, res, next) => {
 
 const LabResultStatuses = async(req, res, next) => {
     try{
-        const statuses = await LabResultStatuses.findAll()
+        const statuses = await LabResultStatus.findAll()
 
         res.status(200).json(categories)
     }catch(err){
@@ -472,6 +475,7 @@ module.exports = {
     InsuranceCompanies,
     PatientActivities,
     LabTestCatalogs,
-LabTestCategories
+LabTestCategories,
+LabResultStatuses
     
 }

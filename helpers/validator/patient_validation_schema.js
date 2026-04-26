@@ -16,7 +16,6 @@ const patientSchema = Joi.object({
     next_kin_type: Joi.string().min(3).max(20).required(),
     next_kin_phone: Joi.string().min(10).max(12).required(),
     joining_date: Joi.date().allow(null),
-    current_activity: Joi.number().default(13),
     insurer_id: Joi.number().allow(null),
     insurance_number: Joi.string().min(5).max(20).allow(null),
     is_active: Joi.bool().required().default(true)

@@ -14,7 +14,7 @@ const { Patient } = require('../models/Main/Patient');
 const { Op, where } = require('sequelize');
 const { User } = require('../models/Auth/User');
 const { Contact } = require('../models/Auth/Contact');
-const { appointmentSchema } = require('../helpers/validator/apointment_validation_schema');
+const { appointmentSchema, labTestRequestSchema, labTestResultSchema, labTestResultSingleSchema } = require('../helpers/validator/apointment_validation_schema');
 const { Department } = require('../models/Lookup/Department');
 const { Gender } = require('../models/Lookup/Gender');
 const { BloodGroup } = require('../models/Lookup/BloodGroup');
@@ -22,6 +22,9 @@ const { PatientActivity } = require('../models/Lookup/PatientActivity');
 const { Insurer } = require('../models/Main/Insurer');
 const { getDateOnly } = require('../helpers/utility');
 const { PatientVital } = require('../models/Main/PatientVital');
+const { LabRequest } = require('../models/Main/LabRequest');
+const { LabTestCatalog } = require('../models/Main/LabTestCatalog');
+const { LabResultStatus } = require('../models/Lookup/LabResultStatus');
 
 
 const appointmentDetails = async (req, res, next) => {
@@ -57,10 +60,14 @@ const appointmentDetails = async (req, res, next) => {
                 {
                     model: PatientVital, as: 'PatientVital'
                 }
-                ,
+                    ,
                 {
                     model: AppointmentStatus, as: 'AppointmentStatus'
                 },
+                {
+                    model: PatientActivity, as: 'PatientActivity'
+                }
+                    ,
                 {
                     model: Patient, as: "Patient",
                     include: [{
@@ -73,12 +80,21 @@ const appointmentDetails = async (req, res, next) => {
                     },
                     {
                         model: BloodGroup, as: 'BloodGroup'
-                    }, {
-                        model: Insurer, as: 'Insurer'
                     },
                     {
-                        model: PatientActivity, as: 'CurrentActivity'
-                    }
+                        model: Insurer, as: 'Insurer'
+                    },
+
+
+                    ]
+
+                },
+                {
+                    model: LabRequest, as: 'LabReqests',
+                    include: [
+                        {
+                            model: LabTestCatalog, as: 'TestCatalog'
+                        }
                     ]
                 },
                 {
@@ -177,9 +193,10 @@ const appointmentsViewByDoctor = async (req, res, next) => {
 
         // parameter is passed
         const appointments = await Appointments.findAll({
-            where: { [Op.and]: [{ tenant_id: tenantId, doctor_id: doctorId, appointment_status: [2, 3]},
-                 Sequelize.where( Sequelize.cast(Sequelize.col('appointment_date'), 'date'), getDateOnly(new Date()))]
-             },
+            where: {
+                [Op.and]: [{ tenant_id: tenantId, doctor_id: doctorId, appointment_status: [2, 3] },
+                Sequelize.where(Sequelize.cast(Sequelize.col('appointment_date'), 'date'), getDateOnly(new Date()))]
+            },
             include: [
                 {
                     model: Department, as: 'Department',
@@ -189,6 +206,10 @@ const appointmentsViewByDoctor = async (req, res, next) => {
                 },
                 {
                     model: Priority, as: 'Priority'
+                },
+
+                {
+                    model: PatientActivity, as: 'PatientActivity'
                 },
                 {
                     model: AppointmentStatus, as: 'AppointmentStatus'
@@ -206,9 +227,6 @@ const appointmentsViewByDoctor = async (req, res, next) => {
                     },
                     {
                         model: BloodGroup, as: 'BloodGroup'
-                    },
-                    {
-                        model: PatientActivity, as: 'CurrentActivity'
                     },
                     {
                         model: Insurer, as: 'Insurer'
@@ -261,26 +279,17 @@ const editAppointment = async (req, res, next) => {
         if (existAppointment) {
             // if ID is present then is for update
             if (appointment.id > 0 && appointment.id == existAppointment.id) {
-                await Appointments.update(
-                    appointment, { where: { id: existAppointment.id } }
-                )
 
                 const status = appointment.appointment_status
                 const currentStatus = existAppointment.appointment_status
-                const patient = await Patient.findOne({
-                    where: { id: appointment.patient_id }
-                })
 
-                if (patient && (status != currentStatus && (status == 2 || status == 3))) {
-                    patient.current_activity = 2
-                    await Patient.update(
-                        patient, {
-                        where: { id: patient.id },
-                        fields: ['current_activity']
-                    },
+                if (status != currentStatus && (status == 2 || status == 3)) {
+                    appointment.current_activity = 2
 
-                    )
                 }
+                await Appointments.update(
+                    appointment, { where: { id: existAppointment.id } }
+                )
 
                 action = 2
             }
@@ -336,21 +345,13 @@ const checkinAppointment = async (req, res, next) => {
             // if ID is present then is for update
             if (appointmentId > 0 && appointmentId == Appointment.id) {
                 const currentStatus = Appointment.appointment_status
+                const status = 3
+                if (status != currentStatus && (status == 2 || status == 3)) {
+                    Appointment.current_activity = 2
+                }
+
                 Appointment.appointment_status = 3
                 await Appointment.save()
-
-
-                const status = 3
-                let patient = await Patient.findOne({
-                    where: { id: Appointment.patient_id }
-                })
-
-                if (patient && (status != currentStatus && (status == 2 || status == 3))) {
-                    patient.current_activity = 2
-
-                    await patient.save()
-
-                }
 
                 action = 2
             }
@@ -379,9 +380,216 @@ const checkinAppointment = async (req, res, next) => {
     }
 }
 
+
+const viewLabRequests = async (req, res, next) => {
+
+    try {
+
+        const appointmentId =  req.params.id;
+
+        const { userId, tenantId } = req.jwtPayload;
+
+        // parameter is passed
+        const appointments = await LabRequest.findAll({
+            where: { appointment_id: appointmentId },
+    
+            include: [
+                {
+                    model: LabTestCatalog, as: 'TestCatalog'
+                },
+
+                {
+                    model: LabResultStatus, as: 'ResultStatus'
+                },           
+            ]
+
+        })
+
+
+
+        await logUserActivity(userId, 14, 4, true)
+
+        res.status(200).json(
+            appointments
+        )
+
+    } catch (err) {
+        logData('appointmentDetails: ' + err)
+        next(err)
+    }
+}
+
+
+
+const editLabRequests = async (req, res, next) => {
+    try {
+
+        let labTests = await labTestRequestSchema.validateAsync(req.body)
+
+        const { userId, tenantId } = req.jwtPayload;
+        const appointmentId = labTests?.test_items[0]?.appointment_id ?? -1
+
+        const existLabTest = await LabRequest.findOne({
+            where: { appointment_id: appointmentId }
+        });
+
+        let action = 0;
+        if (existLabTest) {
+            // if ID is present then is for update
+            if (appointmentId > 0 && appointmentId == existLabTest.appointment_id) {
+
+                // delete tests items then add new one
+                await LabRequest.destroy({
+                    where: { appointment_id: appointmentId }
+                })
+
+                await LabRequest.bulkCreate(
+                    labTests.test_items
+                )
+                action = 2
+            }
+
+
+        } else {
+
+
+            const test_items = await LabRequest.bulkCreate(
+                labTests.test_items
+            )
+            action = 1
+        }
+
+
+        await logUserActivity(userId, 16, action, true, appointmentId)
+
+        res.status(200).json({
+            ...labTests,
+            message: "Lab test details updated successfuly!",
+        })
+
+
+
+    } catch (err) {
+        logData('editLabRequests: +' + err)
+        next(err)
+    }
+}
+
+const editLabResults = async (req, res, next) => {
+    try {
+
+        let labTests = await labTestResultSchema.validateAsync(req.body)
+
+        const { userId, tenantId } = req.jwtPayload;
+        let testIds = []
+        if (!labTests || labTests.length == 0)
+            next(createError.NotFound('No test items found!'))
+
+        labTests.test_items.forEach(test => {
+            testIds.push(test.id)
+        })
+
+        const existLabTest = await LabRequest.findAll({
+            where: { id: [...testIds] }
+        });
+
+        let action = 0;
+        if (existLabTest) {
+
+            existLabTest.forEach(async (test, index, tests,) => {
+                const tst = labTests.test_items.find(t => t.id === test.id)
+                if (!tst)
+                    return
+
+                tests[index].test_result = tst.test_result
+                tests[index].result_status = tst.result_status
+                tests[index].result_date = tst.result_date
+                tests[index].result_completed = tst.result_completed
+                tests[index].result_notes = tst.result_notes
+
+                await tests[index].save()
+            })
+
+            action = 2
+
+        } else {
+
+            next(createError.NotFound('No test items found!'))
+        }
+
+
+        await logUserActivity(userId, 16, action, true, testIds[0])
+
+        res.status(200).json({
+            ...labTests,
+            message: "Lab test details updated successfuly!",
+        })
+
+
+
+    } catch (err) {
+        logData('editLabResults: +' + err)
+        next(err)
+    }
+}
+
+const editLabResultSingle = async (req, res, next) => {
+    try {
+
+        let labTest = await labTestResultSingleSchema.validateAsync(req.body)
+
+
+        const { userId, tenantId } = req.jwtPayload;
+
+        const LabTest = await LabRequest.findOne({
+            where: { id: labTest?.id ?? -1 }
+        });
+
+        let action = 0;
+        // Exist same group name in same tenant
+        if (LabTest) {
+
+            LabTest.test_result = tst.test_result
+            LabTest.result_status = tst.result_status
+            LabTest.result_date = tst.result_date
+            LabTest.result_completed = tst.result_completed
+            LabTest.result_notes = tst.result_notes
+
+            await LabTest.save()
+            action = 2
+
+
+        } else {
+            // Otherwise create new group
+            next(createError.NotFound('Could not find lab rest request'))
+        }
+
+
+        await logUserActivity(userId, 14, action, true, labTest.id)
+
+        res.status(200).json({
+            ...labTest,
+            message: "Test result updated successfuly!",
+        })
+
+
+
+    } catch (err) {
+
+
+        logData('editLabResultSingle: +' + err)
+        next(err)
+    }
+}
+
+
 module.exports = {
     appointmentDetails,
     appointmentsViewByDoctor,
     editAppointment,
-    checkinAppointment
+    checkinAppointment,
+    editLabRequests,
+    editLabResults,
+    editLabResultSingle,
+    viewLabRequests
 }

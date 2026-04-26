@@ -34,6 +34,10 @@ const LabRequest = db.define('main_tbl_lab_request', {
     },
     result_date: {
        type:  DataTypes.DATE
+    },
+    result_completed: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
     }
 }
 )
@@ -41,10 +45,10 @@ const LabRequest = db.define('main_tbl_lab_request', {
 Appointment.hasMany(LabRequest, { as: 'LabReqests', foreignKey: {name: 'appointment_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 LabRequest.belongsTo(Appointment, { as: 'Appointment', foreignKey: {name: 'appointment_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
-LabTestCatalog.hasMany(LabRequest, {foreignKey: {name: 'result_status', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-LabRequest.belongsTo(LabTestCatalog, { as: 'TestCatalog', foreignKey: {name: 'result_status', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+LabTestCatalog.hasMany(LabRequest, {foreignKey: {name: 'test_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+LabRequest.belongsTo(LabTestCatalog, { as: 'TestCatalog', foreignKey: {name: 'test_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 
-LabResultStatus.hasMany(LabRequest, { as: 'LabReqests', foreignKey: {name: 'appointment_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-LabRequest.belongsTo(LabResultStatus, { as: 'ResultStatus', foreignKey: {name: 'appointment_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+LabResultStatus.hasMany(LabRequest, { as: 'LabReqests', foreignKey: {name: 'result_status', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+LabRequest.belongsTo(LabResultStatus, { as: 'ResultStatus', foreignKey: {name: 'result_status', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
   module.exports = { LabRequest}

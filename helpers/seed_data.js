@@ -121,10 +121,10 @@ const seedAuthDatabase = async () => {
         const LabTestCategoryCount = await LabTestCategory.count()
         const LabResultStatusCount = await LabResultStatus.count()
 
-        if (LabResultStatusCount == 0 ){
+        if (LabResultStatusCount == 0) {
             await LabResultStatus.bulkCreate([
-                {id:1, name: 'Normal'}, {id: 2, name: 'High'},
-                {id: 3, name: 'Low'}, {id: 4, name: 'Abnormal'}
+                { id: 1, name: 'Normal' }, { id: 2, name: 'High' },
+                { id: 3, name: 'Low' }, { id: 4, name: 'Abnormal' }
             ])
         }
         if (LabTestCategoryCount == 0) {
@@ -447,15 +447,11 @@ const updateAuthDbSchema = async () => {
 
     try {
 
-        await LabResultStatus.sync({ alter: true })
-            .then(data => { })
-            .catch(err => console.log('error Create table tbl lookups_tbl_lab_result_status: ' + err))
 
-        await LabRequest.sync({ alter: true })
+             await LabRequest.sync({ alter: true })
             .then(data => { })
             .catch(err => console.log('error Create table tbl main_tbl_lab_request: ' + err))
-
-
+            
         return
 
 
@@ -569,7 +565,11 @@ const updateAuthDbSchema = async () => {
             .then(data => { })
             .catch(err => console.log('error Create table tbl lookups_tbl_lab_test_category: ' + err))
 
+        await LabResultStatus.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl lookups_tbl_lab_result_status: ' + err))
 
+            
 
 
         await PatientJourney.sync({ alter: true })
@@ -738,6 +738,9 @@ const updateAuthDbSchema = async () => {
             .then(data => { })
             .catch(err => console.log('error Create table tbl main_tbl_lab_test_catalog: ' + err))
 
+        await LabRequest.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl main_tbl_lab_request: ' + err))
 
 
     } catch (error) {
@@ -747,8 +750,8 @@ const updateAuthDbSchema = async () => {
 }
 
 
-//updateAuthDbSchema()
-seedAuthDatabase()
+updateAuthDbSchema()
+//seedAuthDatabase()
 
 module.exports = {
     seedAuthDatabase,

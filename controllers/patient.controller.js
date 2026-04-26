@@ -5,9 +5,9 @@ const { logData, logUserActivity, } = require('../helpers/logger');
 
 const { sequelize } = require('../helpers/sequelize_init');
 const { contactSchema } = require("../helpers/validator/auth_validation_schema");
-const {patientSchema, patientVitals} = require('../helpers/validator/patient_validation_schema')
-const {Patient: Patients} = require('../models/Main/Patient')
-const {Contact: Contacts} = require('../models/Auth/Contact');
+const { patientSchema, patientVitals } = require('../helpers/validator/patient_validation_schema')
+const { Patient: Patients } = require('../models/Main/Patient')
+const { Contact: Contacts } = require('../models/Auth/Contact');
 const { IDType } = require('../models/Lookup/IDType');
 const { MaritalStatus } = require('../models/Lookup/MaritalStatus');
 const { BloodGroup } = require('../models/Lookup/BloodGroup');
@@ -17,6 +17,7 @@ const { User } = require('../models/Auth/User');
 const { Gender } = require('../models/Lookup/Gender');
 const { PatientVital } = require('../models/Main/PatientVital');
 const { getDateOnly } = require('../helpers/utility');
+const { Appointment } = require('../models/Main/Apointment');
 
 const patientDetails = async (req, res, next) => {
 
@@ -39,15 +40,15 @@ const patientDetails = async (req, res, next) => {
                 },
                 {
                     model: Contacts, as: 'Contact',
-                        include: [
-                            {
-                                model: Gender, as: 'Gender'
-                            }
-                        ]
+                    include: [
+                        {
+                            model: Gender, as: 'Gender'
+                        }
+                    ]
                 },
                 {
                     model: IDType, as: 'IdType',
-                }, 
+                },
                 {
                     model: MaritalStatus, as: 'MaritalStatus'
                 },
@@ -55,12 +56,13 @@ const patientDetails = async (req, res, next) => {
                     model: BloodGroup, as: 'BloodGroup'
                 },
                 {
-                    model: PatientActivity, as: 'CurrentActivity'
+                    model: Appointment, as: 'Appointments',
+                     order: [['id', 'DESC']],
                 },
                 {
                     model: Insurer, as: 'Insurer'
                 }
-            ]
+                ]
 
             })
 
@@ -79,15 +81,15 @@ const patientDetails = async (req, res, next) => {
                 },
                 {
                     model: Contacts, as: 'Contact',
-                        include: [
-                            {
-                                model: Gender, as: 'Gender'
-                            }
-                        ]
+                    include: [
+                        {
+                            model: Gender, as: 'Gender'
+                        }
+                    ]
                 },
                 {
                     model: IDType, as: 'IdType',
-                }, 
+                },
                 {
                     model: MaritalStatus, as: 'MaritalStatus'
                 },
@@ -95,12 +97,20 @@ const patientDetails = async (req, res, next) => {
                     model: BloodGroup, as: 'BloodGroup'
                 },
                 {
-                    model: PatientActivity, as: 'CurrentActivity'
+                    model: Appointment, as: 'Appointments',
+                    limit: 1,
+                    order: [['id', 'DESC']],
+                   // separate: true,
+                    include: [
+                        {
+                            model: PatientActivity, as: 'PatientActivity'
+                        }
+                    ]
                 },
                 {
                     model: Insurer, as: 'Insurer'
                 }
-            ]
+                ]
 
             })
         }
@@ -113,21 +123,23 @@ const patientDetails = async (req, res, next) => {
         )
 
     } catch (err) {
+        console.error('ERROR: ', err)
+
         logData('getPatient: ' + err)
         next(err)
     }
 }
 
 const editPatient = async (req, res, next) => {
-       const transaction = await sequelize.transaction()
+    const transaction = await sequelize.transaction()
     try {
 
         let patient = await patientSchema.validateAsync(req.body)
         let contact = await contactSchema.validateAsync(req.body)
-       patient.id = patient.id == 0 ? null : patient.id
-        contact.id =contact.id == 0 ? null : contact.id
+        patient.id = patient.id == 0 ? null : patient.id
+        contact.id = contact.id == 0 ? null : contact.id
 
-      
+
         const { userId, tenantId } = req.jwtPayload;
         patient.tenant_id = tenantId
 
@@ -141,7 +153,7 @@ const editPatient = async (req, res, next) => {
             // if ID is present then is for update
             if (patient.id > 0 && patient.id == existPatient.id) {
                 Patients.update(
-                    patient, { where: { id: existPatient.id } },{ transaction }
+                    patient, { where: { id: existPatient.id } }, { transaction }
                 )
 
                 const Contact = await Contacts.findOne({
@@ -152,16 +164,16 @@ const editPatient = async (req, res, next) => {
                     contact.id = existPatient.contact_id
                     await Contacts.update(
                         contact, {
-                            where: { id: existPatient.contact_id }
-                    },{ transaction }
+                        where: { id: existPatient.contact_id }
+                    }, { transaction }
                     )
-                    
-                    }
-                    action = 2
+
                 }
-            } else {
+                action = 2
+            }
+        } else {
             // Otherwise create new group
-       
+
             if (!patient.contact_id || !(patient.contact_id > 0)) {
                 contact.id = null
                 contact = await Contacts.create(contact, { transaction })
@@ -172,7 +184,7 @@ const editPatient = async (req, res, next) => {
             action = 1
         }
 
-    
+
         await logUserActivity(userId, 12, action, true, patient.id)
 
         transaction.commit()
@@ -194,26 +206,26 @@ const editPatient = async (req, res, next) => {
 const changeActivityStatus = async (req, res, next) => {
     try {
 
-        let patientId = await req.body?.patient_id ?? -1
+        let appointmentId = await req.body?.appointment_id ?? -1
         let statusId = await req.body?.current_activity ?? 13
 
         const { userId, tenantId } = req.jwtPayload;
 
-        const Patient = await Patients.findOne({
+        const appoitment = await Appointment.findOne({
             where: {
-                
-                id: patientId , tenant_id: tenantId
+
+                id: appointmentId, tenant_id: tenantId
             }, order: [['id', 'ASC']],
         });
 
         let action = 0;
         // Exist same group name in same tenant
-        if (Patient) {
+        if (appoitment) {
 
             // if ID is present then is for update
-            if (patientId > 0 && patientId == Patient.id) {
-                Patient.current_activity = statusId
-                await Patient.save()
+            if (appointmentId > 0 && appointmentId == appoitment.id) {
+                appoitment.current_activity = statusId
+                await appoitment.save()
 
                 action = 2
             }
@@ -225,11 +237,11 @@ const changeActivityStatus = async (req, res, next) => {
         }
 
 
-        await logUserActivity(userId, 12, action, true, patientId)
+        await logUserActivity(userId, 12, action, true, appointmentId)
 
         res.status(200).json({
-            ...{patient_id: patientId, current_activity: statusId},
-            message: "Patiend updated in  successfuly!",
+            ...{ appoitment_id: appointmentId, current_activity: statusId },
+            message: "Appointment updated in  successfuly!",
         })
 
 
@@ -251,7 +263,7 @@ const editPatientVitals = async (req, res, next) => {
 
 
 
-      
+
         const existsVitals = await PatientVital.findOne({
             where: { [Op.and]: { id: vitals?.id ?? -1 } }
         });
@@ -269,7 +281,7 @@ const editPatientVitals = async (req, res, next) => {
 
 
         } else {
-           vitals.date_taken = getDateOnly(new Date())
+            vitals.date_taken = getDateOnly(new Date())
             vitals = await PatientVital.create(vitals)
             action = 1
         }

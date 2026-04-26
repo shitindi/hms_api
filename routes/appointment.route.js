@@ -118,4 +118,15 @@ router.post("/appointment", verifyAccessToken, appointmentController.editAppoint
  */
 router.post("/check-in", verifyAccessToken, appointmentController.checkinAppointment)
 
+/* NOT DOCUMENTED YET */
+router.post("/lab-request", verifyAccessToken, appointmentController.editLabRequests)
+
+/* NOT DOCUMENTED YET */
+router.post("/lab-result", verifyAccessToken, appointmentController.editLabResults)
+
+/* NOT DOCUMENTED YET */
+router.post("/lab-result", verifyAccessToken, appointmentController.editLabResultSingle)
+
+/* NOT DOCUMENTED YET */
+router.get('/lab-results/:id', verifyAccessToken, appointmentController.viewLabRequests)
 module.exports = router;

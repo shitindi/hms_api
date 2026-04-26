@@ -18,6 +18,43 @@ const appointmentSchema = Joi.object({
     appointment_no: Joi.string().max(20).required(),
     created_by: Joi.number().required()
 }
-).options({stripUnknown: true}).options({stripUnknown: true})
+).options({ stripUnknown: true }).options({ stripUnknown: true })
 
-module.exports = {appointmentSchema}
+const labTestRequestSchema = Joi.object({
+    test_items: Joi.array().items({
+        id: Joi.number().allow(null),
+        appointment_id: Joi.number().required(),
+        test_id: Joi.number().required(),
+        request_notes: Joi.string().max(300).allow(null),
+        request_date: Joi.date().required(),
+    })
+}).options({ stripUnknown: true })
+
+const labTestResultSchema = Joi.object({
+    test_items: Joi.array().items({
+        id: Joi.number().required(),
+        test_result: Joi.string().required().max(100),
+        result_status: Joi.string().max(20).allow(null),
+        result_notes: Joi.string().max(300).allow(null),
+        result_date: Joi.date().required(),
+        result_completed: Joi.boolean().default(true) 
+    })
+}).options({ stripUnknown: true })
+
+const labTestResultSingleSchema = Joi.object({
+        id: Joi.number().required(),
+        test_result: Joi.string().required().max(100),
+        result_status: Joi.string().max(20).allow(null),
+        result_notes: Joi.string().max(300).allow(null),
+        result_date: Joi.date().required(),
+        result_completed: Joi.boolean().default(true) 
+}).options({ stripUnknown: true })
+
+module.exports = {
+     appointmentSchema,
+     labTestRequestSchema,
+     labTestResultSchema,
+     labTestResultSingleSchema
+    
+    }
+

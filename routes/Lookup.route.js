@@ -328,7 +328,20 @@ router.get("/lab-test-categories", lookupController.LabTestCategories)
  *      200:
  *        description: Ok
  */
-router.get("/lab-test-catalogs", lookupController.LabTestCatalogs)
+router.get("/lab-test-catalogs", verifyAccessToken, lookupController.LabTestCatalogs)
+
+/**
+ * @openapi
+ * '/lookups/lab-test-catalogs':
+ *  get:
+ *    tags:
+ *    - Lookups
+ *    summary: Get get list of Hospital Lab test result statuses
+ *    responses:
+ *      200:
+ *        description: Ok
+ */
+router.get("/lab-test-statuses", lookupController.LabResultStatuses)
 
 
 /**

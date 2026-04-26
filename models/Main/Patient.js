@@ -56,11 +56,11 @@ const Patient = db.define('main_tbl_patient', {
     joining_date: {
         type: DataTypes.DATEONLY
     },
-    current_activity: {
-        type: DataTypes.SMALLINT,
-        allowNull: false
-    }
-    ,
+    // current_activity: {
+    //     type: DataTypes.SMALLINT,
+    //     allowNull: false
+    // }
+    // ,
     insurer_id: {
         type: DataTypes.SMALLINT,
         allowNull: true
@@ -95,9 +95,6 @@ Patient.belongsTo(MaritalStatus, {as: 'MaritalStatus',foreignKey: {  name: 'mari
 
 BloodGroup.hasMany(Patient, {foreignKey: {name: 'blood_group', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Patient.belongsTo(BloodGroup, {as: 'BloodGroup',foreignKey: {  name: 'blood_group', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-
-PatientActivity.hasMany(Patient, {foreignKey: {name: 'current_activity', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-Patient.belongsTo(PatientActivity, {as: 'CurrentActivity',foreignKey: {  name: 'current_activity', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 Insurer.hasMany(Patient, {foreignKey: {name: 'insurer_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Patient.belongsTo(Insurer, {as: 'Insurer',foreignKey: {  name: 'insurer_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})

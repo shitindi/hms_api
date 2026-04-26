@@ -7,6 +7,7 @@ const {Priority} = require('../Lookup/Priority')
 const { Patient } = require('./Patient')
 const { User } = require('../Auth/User')
 const { Department } = require('../Lookup/Department')
+const { PatientActivity } = require('../Lookup/PatientActivity')
 
 const Appointment = db.define('main_tbl_apointment', {
 
@@ -61,13 +62,23 @@ const Appointment = db.define('main_tbl_apointment', {
     created_by: {
         type: DataTypes.INTEGER,
         allowNull: false
+    },
+    current_activity: {
+        type: DataTypes.SMALLINT,
+        defaultValue: 13
+    },
+    payment_done: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
     }
 }
 )
+PatientActivity.hasMany(Appointment, {foreignKey: {name: 'department_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Appointment.belongsTo(PatientActivity, {as: 'PatientActivity',foreignKey: {  name: 'department_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
 
 Department.hasMany(Appointment, {foreignKey: {name: 'department_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Appointment.belongsTo(Department, {as: 'Department',foreignKey: {  name: 'department_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-
 
 
 User.hasMany(Appointment, {foreignKey: {name: 'created_by', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
@@ -88,7 +99,7 @@ Appointment.belongsTo(AppointmentStatus, {as: 'AppointmentStatus',foreignKey: { 
 Doctor.hasMany(Appointment, {foreignKey: {name: 'doctor_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Appointment.belongsTo(Doctor, {as: 'Doctor',foreignKey: {  name: 'doctor_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
-Patient.hasMany(Appointment, {foreignKey: {name: 'patient_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Patient.hasMany(Appointment, {as: 'Appointments', foreignKey: {name: 'patient_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Appointment.belongsTo(Patient, {as: 'Patient',foreignKey: {  name: 'patient_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 
