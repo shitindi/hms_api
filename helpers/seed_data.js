@@ -71,6 +71,10 @@ const { LabTestCategory } = require('../models/Lookup/LabTestCategory')
 const { LabTestCatalog } = require('../models/Main/LabTestCatalog')
 const { LabResultStatus } = require('../models/Lookup/LabResultStatus')
 const { LabRequest } = require('../models/Main/LabRequest')
+const { MedicineForm } = require('../models/Lookup/Medicineform')
+const { Medicine } = require('../models/Main/Medicine')
+const { PrescriptionStatus } = require('../models/Lookup/PrescriptionStatus')
+const { Prescription } = require('../models/Main/Prescription')
 
 const seedAuthDatabase = async () => {
     try {
@@ -120,6 +124,22 @@ const seedAuthDatabase = async () => {
         const DefaultRolesCount = await DefaultRole.count()
         const LabTestCategoryCount = await LabTestCategory.count()
         const LabResultStatusCount = await LabResultStatus.count()
+        const MedicalFormCount = await MedicineForm.count()
+        const PrescriptionStatusCount = await PrescriptionStatus.count()
+        //pending, dispensed, partially_dispensed, cancelled
+        if (PrescriptionStatusCount == 0) {
+            await PrescriptionStatus.bulkCreate([
+                { id: 1, name: 'Pending' }, { id: 2, name: 'Dispensed' },
+                { id: 3, name: 'Partial Dispensed' }, { id: 4, name: 'Cancelled' }
+            ])
+        }
+
+        if (MedicalFormCount == 0) {
+            await MedicineForm.bulkCreate([
+                { id: 1, name: 'Tablet' }, { id: 2, name: 'Capsule' },
+                { id: 3, name: 'Syrup' }, { id: 4, name: 'Injection' }
+            ])
+        }
 
         if (LabResultStatusCount == 0) {
             await LabResultStatus.bulkCreate([
@@ -331,6 +351,7 @@ const seedAuthDatabase = async () => {
                     { id: 12, item_name: 'Patient details', module_id: module.id, code: 112 },
                     { id: 13, item_name: 'Doctors details', module_id: module.id, code: 113 },
                     { id: 14, item_name: 'Apointment details', module_id: module.id, code: 114 },
+                    { id: 15, item_name: 'Medicine details', module_id: module.id, code: 115 },
 
 
 
@@ -448,10 +469,16 @@ const updateAuthDbSchema = async () => {
     try {
 
 
-             await LabRequest.sync({ alter: true })
+        await PrescriptionStatus.sync({ alter: true })
             .then(data => { })
-            .catch(err => console.log('error Create table tbl main_tbl_lab_request: ' + err))
-            
+            .catch(err => console.log('error Create table tbl lookups_tbl_prescription_status: ' + err))
+
+        await Prescription.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl main_tbl_prescription: ' + err))
+
+
+
         return
 
 
@@ -569,7 +596,15 @@ const updateAuthDbSchema = async () => {
             .then(data => { })
             .catch(err => console.log('error Create table tbl lookups_tbl_lab_result_status: ' + err))
 
-            
+        await MedicineForm.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl lookups_tbl_medicine_form: ' + err))
+
+        await PrescriptionStatus.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl lookups_tbl_prescription_status: ' + err))
+
+        // END OF LOOKUPS
 
 
         await PatientJourney.sync({ alter: true })
@@ -742,6 +777,13 @@ const updateAuthDbSchema = async () => {
             .then(data => { })
             .catch(err => console.log('error Create table tbl main_tbl_lab_request: ' + err))
 
+        await Medicine.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl main_tbl_medicine: ' + err))
+
+        await Prescription.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl main_tbl_prescription: ' + err))
 
     } catch (error) {
         console.log('updateDatabse: ' + error)
@@ -750,7 +792,7 @@ const updateAuthDbSchema = async () => {
 }
 
 
-updateAuthDbSchema()
+//ßupdateAuthDbSchema()
 //seedAuthDatabase()
 
 module.exports = {

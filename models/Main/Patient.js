@@ -7,6 +7,7 @@ const { Contact } = require('../Auth/Contact')
 const { User } = require('../Auth/User')
 const { PatientActivity } = require('../Lookup/PatientActivity')
 const { Insurer } = require('./Insurer')
+const { Tenant } = require('../Auth/Tenant')
 
 const Patient = db.define('main_tbl_patient', {
 
@@ -80,6 +81,10 @@ const Patient = db.define('main_tbl_patient', {
 
 }
 )
+
+Tenant.hasMany(Patient, {foreignKey: {name: 'tenant_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Patient.belongsTo(Tenant, {as: 'Tenant',foreignKey: {  name: 'tenant_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
 
 User.hasMany(Patient, {foreignKey: {name: 'created_by', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Patient.belongsTo(User, {as: 'CreatedBy',foreignKey: {  name: 'created_by', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})

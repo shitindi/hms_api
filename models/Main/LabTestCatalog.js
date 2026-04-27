@@ -1,4 +1,5 @@
 const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
+const { Tenant } = require('../Auth/Tenant')
 const { LabTestCategory } = require('../Lookup/LabTestCategory')
 
 
@@ -27,6 +28,9 @@ const LabTestCatalog = db.define('main_tbl_lab_test_catalog', {
     }
 }
 )
+
+Tenant.hasMany(LabTestCatalog, {foreignKey: {name: 'tenant_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+LabTestCatalog.belongsTo(Tenant, {as: 'Tenant',foreignKey: {  name: 'tenant_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 LabTestCategory.hasMany(LabTestCatalog, {foreignKey: {name: 'category_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 LabTestCatalog.belongsTo(LabTestCategory, { as: 'Category', foreignKey: {name: 'category_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})

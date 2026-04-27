@@ -5,6 +5,7 @@ const { Department } = require('../Lookup/Department')
 const { Specialization } = require('../Lookup/Specialization')
 const { EmploymentType } = require('../Lookup/EmploymentType')
 const { User } = require('../Auth/User')
+const { Tenant } = require('../Auth/Tenant')
 
 const Doctor = db.define('main_tbl_doctor', {
 
@@ -63,6 +64,8 @@ const Doctor = db.define('main_tbl_doctor', {
 
 }
 )
+Tenant.hasMany(Doctor, {foreignKey: {name: 'tenant_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Doctor.belongsTo(Tenant, {as: 'Tenant',foreignKey: {  name: 'tenant_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 
 User.hasMany(Doctor, {foreignKey: {name: 'created_by', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})

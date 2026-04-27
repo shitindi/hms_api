@@ -1,10 +1,10 @@
 const createError = require('http-errors');
 const { logData } = require('../helpers/logger');
-const {ActivationType} = require('../models/Auth/ActivationType')
-const {TenantStatus} = require('../models/Auth/TenantStatus')
-const {UserStatus} = require('../models/Auth/UserStatus')
-const {PersmissionType} = require('../models/Auth/PermisionType')
-const {Module} = require('../models/Auth/Module');
+const { ActivationType } = require('../models/Auth/ActivationType')
+const { TenantStatus } = require('../models/Auth/TenantStatus')
+const { UserStatus } = require('../models/Auth/UserStatus')
+const { PersmissionType } = require('../models/Auth/PermisionType')
+const { Module } = require('../models/Auth/Module');
 const { LicensePaymentMethod } = require('../models/Client/LicensePaymentMethod');
 const { LicensePaymentType } = require('../models/Client/LIcensePyamentType');
 const { TenantCountry } = require('../models/Client/Countries');
@@ -15,35 +15,37 @@ const { TenantType } = require('../models/Auth/TenantType');
 const { TenantRegion } = require('../models/Lookup/Regions');
 const { PaymentStatus } = require('../models/Main/PaymentStatus');
 const { OrderStatus } = require('../models/Lookup/OrderStatus');
-const {AppointmentStatus} = require('../models/Lookup/AppointmentStatus')
-const {AppointmentType} = require('../models/Lookup/AppointmentType')
-const {BloodGroup} = require('../models/Lookup/BloodGroup')
-const {Currrency} = require('../models/Lookup/Currency')
-const {Department} = require('../models/Lookup/Department')
-const {EmploymentType} = require('../models/Lookup/EmploymentType')
-const {Gender} = require('../models/Lookup/Gender')
-const {IDType} = require('../models/Lookup/IDType')
-const {MaritalStatus} = require('../models/Lookup/MaritalStatus')
-const {Specialization} = require('../models/Lookup/Specialization')
-const {Priority} = require('../models/Lookup/Priority');
+const { AppointmentStatus } = require('../models/Lookup/AppointmentStatus')
+const { AppointmentType } = require('../models/Lookup/AppointmentType')
+const { BloodGroup } = require('../models/Lookup/BloodGroup')
+const { Currrency } = require('../models/Lookup/Currency')
+const { Department } = require('../models/Lookup/Department')
+const { EmploymentType } = require('../models/Lookup/EmploymentType')
+const { Gender } = require('../models/Lookup/Gender')
+const { IDType } = require('../models/Lookup/IDType')
+const { MaritalStatus } = require('../models/Lookup/MaritalStatus')
+const { Specialization } = require('../models/Lookup/Specialization')
+const { Priority } = require('../models/Lookup/Priority');
 const { BillingOption } = require('../models/Lookup/BillingtOption');
 const { PatientActivity } = require('../models/Lookup/PatientActivity');
 const { Insurer } = require('../models/Main/Insurer');
 const { LabTestCategory } = require('../models/Lookup/LabTestCategory');
 const { LabTestCatalog } = require('../models/Main/LabTestCatalog');
 const { LabResultStatus } = require('../models/Lookup/LabResultStatus');
+const { MedicineForm } = require('../models/Lookup/Medicineform');
+const { PrescriptionStatus } = require('../models/Lookup/PrescriptionStatus');
 
 
 // Authentication lookup
 const activationType = async (req, res, next) => {
 
-    try{
-        console.log("User ID: ", req.jwtPayload.userId, ', Tenant Id: ', req.jwtPayload.tenantId,', roles: ', req.jwtPayload.roles,
-             ', Path: ', req.path)
+    try {
+        console.log("User ID: ", req.jwtPayload.userId, ', Tenant Id: ', req.jwtPayload.tenantId, ', roles: ', req.jwtPayload.roles,
+            ', Path: ', req.path)
         const activationTypes = await ActivationType.findAll()
 
-        res.status(200).json( activationTypes)
-    }catch(err){
+        res.status(200).json(activationTypes)
+    } catch (err) {
         logData('activationType: ' + err)
         next(err)
     }
@@ -51,11 +53,11 @@ const activationType = async (req, res, next) => {
 
 const tenantStatuses = async (req, res, next) => {
 
-    try{
+    try {
         const tenantStatuses = await TenantStatus.findAll()
 
-        res.status(200).json( tenantStatuses)
-    }catch(err){
+        res.status(200).json(tenantStatuses)
+    } catch (err) {
         logData('tenantStatuses: ' + err)
         next(err)
     }
@@ -63,11 +65,11 @@ const tenantStatuses = async (req, res, next) => {
 
 const userStatuses = async (req, res, next) => {
 
-    try{
+    try {
         const userStatuses = await UserStatus.findAll()
 
-        res.status(200).json( userStatuses)
-    }catch(err){
+        res.status(200).json(userStatuses)
+    } catch (err) {
         logData('userStatuses: ' + err)
         next(err)
     }
@@ -76,277 +78,277 @@ const userStatuses = async (req, res, next) => {
 
 const permissionTypes = async (req, res, next) => {
 
-    try{
+    try {
         const permissionTypes = await PersmissionType.findAll()
 
-        res.status(200).json( permissionTypes)
-    }catch(err){
+        res.status(200).json(permissionTypes)
+    } catch (err) {
         logData('permissionTypes: ' + err)
         next(err)
     }
 }
 
-const appModules = async(req, res, next) => {
-    try{
+const appModules = async (req, res, next) => {
+    try {
         const appModules = await Module.findAll()
 
         res.status(200).json(appModules)
-    }catch(err){
+    } catch (err) {
         logData('appModules: ' + err)
         next(err)
     }
 }
 
-const paymentMethod = async(req, res, next) => {
-    try{
+const paymentMethod = async (req, res, next) => {
+    try {
         const paymethods = await LicensePaymentMethod.findAll()
 
         res.status(200).json(paymethods)
-    }catch(err){
+    } catch (err) {
         logData('paymethods: ' + err)
         next(err)
     }
 }
 
-const paymentType = async(req, res, next) => {
-    try{
+const paymentType = async (req, res, next) => {
+    try {
         const payTypes = await LicensePaymentType.findAll()
 
         res.status(200).json(payTypes)
-    }catch(err){
+    } catch (err) {
         logData('payTypes: ' + err)
         next(err)
     }
 }
 
-const Regions = async(req, res, next) => {
-    try{
+const Regions = async (req, res, next) => {
+    try {
         const regions = await TenantRegion.findAll()
 
         res.status(200).json(regions)
-    }catch(err){
+    } catch (err) {
         logData('Regions: ' + err)
         next(err)
     }
 }
 
-const paymentStatus = async(req, res, next) => {
-    try{
+const paymentStatus = async (req, res, next) => {
+    try {
         const payStatuses = await PaymentStatus.findAll()
 
         res.status(200).json(payStatuses)
-    }catch(err){
+    } catch (err) {
         logData('payStatuses: ' + err)
         next(err)
     }
 }
 
-const Countries = async(req, res, next) => {
-    try{
+const Countries = async (req, res, next) => {
+    try {
         const countries = await TenantCountry.findAll()
 
         res.status(200).json(countries)
-    }catch(err){
+    } catch (err) {
         logData('countries: ' + err)
         next(err)
     }
 }
 
 
-const ContactTypes = async(req, res, next) => {
-    try{
+const ContactTypes = async (req, res, next) => {
+    try {
         const contactTypes = await ContactType.findAll()
 
         res.status(200).json(contactTypes)
-    }catch(err){
+    } catch (err) {
         logData('ContactTypes: ' + err)
         next(err)
     }
 }
 
-const OrderStatuses = async(req, res, next) => {
-    try{
+const OrderStatuses = async (req, res, next) => {
+    try {
         const orderStatus = await OrderStatus.findAll()
 
         res.status(200).json(orderStatus)
-    }catch(err){
+    } catch (err) {
         logData('OrderStatus: ' + err)
         next(err)
     }
 }
 
-const AppointmentStatuses = async(req, res, next) => {
-    try{
+const AppointmentStatuses = async (req, res, next) => {
+    try {
         const appointmentStatuses = await AppointmentStatus.findAll()
 
         res.status(200).json(appointmentStatuses)
-    }catch(err){
+    } catch (err) {
         logData('AppointmentStatuses: ' + err)
         next(err)
     }
 }
 
-const AppointmentTypes = async(req, res, next) => {
-    try{
+const AppointmentTypes = async (req, res, next) => {
+    try {
         const appointmentStatuses = await AppointmentType.findAll()
 
         res.status(200).json(appointmentStatuses)
-    }catch(err){
+    } catch (err) {
         logData('AppointmentTypes: ' + err)
         next(err)
     }
 }
 
-const BloodGroups = async(req, res, next) => {
-    try{
+const BloodGroups = async (req, res, next) => {
+    try {
         const bloodGroups = await BloodGroup.findAll()
 
         res.status(200).json(bloodGroups)
-    }catch(err){
+    } catch (err) {
         logData('BloodGroups: ' + err)
         next(err)
     }
 }
 
-const Currencies = async(req, res, next) => {
-    try{
+const Currencies = async (req, res, next) => {
+    try {
         const currencies = await Currrency.findAll()
 
         res.status(200).json(currencies)
-    }catch(err){
+    } catch (err) {
         logData('Currencies: ' + err)
         next(err)
     }
 }
 
-const Departments = async(req, res, next) => {
-    try{
+const Departments = async (req, res, next) => {
+    try {
         const departments = await Department.findAll()
 
         res.status(200).json(departments)
-    }catch(err){
+    } catch (err) {
         logData('Departments: ' + err)
         next(err)
     }
 }
 
-const EmploymentTypes = async(req, res, next) => {
-    try{
+const EmploymentTypes = async (req, res, next) => {
+    try {
         const employmentTypes = await EmploymentType.findAll()
 
         res.status(200).json(employmentTypes)
-    }catch(err){
+    } catch (err) {
         logData('EmploymentTypes: ' + err)
         next(err)
     }
 }
 
-const Genders = async(req, res, next) => {
-    try{
+const Genders = async (req, res, next) => {
+    try {
         const genders = await Gender.findAll()
 
         res.status(200).json(genders)
-    }catch(err){
+    } catch (err) {
         logData('Genders: ' + err)
         next(err)
     }
 }
 
-const IdTypes = async(req, res, next) => {
-    try{
+const IdTypes = async (req, res, next) => {
+    try {
         const idTypes = await IDType.findAll()
 
         res.status(200).json(idTypes)
-    }catch(err){
+    } catch (err) {
         logData('IdTypes: ' + err)
         next(err)
     }
 }
 
-const MaritalStatuses = async(req, res, next) => {
-    try{
+const MaritalStatuses = async (req, res, next) => {
+    try {
         const maritalStatutes = await MaritalStatus.findAll()
 
         res.status(200).json(maritalStatutes)
-    }catch(err){
+    } catch (err) {
         logData('MaritalStatuses: ' + err)
         next(err)
     }
 }
 
-const Specializations = async(req, res, next) => {
-    try{
+const Specializations = async (req, res, next) => {
+    try {
         const specializations = await Specialization.findAll()
 
         res.status(200).json(specializations)
-    }catch(err){
+    } catch (err) {
         logData('Specializations: ' + err)
         next(err)
     }
 }
 
-const Priorities = async(req, res, next) => {
-    try{
+const Priorities = async (req, res, next) => {
+    try {
         const priorities = await Priority.findAll()
 
         res.status(200).json(priorities)
-    }catch(err){
+    } catch (err) {
         logData('Priorities: ' + err)
         next(err)
     }
 }
 
-const BillingOptions = async(req, res, next) => {
-    try{
+const BillingOptions = async (req, res, next) => {
+    try {
         const billingOptions = await BillingOption.findAll()
 
         res.status(200).json(billingOptions)
-    }catch(err){
+    } catch (err) {
         logData('BillingOptions: ' + err)
         next(err)
     }
 }
 
-const PatientActivities = async(req, res, next) => {
-    try{
+const PatientActivities = async (req, res, next) => {
+    try {
         const activities = await PatientActivity.findAll()
 
         res.status(200).json(activities)
-    }catch(err){
+    } catch (err) {
         logData('PatientActivities: ' + err)
         next(err)
     }
 }
 
-const InsuranceCompanies = async(req, res, next) => {
-    try{
+const InsuranceCompanies = async (req, res, next) => {
+    try {
         const insurers = await Insurer.findAll()
 
         res.status(200).json(insurers)
-    }catch(err){
+    } catch (err) {
         logData('InsuranceCompanies: ' + err)
         next(err)
     }
 }
 
 
-const LabTestCategories = async(req, res, next) => {
-    try{
+const LabTestCategories = async (req, res, next) => {
+    try {
         const categories = await LabTestCategory.findAll()
 
         res.status(200).json(categories)
-    }catch(err){
+    } catch (err) {
         logData('LabTestCategories: ' + err)
         next(err)
     }
 }
 
-const LabTestCatalogs = async(req, res, next) => {
-    try{
-         const { userId, tenantId } = req.jwtPayload;
+const LabTestCatalogs = async (req, res, next) => {
+    try {
+        const { userId, tenantId } = req.jwtPayload;
 
         const catalogs = await LabTestCatalog.findAll({
-            where: {tenant_id: tenantId},
+            where: { tenant_id: tenantId },
             include: [
                 {
                     model: LabTestCategory, as: 'Category'
@@ -355,39 +357,57 @@ const LabTestCatalogs = async(req, res, next) => {
         })
 
         res.status(200).json(catalogs)
-    }catch(err){
+    } catch (err) {
         logData('LabTestCatalogs: ' + err)
         next(err)
     }
 }
 
-const LabResultStatuses = async(req, res, next) => {
-    try{
+const LabResultStatuses = async (req, res, next) => {
+    try {
         const statuses = await LabResultStatus.findAll()
-
         res.status(200).json(categories)
-    }catch(err){
+    } catch (err) {
         logData('LabResultStatuses: ' + err)
         next(err)
     }
 }
 
+const MedicineForms = async (req, res, next) => {
+    try {
+        const forms = await MedicineForm.findAll()
+        res.status(200).json(forms)
+    } catch (err) {
+        logData('MedicineForms: ' + err)
+        next(err)
+    }
+}
 
-const GetLookupsAll = async(req, res, next) => {
-    try{
+const PrescriptionStatuses = async (req, res, next) => {
+    try {
+        const forms = await PrescriptionStatus.findAll()
+        res.status(200).json(forms)
+    } catch (err) {
+        logData('PrescriptionStatuses: ' + err)
+        next(err)
+    }
+}
+
+const GetLookupsAll = async (req, res, next) => {
+    try {
         const activation_types = await ActivationType.findAll()
-        const tenant_statuses =  await TenantType.findAll()
+        const tenant_statuses = await TenantType.findAll()
         const user_statuses = await UserStatus.findAll()
         const payment_method = await LicensePaymentMethod.findAll()
         const payment_types = await LicensePaymentType.findAll()
-        const regions =  await  TenantRegion. findAll()
+        const regions = await TenantRegion.findAll()
         const payment_statuses = await PaymentStatus.findAll()
         const countries = await TenantCountry.findAll()
         const contact_types = await ContactType.findAll()
 
 
         const order_statutes = await OrderStatus.findAll()
-        const  appointment_statuses = await AppointmentStatus.findAll()
+        const appointment_statuses = await AppointmentStatus.findAll()
         const appointment_types = await AppointmentType.findAll()
         const blood_groups = await BloodGroup.findAll()
         const curriences = await Currrency.findAll()
@@ -404,7 +424,9 @@ const GetLookupsAll = async(req, res, next) => {
         const insurers = await Insurer.findAll()
         const lab_test_categories = await LabTestCategory.findAll()
         const lab_result_statuses = await LabResultStatus.findAll()
-        
+
+        const medicine_forms = await MedicineForm.findAll()
+        const prescription_statuses = await PrescriptionStatus.findAll()
         res.status(200).json({
             activation_types,
             tenant_statuses,
@@ -433,10 +455,12 @@ const GetLookupsAll = async(req, res, next) => {
             billing_options,
             insurers,
             lab_test_categories,
-            lab_result_statuses
+            lab_result_statuses,
+            medicine_forms,
+            prescription_statuses
         })
 
-    }catch(err){
+    } catch (err) {
         logData('GetLookupsAll: ' + err)
         next(err)
     }
@@ -475,7 +499,9 @@ module.exports = {
     InsuranceCompanies,
     PatientActivities,
     LabTestCatalogs,
-LabTestCategories,
-LabResultStatuses
-    
+    LabTestCategories,
+    LabResultStatuses,
+    MedicineForms,
+    PrescriptionStatuses
+
 }

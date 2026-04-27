@@ -1,7 +1,10 @@
 const  {sequelize:db, DataTypes} = require('../../helpers/sequelize_init')
+const { Tenant } = require('../Auth/Tenant')
+const { User } = require('../Auth/User')
+const { MedicineForm } = require('../Lookup/Medicineform')
 
 
-const LabTestCatalog = db.define('main_tbl_medicine', {
+const Medicine = db.define('main_tbl_medicine', {
 
     tenant_id: {
         type: DataTypes.INTEGER,
@@ -38,13 +41,24 @@ const LabTestCatalog = db.define('main_tbl_medicine', {
     is_active: {
         type: DataTypes.BOOLEAN,
         defaultValue: true
+    },
+    created_by: {
+        type: DataTypes.INTEGER,
+        allowNull: false
     }
 }
 )
 
-LabTestCategory.hasMany(LabTestCatalog, {foreignKey: {name: 'category_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-LabTestCatalog.belongsTo(LabTestCategory, { as: 'Category', foreignKey: {name: 'category_id', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Tenant.hasMany(Medicine, {foreignKey: {name: 'tenant_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Medicine.belongsTo(Tenant, {as: 'Tenant',foreignKey: {  name: 'tenant_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
+MedicineForm.hasMany(Medicine, {foreignKey: {name: 'form_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Medicine.belongsTo(MedicineForm, { as: 'Form', foreignKey: {name: 'form_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
+
+User.hasMany(Medicine, {foreignKey: {name: 'created_by', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Medicine.belongsTo(User, { as: 'CreatedBy', foreignKey: {name: 'created_by', allowNull: false}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 
 
-  module.exports = { LabTestCatalog}
+  module.exports = { Medicine}

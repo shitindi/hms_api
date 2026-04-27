@@ -8,6 +8,7 @@ const { Patient } = require('./Patient')
 const { User } = require('../Auth/User')
 const { Department } = require('../Lookup/Department')
 const { PatientActivity } = require('../Lookup/PatientActivity')
+const { Tenant } = require('../Auth/Tenant')
 
 const Appointment = db.define('main_tbl_apointment', {
 
@@ -73,6 +74,11 @@ const Appointment = db.define('main_tbl_apointment', {
     }
 }
 )
+
+Tenant.hasMany(Appointment, {foreignKey: {name: 'tenant_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Appointment.belongsTo(Tenant, {as: 'Tenant',foreignKey: {  name: 'tenant_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
+
 PatientActivity.hasMany(Appointment, {foreignKey: {name: 'department_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Appointment.belongsTo(PatientActivity, {as: 'PatientActivity',foreignKey: {  name: 'department_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 

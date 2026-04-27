@@ -341,8 +341,33 @@ router.get("/lab-test-catalogs", verifyAccessToken, lookupController.LabTestCata
  *      200:
  *        description: Ok
  */
-router.get("/lab-test-statuses", lookupController.LabResultStatuses)
+router.get("/lab-test-statuses", lookupController. LabResultStatuses)
 
+/**
+ * @openapi
+ * '/lookups/medical-forms':
+ *  get:
+ *    tags:
+ *    - Lookups
+ *    summary: Get get list of Hospital drags forms
+ *    responses:
+ *      200:
+ *        description: Ok
+ */
+router.get("/medical-forms", lookupController.MedicineForms)
+
+/**
+ * @openapi
+ * '/lookups/prescription-statuses':
+ *  get:
+ *    tags:
+ *    - Lookups
+ *    summary: Get get list of Hospital prescriptions statuses
+ *    responses:
+ *      200:
+ *        description: Ok
+ */
+router.get("/prescription-statuses", lookupController.PrescriptionStatuses)
 
 /**
  * @openapi
