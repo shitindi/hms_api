@@ -8,7 +8,7 @@ const {Medicine: Medicines} = require('../models/Main/Medicine');
 const { User } = require('../models/Auth/User');
 const { Contact } = require('../models/Auth/Contact');
 const { MedicineForm } = require('../models/Lookup/Medicineform');
-const { medicineSchema } = require('../helpers/validator/pharmacy_validation_schema');
+const { medicineSchema, prescriptionSchema } = require('../helpers/validator/pharmacy_validation_schema');
 const { Prescription: Prescriptions } = require('../models/Main/Prescription');
 const { PrescriptionStatus } = require('../models/Lookup/PrescriptionStatus');
 
@@ -44,7 +44,7 @@ const medicineDetails = async (req, res, next) => {
         } else {
             // no parameter is passed
             Medicine = await Medicines.findAll({
-                where: { id: medicineId, tenant_id: tenantId },
+                where: { tenant_id: tenantId },
                 include: [{
                     model: User, as: "CreatedBy",
                     attributes: ['id', 'user_name'],
@@ -166,7 +166,64 @@ const appointmentPrescription = async (req, res, next) => {
 }
 
 
+const editPrescription = async (req, res, next) => {
+    try {
+
+        let prescription = await prescriptionSchema.validateAsync(req.body)
+
+        const { userId, tenantId } = req.jwtPayload;
+        const appointmentId = prescription?.prescription_items[0]?.appointment_id ?? -1
+
+        const existPrescription = await Prescriptions.findOne({
+            where: { appointment_id: appointmentId }
+        });
+
+        let action = 0;
+        if (existPrescription) {
+            // if ID is present then is for update
+            if (appointmentId > 0 && appointmentId == existPrescription.appointment_id) {
+
+                // delete tests items then add new one
+                await Prescriptions.destroy({
+                    where: { appointment_id: appointmentId }
+                })
+
+                await Prescriptions.bulkCreate(
+                    prescription.prescription_items
+                )
+                action = 2
+            }
+
+
+        } else {
+
+
+            const prescription_items = await LabRequest.bulkCreate(
+                prescription.prescription_items
+            )
+            action = 1
+        }
+
+
+        await logUserActivity(userId, 16, action, true, appointmentId)
+
+        res.status(200).json({
+            ...prescription,
+            message: "Prescription details updated successfuly!",
+        })
+
+
+
+    } catch (err) {
+        logData('editPrescription: +' + err)
+        next(err)
+    }
+}
+
+
 module.exports = {
     medicineDetails,
-    editMedicine
+    editMedicine,
+    appointmentPrescription,
+    editPrescription
 }

@@ -9,4 +9,7 @@ router.get("/medicines/:id?", verifyAccessToken, medicineController.medicineDeta
 
 router.post("/medicine", verifyAccessToken, medicineController.editMedicine)
 
+router.get("/prescriptions/:id?", verifyAccessToken, medicineController.appointmentPrescription)
+
+router.post("/prescription", verifyAccessToken, medicineController.editPrescription)
 module.exports = router

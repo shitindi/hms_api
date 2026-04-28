@@ -18,8 +18,10 @@ const medicineSchema = Joi.object({
 
 
 const prescriptionSchema = Joi.object({
-    id: Joi.number().allow(null),
-    appointment_id: Joi.number().required(),
+
+    prescription_items: Joi.array().items({
+        id: Joi.number().allow(null),
+        appointment_id: Joi.number().required(),
         medicine_id: Joi.number().required(),
         dosage: Joi.string().max(100).required(),
         frequency: Joi.string().max(100).allow(null),
@@ -27,8 +29,10 @@ const prescriptionSchema = Joi.object({
         quantity: Joi.number().allow(null),
         instructions: Joi.string().max(1000).allow(null),
         status_id: Joi.number().required().default(1)
+    })
+
 })
-.options({stripUnknown: true})
+    .options({ stripUnknown: true })
 module.exports = {
     medicineSchema,
     prescriptionSchema
