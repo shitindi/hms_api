@@ -13,12 +13,17 @@ const doctorSchema = Joi.object({
     department: Joi.number().allow(null),
     specialization: Joi.number().allow(null),
     hightest_qualification: Joi.string().max(100).min(2).allow(null),
-    year_of_experience: Joi.number(),
     employment_type: Joi.number(),
     joining_date: Joi.date(),
     created_by: Joi.number().required(),
-    is_active: Joi.bool().default(false)
+    is_active: Joi.bool().default(false),
+    consultation_fee: Joi.number().allow(null),
+    year_of_experience: Joi.number().required(),
+    joining_date: Joi.date().required()
 
 }).options({stripUnknown: true}).options({stripUnknown: true})
+
+
+
 
 module.exports = {doctorSchema}

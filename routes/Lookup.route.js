@@ -371,6 +371,20 @@ router.get("/prescription-statuses", lookupController.PrescriptionStatuses)
 
 /**
  * @openapi
+ * '/lookups/default-roles':
+ *  get:
+ *    tags:
+ *    - Lookups
+ *    summary: Get get list of default roles
+ *    responses:
+ *      200:
+ *        description: Ok
+ */
+router.get("/default-roles", lookupController.DefaultRoles)
+
+
+/**
+ * @openapi
  * '/lookups/get-all-lookups':
  *  get:
  *    tags:
@@ -380,7 +394,8 @@ router.get("/prescription-statuses", lookupController.PrescriptionStatuses)
  *      200:
  *        description: Ok
  */
-router.get("/get-all-lookups", lookupController.GetLookupsAll)
+router.get("/get-all-lookups", verifyAccessToken, lookupController.GetLookupsAll)
+
 
 
 module.exports = router

@@ -4,13 +4,16 @@ const { Op } = require("sequelize");
 const { logData, logUserActivity, } = require('../helpers/logger');
 
 const { sequelize } = require('../helpers/sequelize_init');
-const {Medicine: Medicines} = require('../models/Main/Medicine');
+const { Medicine: Medicines } = require('../models/Main/Medicine');
 const { User } = require('../models/Auth/User');
 const { Contact } = require('../models/Auth/Contact');
 const { MedicineForm } = require('../models/Lookup/Medicineform');
 const { medicineSchema, prescriptionSchema } = require('../helpers/validator/pharmacy_validation_schema');
 const { Prescription: Prescriptions } = require('../models/Main/Prescription');
 const { PrescriptionStatus } = require('../models/Lookup/PrescriptionStatus');
+const { PaymentStatus } = require('../models/Main/PaymentStatus');
+const { Appointment } = require('../models/Main/Apointment');
+const { AppointmentChecklist } = require('../models/Main/AppointmentChecklist');
 
 
 
@@ -36,7 +39,7 @@ const medicineDetails = async (req, res, next) => {
                 {
                     model: MedicineForm, as: 'Form'
                 },
-                
+
                 ]
 
             })
@@ -56,7 +59,7 @@ const medicineDetails = async (req, res, next) => {
                 {
                     model: MedicineForm, as: 'Form'
                 },
-                
+
                 ]
 
             })
@@ -94,7 +97,7 @@ const editMedicine = async (req, res, next) => {
         if (existMedicine) {
             // if ID is present then is for update
             if (medicine.id > 0 && medicine.id == existMedicine.id) {
-               await Medicines.update(
+                await Medicines.update(
                     medicine, { where: { id: existMedicine.id } }
                 )
                 action = 2
@@ -137,20 +140,33 @@ const appointmentPrescription = async (req, res, next) => {
         if (appointmentId && appointmentId > 0) {
             // parameter is passed
             Prescription = await Prescriptions.findAll({
-                where: { appointment_id: appointmentId},
+                where: { appointment_id: appointmentId },
                 include: [{
-                    model: User, as: "Medicine",
+                    model: Medicines, as: "Medicine",
                     attributes: ['id', 'name', 'generic_name', 'brand_name', 'manufacturer'],
+                    include: [
+                        {
+                            model: MedicineForm, as: 'Form'
+                        }
+                    ]
                 },
                 {
                     model: PrescriptionStatus, as: 'Status'
                 },
-                
+                {
+                    model: PaymentStatus, as: 'PaymentStatus'
+                },
+                {
+                    model: Appointment, as: 'Appointment',
+                    where: { appointment_status: 3 },
+                    required: true,
+                    attributes: ['id', 'appointment_status']
+                }
                 ]
 
             })
 
-        } 
+        }
 
 
         await logUserActivity(userId, 15, 4, true)
@@ -160,6 +176,7 @@ const appointmentPrescription = async (req, res, next) => {
         )
 
     } catch (err) {
+        console.error('++++++++++++++++++++++: ', err)
         logData('appointmentPrescription: ' + err)
         next(err)
     }
@@ -167,6 +184,8 @@ const appointmentPrescription = async (req, res, next) => {
 
 
 const editPrescription = async (req, res, next) => {
+    const transaction = await sequelize.transaction()
+
     try {
 
         let prescription = await prescriptionSchema.validateAsync(req.body)
@@ -178,6 +197,11 @@ const editPrescription = async (req, res, next) => {
             where: { appointment_id: appointmentId }
         });
 
+         const Checklist = await AppointmentChecklist.findOne({
+            where: { appointment_id: preDiagnosis.appointment_id }
+        })
+
+
         let action = 0;
         if (existPrescription) {
             // if ID is present then is for update
@@ -185,11 +209,12 @@ const editPrescription = async (req, res, next) => {
 
                 // delete tests items then add new one
                 await Prescriptions.destroy({
-                    where: { appointment_id: appointmentId }
-                })
+                    where: { appointment_id: appointmentId }                
+                }, {transaction})
 
                 await Prescriptions.bulkCreate(
-                    prescription.prescription_items
+                    prescription.prescription_items,
+                    {transaction}
                 )
                 action = 2
             }
@@ -198,15 +223,22 @@ const editPrescription = async (req, res, next) => {
         } else {
 
 
-            const prescription_items = await LabRequest.bulkCreate(
-                prescription.prescription_items
+            const prescription_items = await Prescriptions.bulkCreate(
+                prescription.prescription_items,
+                {transaction}
             )
+
+            if (Checklist){
+                Checklist.patient_prescibed= true
+                Checklist.save({transaction})
+            }
             action = 1
         }
 
 
         await logUserActivity(userId, 16, action, true, appointmentId)
 
+        transaction.commit()
         res.status(200).json({
             ...prescription,
             message: "Prescription details updated successfuly!",
@@ -215,6 +247,7 @@ const editPrescription = async (req, res, next) => {
 
 
     } catch (err) {
+        transaction.rollback()
         logData('editPrescription: +' + err)
         next(err)
     }

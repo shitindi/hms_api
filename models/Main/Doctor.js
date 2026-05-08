@@ -60,6 +60,9 @@ const Doctor = db.define('main_tbl_doctor', {
     created_by: {
         type: DataTypes.INTEGER,
         allowNull: false
+    },
+    consultation_fee: {
+        type: DataTypes.DECIMAL
     }
 
 }
@@ -85,7 +88,7 @@ Doctor.belongsTo(Specialization, {as: 'Specialization',foreignKey: {  name: 'spe
 EmploymentType.hasMany(Doctor, {foreignKey: {name: 'employment_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Doctor.belongsTo(EmploymentType, {as: 'EmploymentType',foreignKey: {  name: 'employment_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
-User.hasOne(Doctor, {foreignKey: {name: 'user_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+User.hasOne(Doctor, {as: 'Doctor', foreignKey: {name: 'user_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Doctor.belongsTo(User, {as: 'User',foreignKey: {  name: 'user_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 

@@ -1,0 +1,40 @@
+2026-05-07 10:54:51: makeServicePayment: TypeError: Cannot read properties of null (reading 'id')
+ 
+2026-05-07 10:56:21: makeServicePayment: SequelizeDatabaseError: null value in column "tenant_id" of relation "sales_tbl_payments" violates not-null constraint
+ 
+2026-05-07 11:00:36: makeServicePayment: NotAcceptableError: Paid amount exceeded billing amount!!
+ 
+2026-05-07 11:06:50: makeServicePayment: TypeError: Cannot read properties of null (reading 'id')
+ 
+2026-05-07 11:10:22: makeServicePayment: TypeError: Cannot read properties of null (reading 'id')
+ 
+2026-05-07 11:11:53: makeServicePayment: TypeError: Cannot read properties of null (reading 'id')
+ 
+2026-05-07 11:30:08: makeServicePayment: ReferenceError: userGroup is not defined
+ 
+2026-05-07 12:10:06: todayAppointmentsBilling: Error: Include unexpected. Element has to be either a Model, an Association or an object.
+ 
+2026-05-08 08:48:41: verifyRefreshToken: 
+ 
+2026-05-08 08:48:41: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-05-08 08:48:41: verifyRefreshToken: 
+ 
+2026-05-08 08:48:41: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-05-08 08:48:41: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-05-08 08:48:41: verifyRefreshToken: 
+ 
+2026-05-08 08:48:41: verifyRefreshToken: 
+ 
+2026-05-08 08:48:41: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-05-08 09:12:29: userDetails: SequelizeDatabaseError: column Contact->ContactType.id does not exist
+ 
+2026-05-08 09:12:38: userDetails: SequelizeDatabaseError: column Contact->ContactType.id does not exist
+ 
+2026-05-08 09:13:16: userDetails: SequelizeDatabaseError: column Contact->ContactType.id does not exist
+ 
+2026-05-08 09:13:34: userDetails: SequelizeDatabaseError: column Contact->ContactType.id does not exist
+ 

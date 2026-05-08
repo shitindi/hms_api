@@ -9,6 +9,7 @@ const { User } = require('../Auth/User')
 const { Department } = require('../Lookup/Department')
 const { PatientActivity } = require('../Lookup/PatientActivity')
 const { Tenant } = require('../Auth/Tenant')
+const { PaymentStatus } = require('./PaymentStatus')
 
 const Appointment = db.define('main_tbl_apointment', {
 
@@ -41,6 +42,12 @@ const Appointment = db.define('main_tbl_apointment', {
     appointment_reason: {
         type: DataTypes.STRING,
     },
+    pre_diagnosis: {
+        type: DataTypes.STRING
+    },
+    doctor_suggestion: {
+        type: DataTypes.TEXT
+    },
     appointment_status:{
         type: DataTypes.SMALLINT,
         allowNull: false,
@@ -66,38 +73,38 @@ const Appointment = db.define('main_tbl_apointment', {
     },
     current_activity: {
         type: DataTypes.SMALLINT,
-        defaultValue: 13
+       allowNull: false
     },
-    payment_done: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
+    pyament_status: {
+        type: DataTypes.SMALLINT,
+        allowNull: false
+    },
+    appointment_fee: {
+        type: DataTypes.DECIMAL
     }
 }
 )
 
+PaymentStatus.hasMany(Appointment, {foreignKey: {name: 'pyament_status', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Appointment.belongsTo(PaymentStatus, {as: 'PaymentStatus',foreignKey: {  name: 'pyament_status', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+
 Tenant.hasMany(Appointment, {foreignKey: {name: 'tenant_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Appointment.belongsTo(Tenant, {as: 'Tenant',foreignKey: {  name: 'tenant_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
-
-PatientActivity.hasMany(Appointment, {foreignKey: {name: 'department_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-Appointment.belongsTo(PatientActivity, {as: 'PatientActivity',foreignKey: {  name: 'department_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-
+PatientActivity.hasMany(Appointment, {foreignKey: {name: 'current_activity', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
+Appointment.belongsTo(PatientActivity, {as: 'PatientActivity',foreignKey: {  name: 'current_activity', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
 Department.hasMany(Appointment, {foreignKey: {name: 'department_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Appointment.belongsTo(Department, {as: 'Department',foreignKey: {  name: 'department_id', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
-
 User.hasMany(Appointment, {foreignKey: {name: 'created_by', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Appointment.belongsTo(User, {as: 'CreatedBy',foreignKey: {  name: 'created_by', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-
 
 AppointmentType.hasMany(Appointment, {foreignKey: {name: 'visit_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Appointment.belongsTo(AppointmentType, {as: 'AppointmentType',foreignKey: {  name: 'visit_type', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 
-
 Priority.hasMany(Appointment, {foreignKey: {name: 'priority', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Appointment.belongsTo(Priority, {as: 'Priority',foreignKey: {  name: 'priority', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
-
 
 AppointmentStatus.hasMany(Appointment, {foreignKey: {name: 'appointment_status', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})
 Appointment.belongsTo(AppointmentStatus, {as: 'AppointmentStatus',foreignKey: {  name: 'appointment_status', allowNull: true}, onDelete: 'NO ACTION', onUpdate: 'CASCADE'})

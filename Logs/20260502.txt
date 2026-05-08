@@ -1,0 +1,24 @@
+2026-05-02 06:15:18: REFRESH: ReferenceError: reject is not defined
+ 
+2026-05-02 06:15:19: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-05-02 06:15:19: verifyRefreshToken: 
+ 
+2026-05-02 06:15:19: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-05-02 06:15:19: verifyRefreshToken: 
+ 
+2026-05-02 10:36:52: doctorDetails: SequelizeDatabaseError: column main_tbl_doctor.consultation_fee does not exist
+ 
+2026-05-02 10:39:34: appointmentDetails: Error: Include unexpected. Element has to be either a Model, an Association or an object.
+ 
+2026-05-02 10:39:34: doctorDetails: SequelizeDatabaseError: column main_tbl_doctor.consultation_fee does not exist
+ 
+2026-05-02 10:46:56: appointmentDetails: Error: Include unexpected. Element has to be either a Model, an Association or an object.
+ 
+2026-05-02 10:46:56: doctorDetails: SequelizeDatabaseError: column main_tbl_doctor.consultation_fee does not exist
+ 
+2026-05-02 10:48:23: appointmentDetails: Error: Include unexpected. Element has to be either a Model, an Association or an object.
+ 
+2026-05-02 10:50:44: appointmentDetails: Error: Include unexpected. Element has to be either a Model, an Association or an object.
+ 

@@ -28,7 +28,8 @@ const prescriptionSchema = Joi.object({
         duration: Joi.string().max(100).allow(null),
         quantity: Joi.number().allow(null),
         instructions: Joi.string().max(1000).allow(null),
-        status_id: Joi.number().required().default(1)
+        status_id: Joi.number().required().default(1),
+        pyament_status: Joi.number().default(1).allow(null)
     })
 
 })
@@ -36,4 +37,4 @@ const prescriptionSchema = Joi.object({
 module.exports = {
     medicineSchema,
     prescriptionSchema
-}
+}//2 6 17 

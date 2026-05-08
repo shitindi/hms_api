@@ -1,0 +1,2 @@
+2026-05-01 04:29:44: logUserActivity: SequelizeForeignKeyConstraintError: insert or update on table "auth_tbl_user_activities" violates foreign key constraint "auth_tbl_user_activities_module_item_id_fkey"
+ 

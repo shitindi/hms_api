@@ -16,9 +16,22 @@ const appointmentSchema = Joi.object({
     sms_notification: Joi.bool().default(false),
     email_notification: Joi.bool().default(false),
     appointment_no: Joi.string().max(20).required(),
-    created_by: Joi.number().required()
+    created_by: Joi.number().required(),
+    pyament_status: Joi.number().default(1).allow(null),
+    pre_diagnosis: Joi.string().allow(null),
+    doctor_suggestion: Joi.string().allow(null),
+    appointment_fee: Joi.number().allow(null)
 }
 ).options({ stripUnknown: true }).options({ stripUnknown: true })
+
+const preDiagnosisSchema = Joi.object({
+    appointment_id: Joi.number().required(),
+    appointment_reason: Joi.string().min(3).max(1024).required(),
+    pre_diagnosis: Joi.string().allow(null),
+    doctor_suggestion: Joi.string().allow(null)
+}
+).options({ stripUnknown: true }).options({ stripUnknown: true })
+
 
 const labTestRequestSchema = Joi.object({
     test_items: Joi.array().items({
@@ -27,6 +40,7 @@ const labTestRequestSchema = Joi.object({
         test_id: Joi.number().required(),
         request_notes: Joi.string().max(300).allow(null),
         request_date: Joi.date().required(),
+        pyament_status: Joi.number().default(1).allow(null)
     })
 }).options({ stripUnknown: true })
 
@@ -54,7 +68,8 @@ module.exports = {
      appointmentSchema,
      labTestRequestSchema,
      labTestResultSchema,
-     labTestResultSingleSchema
+     labTestResultSingleSchema,
+     preDiagnosisSchema
     
     }
 

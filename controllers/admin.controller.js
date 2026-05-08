@@ -1,6 +1,6 @@
 const createError = require('http-errors');
 const { groupSchema, userSchema, contactSchema, userGroupSchema, groupPermissionSchema, userPermissionSchema } = require('../helpers/validator/auth_validation_schema')
-const {doctorSchema} = require('../helpers/validator/doctor_validation_schema')
+const { doctorSchema } = require('../helpers/validator/doctor_validation_schema')
 const { Group: Groups } = require('../models/Auth/Group');
 const { User: Users, User } = require('../models/Auth/User')
 const { Contact: Contacts } = require('../models/Auth/Contact');
@@ -32,6 +32,7 @@ const { TenantLicense } = require('../models/Client/TenantLicense');
 const { LicensePackage } = require('../models/Client/LicensePackage');
 const { Department } = require('../models/Lookup/Department');
 const { Doctor: Doctors } = require('../models/Main/Doctor');
+const { DefaultRole } = require('../models/Auth/DefaultRole');
 
 const groupDetails = async (req, res, next) => {
 
@@ -102,7 +103,7 @@ const editGroup = async (req, res, next) => {
         if (existGroup) {
             // if ID is present then is for update
             if (group.id > 0 && group.id == existGroup.id) {
-               await Groups.update(
+                await Groups.update(
                     group, { where: { id: existGroup.id } }
                 )
                 action = 2
@@ -213,7 +214,7 @@ const editContact = async (req, res, next) => {
         if (existContact) {
             // if ID is present then is for update
             if (contact.id > 0 && contact.id == existContact.id) {
-               await Groups.update(
+                await Groups.update(
                     contact, { where: { id: existContact.id } }
                 )
                 action = 2
@@ -251,7 +252,7 @@ const userGroupDetails = async (req, res, next) => {
     try {
         const userGroupId = req.params.id;
         const { userId, tenantId } = req.jwtPayload;
-      // console.log('JWTPayload: ', req.jwtPayload)
+        // console.log('JWTPayload: ', req.jwtPayload)
         let userGroupList = null;
 
         if (userGroupId && userGroupId > 0) {
@@ -381,18 +382,25 @@ const userDetails = async (req, res, next) => {
                     include: [
                         {
                             model: Users, as: 'CreatedBy',
-                            attributes: ['id', 'user_name']
+                            attributes: ['id', 'user_name'],
+                            include: [
+                                {
+                                    model: Contacts, as: 'Contact',
+                                    attributes: ['id', 'first_name', 'last_name']
+                                }
+                            ]
+
                         },
                         {
                             model: ContactType, as: 'ContactType',
-                            attributes: ['id', 'name']
+                            attributes: ['ID', 'name']
                         }
                     ],
 
                 },
                 {
                     model: UserStatus, as: 'UserSatus',
-                    attributes: ['id', 'name']
+                    attributes: ['ID', 'name']
                 },
 
                 {
@@ -401,8 +409,17 @@ const userDetails = async (req, res, next) => {
                 },
                 {
                     model: Department, as: 'Department',
-                    attributes: ['id', 'name']
+                    attributes: ['ID', 'name']
+                },
+                    ,
+                {
+                    model: DefaultRole, as: 'DefaultRole'
+                },
+                {
+                    model: Doctors, as: 'Doctor',
+                    required: false
                 }
+
                 ]
             })
         } else {
@@ -411,23 +428,46 @@ const userDetails = async (req, res, next) => {
                 attributes: { exclude: ['password', 'contact_id'] },
                 include: [{
                     model: Contacts, as: 'Contact',
-                    attributes: { exclude: ['createdAt', 'updatedAt', 'contact_type', 'created_by'] },
+                    attributes: { exclude: ['updatedAt', 'contact_type', 'created_by'] },
                     include: [
                         {
                             model: Users, as: 'CreatedBy',
-                            attributes: ['id', 'user_name']
+                            attributes: ['id', 'user_name'],
+                            include: [
+                                {
+                                    model: Contacts, as: 'Contact',
+                                    attributes: ['id', 'first_name', 'last_name']
+                                }
+                            ]
                         },
                         {
                             model: ContactType, as: 'ContactType',
-                            attributes: ['id', 'name']
+                            attributes: ['ID', 'name']
                         }
                     ],
 
                 },
                 {
                     model: UserStatus, as: 'UserSatus',
-                    attributes: ['id', 'name']
-                }],
+                    attributes: ['ID', 'name']
+                },
+                {
+                    model: TenantBranch, as: 'DefaultBranch',
+                    attributes: ['id', 'branch_name']
+                },
+                {
+                    model: Department, as: 'Department',
+                    attributes: ['ID', 'name']
+                },
+                {
+                    model: DefaultRole, as: 'DefaultRole'
+                },
+                {
+                    model: Doctors, as: 'Doctor',
+                    required: false
+                }
+
+                ],
 
             })
 
@@ -441,6 +481,7 @@ const userDetails = async (req, res, next) => {
 
         res.status(200).json(userList)
     } catch (err) {
+        console.error('ERROR++++++++++++++++++++++++++++++++++++', err)
         logData('userDetails: ' + err)
         next(err)
     }
@@ -453,11 +494,14 @@ const editUser = async (req, res, next) => {
 
         let user = await userSchema.validateAsync(req.body)
         let contact = await contactSchema.validateAsync(req.body)
-        let doctor = await doctorSchema.validateAsync(req.body)
+        let doctor = null
+        if (contact.contact_type == 1)
+            doctor = await doctorSchema.validateAsync(req.body)
 
+        console.error('DOCTOR:--------------------------', doctor)
         const { user_id, tenantId } = req.jwtPayload;
 
-        let is_doctor = contact.contact_type ==1 ? true : false;
+        let is_doctor = contact.contact_type == 1 ? true : false;
         let existDoctor = null;
         let Doctor = null;
 
@@ -471,17 +515,17 @@ const editUser = async (req, res, next) => {
         user.created_by = user_id
 
         const User = await Users.findOne({
-            where: { user_name: user.user_name , tenant_id: contact.tenant_id}
+            where: { user_name: user.user_name, tenant_id: contact.tenant_id }
         });
         const existUser = await Users.findOne({
-            where: { id: user.user_id , tenant_id: contact.tenant_id}
+            where: { id: user.user_id, tenant_id: contact.tenant_id }
         });
 
-       
-        
-        if (is_doctor == true){
+
+
+        if (is_doctor == true) {
             existDoctor = await Doctors.findOne({
-                where: {id: doctor.doctor_id}
+                where: { id: doctor?.doctor_id ?? -100 }
             })
         }
 
@@ -490,39 +534,42 @@ const editUser = async (req, res, next) => {
         // Exist same user name in same tenant
         if (existUser) {
             // Field theat should not be updated
-            const fieldsToExclude = ['id','password', 'user_name', 'contact_id', 'tenant_id']
+            const fieldsToExclude = ['id', 'password', 'user_name', 'contact_id', 'tenant_id']
             const myFields = Object.keys(Users.getAttributes).filter(s => !fieldsToExclude.includes(s))
 
             // if ID is present then is for update
             if (user.user_id > 0 && user.id == existUser.id) {
                 await Users.update(
-                    user, { where: { id: user.user_id } , fields: myFields}
+                    user, { where: { id: user.user_id }, fields: myFields },
+                    { transaction }
                 );
 
                 const Contact = await Contacts.findOne({
-                    where: { id: user?.contact_id ?? -1}
+                    where: { id: user?.contact_id ?? -1 }
                 })
 
-                if (existDoctor && existDoctor.id == doctor.doctor_id && doctor.user_id == existUser.id){
+                if (existDoctor && existDoctor.id == doctor.doctor_id && doctor.user_id == existUser.id) {
                     await Doctors.update(
                         doctor, {
-                            where: {[Op.and]: {id: existDoctor.id, user_id: existUser.id}}
-                        }
+                        where: { [Op.and]: { id: existDoctor.id, user_id: existUser.id } }
+                    },
+                        { transaction }
                     )
                 }
 
-                if ( contact.contact_type != 1){
+                if (contact.contact_type != 1) {
                     Doctors.destroy({
-                        where: {user_id: existUser.id}
-                    })
+                        where: { user_id: existUser.id },
+
+                    }, { transaction })
                 }
 
                 if (Contact && Contact.id == existUser.contact_id) {
                     await Contacts.update(
                         contact, {
-                            where: { id: existUser.contact_id },
+                        where: { id: existUser.contact_id },
                         fields: ['must_change_password', 'user_status']
-                    }
+                    }, { transaction }
                     )
                     if (existUser.user_status != user.user_status) {
                         const userStatHistory = {
@@ -590,9 +637,12 @@ const editUser = async (req, res, next) => {
 
             user = await Users.create(user, { transaction })
 
-            doctor.tenant_id = user.tenant_id
-            doctor.user_id = user.id
-            doctor = await Doctors.create(doctor, { transaction})
+            if (is_doctor) {
+                doctor.tenant_id = user.tenant_id
+                doctor.user_id = user.id
+                doctor = await Doctors.create(doctor, { transaction })
+            }
+
 
             //Log first password usage
             const passUsage = {
@@ -626,6 +676,7 @@ const editUser = async (req, res, next) => {
             message: "User details updated successfuly!",
         })
     } catch (err) {
+        console.error('ERROR================================', err)
         transaction.rollback()
         logData('editUser: ' + err)
         next(err)
@@ -948,12 +999,12 @@ const tenantBranchDetails = async (req, res, next) => {
                 },
                 {
                     model: TenantCountry, as: "Country",
-                    attributes: ['id','name']
+                    attributes: ['id', 'name']
 
                 },
                 {
                     model: TenantRegion, as: "Region",
-                    attributes: ['id','name']
+                    attributes: ['id', 'name']
                 },
                 {
                     model: Contacts, as: 'ContactPerson',
@@ -971,16 +1022,16 @@ const tenantBranchDetails = async (req, res, next) => {
                 },
                 {
                     model: TenantCountry, as: "Country",
-                    attributes: ['id','name']
+                    attributes: ['id', 'name']
 
                 },
                 {
                     model: TenantRegion, as: "Region",
-                    attributes: ['id','name']
+                    attributes: ['id', 'name']
                 },
                 {
                     model: Contacts, as: 'ContactPerson',
-                    attributes: ['id','first_name', 'middle_name', 'last_name', 'mobile_no']
+                    attributes: ['id', 'first_name', 'middle_name', 'last_name', 'mobile_no']
                 }],
             })
         }
@@ -1044,7 +1095,7 @@ const editTenantBranch = async (req, res, next) => {
             const BranchCount = await LicenseBranchCount.findOne({
                 where: { id: License.branch_count_id }
             })
-          //  console.log('LICENSING: Package count->',  Package.branch_count, ', BranchCount->',BranchCount?.branch_count ?? 0 )
+            //  console.log('LICENSING: Package count->',  Package.branch_count, ', BranchCount->',BranchCount?.branch_count ?? 0 )
 
             const availableBranchCount = (Package?.branch_count ?? 0) + (BranchCount?.branch_count ?? 0)
             const registeredBranch = await TenantBranch.count({

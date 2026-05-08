@@ -17,7 +17,6 @@ const Patient = db.define('main_tbl_patient', {
     }, 
     registration_no: {
         type: DataTypes.STRING,
-        allowNull: true,
         unique: true
     },
     contact_id: {
@@ -57,11 +56,7 @@ const Patient = db.define('main_tbl_patient', {
     joining_date: {
         type: DataTypes.DATEONLY
     },
-    // current_activity: {
-    //     type: DataTypes.SMALLINT,
-    //     allowNull: false
-    // }
-    // ,
+
     insurer_id: {
         type: DataTypes.SMALLINT,
         allowNull: true

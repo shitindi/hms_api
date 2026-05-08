@@ -75,8 +75,12 @@ const { MedicineForm } = require('../models/Lookup/Medicineform')
 const { Medicine } = require('../models/Main/Medicine')
 const { PrescriptionStatus } = require('../models/Lookup/PrescriptionStatus')
 const { Prescription } = require('../models/Main/Prescription')
+const { AppointmentChecklist } = require('../models/Main/AppointmentChecklist')
+const { BillingService } = require('../models/Lookup/BillingService')
+const { Billing } = require('../models/Main/Billing')
+const { BillingItem } = require('../models/Main/BillingItem')
 
-const seedAuthDatabase = async () => {
+const seedDatabase = async () => {
     try {
 
 
@@ -126,7 +130,18 @@ const seedAuthDatabase = async () => {
         const LabResultStatusCount = await LabResultStatus.count()
         const MedicalFormCount = await MedicineForm.count()
         const PrescriptionStatusCount = await PrescriptionStatus.count()
-        //pending, dispensed, partially_dispensed, cancelled
+
+        const BillingServicesCount = await BillingService.count()
+
+        if (BillingServicesCount == 0) {
+            await BillingService.bulkCreate([
+                { ID: 1, name: 'Consultation' }, { ID: 2, name: 'Lab Services' },
+                { ID: 3, name: 'Pharmacy Services' }, { ID: 4, name: 'Clinical Services' },
+                { ID: 5, name: 'Admission Services' }, { ID: 6, name: 'Imaging Services' },
+                { ID: 7, name: 'Emergnecy Services' }
+            ])
+        }
+
         if (PrescriptionStatusCount == 0) {
             await PrescriptionStatus.bulkCreate([
                 { id: 1, name: 'Pending' }, { id: 2, name: 'Dispensed' },
@@ -352,7 +367,7 @@ const seedAuthDatabase = async () => {
                     { id: 13, item_name: 'Doctors details', module_id: module.id, code: 113 },
                     { id: 14, item_name: 'Apointment details', module_id: module.id, code: 114 },
                     { id: 15, item_name: 'Medicine details', module_id: module.id, code: 115 },
-
+                    { id: 16, item_name: 'Billing details', module_id: module.id, code: 116 },
 
 
                 ])
@@ -363,7 +378,9 @@ const seedAuthDatabase = async () => {
 
             await LicensePaymentType.bulkCreate([
 
-                { ID: 1, name: 'Bank Transfer' }, { ID: 2, name: 'Cash' }, { ID: 3, name: 'Card' }
+                { ID: 1, name: 'Cash' }, { ID: 2, name: 'Mobile Money' },
+                { ID: 3, name: 'Bank Transfer' }, { ID: 4, name: 'Card' },
+                { ID: 5, name: 'Isurance' }
             ])
         }
 
@@ -455,7 +472,8 @@ const seedAuthDatabase = async () => {
 
             await PaymentStatus.bulkCreate([
 
-                { id: 1, name: 'Not Paid' }, { id: 2, name: 'Received' }, { id: 3, name: 'Rejected' }, { id: 4, name: 'Verified' }
+                { id: 1, name: 'Not Paid' }, { id: 2, name: 'Received' }, { id: 3, name: 'Rejected' },
+                { id: 4, name: 'Verified' }, { id: 5, name: 'Partial received' }, { id: 6, name: 'Insured' }
             ])
         }
 
@@ -464,20 +482,14 @@ const seedAuthDatabase = async () => {
     }
 }
 
-const updateAuthDbSchema = async () => {
+const updateDbSchema = async () => {
 
     try {
 
 
-        await PrescriptionStatus.sync({ alter: true })
+        await Payment.sync({ alter: true })
             .then(data => { })
-            .catch(err => console.log('error Create table tbl lookups_tbl_prescription_status: ' + err))
-
-        await Prescription.sync({ alter: true })
-            .then(data => { })
-            .catch(err => console.log('error Create table tbl main_tbl_prescription: ' + err))
-
-
+            .catch(err => console.log('error Create table tbl lookups_tbl_billing_service: ' + err))
 
         return
 
@@ -785,6 +797,11 @@ const updateAuthDbSchema = async () => {
             .then(data => { })
             .catch(err => console.log('error Create table tbl main_tbl_prescription: ' + err))
 
+        await AppointmentChecklist.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl main_tbl_apointment_checklist: ' + err))
+
+        return
     } catch (error) {
         console.log('updateDatabse: ' + error)
     }
@@ -792,11 +809,11 @@ const updateAuthDbSchema = async () => {
 }
 
 
-//ßupdateAuthDbSchema()
-//seedAuthDatabase()
+updateDbSchema()
+//seedDatabase()
 
 module.exports = {
-    seedAuthDatabase,
-    updateAuthDbSchema
+    seedDatabase,
+    updateDbSchema
 }
 

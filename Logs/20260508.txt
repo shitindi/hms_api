@@ -1,0 +1,50 @@
+2026-05-08 09:14:38: userDetails: SequelizeDatabaseError: column Contact->ContactType.id does not exist
+ 
+2026-05-08 09:16:16: userDetails: SequelizeDatabaseError: column UserSatus.id does not exist
+ 
+2026-05-08 13:52:51: editUser: Error: WHERE parameter "id" has invalid "undefined" value
+ 
+2026-05-08 13:54:19: editUser: Error: WHERE parameter "id" has invalid "undefined" value
+ 
+2026-05-08 14:03:04: editUser: SequelizeUniqueConstraintError: Validation error
+ 
+2026-05-08 14:11:12: editUser: SequelizeValidationError: notNull Violation: main_tbl_doctor.specialization cannot be null,
+notNull Violation: main_tbl_doctor.hightest_qualification cannot be null,
+notNull Violation: main_tbl_doctor.employment_type cannot be null,
+notNull Violation: main_tbl_doctor.joining_date cannot be null
+ 
+2026-05-08 14:19:36: editUser: SequelizeValidationError: notNull Violation: main_tbl_doctor.specialization cannot be null,
+notNull Violation: main_tbl_doctor.hightest_qualification cannot be null,
+notNull Violation: main_tbl_doctor.employment_type cannot be null,
+notNull Violation: main_tbl_doctor.joining_date cannot be null
+ 
+2026-05-08 15:32:37: editUser: SequelizeValidationError: notNull Violation: main_tbl_doctor.specialization cannot be null,
+notNull Violation: main_tbl_doctor.hightest_qualification cannot be null,
+notNull Violation: main_tbl_doctor.employment_type cannot be null,
+notNull Violation: main_tbl_doctor.joining_date cannot be null
+ 
+2026-05-08 16:21:44: editUser: SequelizeValidationError: notNull Violation: main_tbl_doctor.specialization cannot be null,
+notNull Violation: main_tbl_doctor.hightest_qualification cannot be null,
+notNull Violation: main_tbl_doctor.employment_type cannot be null,
+notNull Violation: main_tbl_doctor.joining_date cannot be null
+ 
+2026-05-08 16:29:22: editUser: TypeError: Cannot set properties of null (setting 'tenant_id')
+ 
+2026-05-08 16:31:45: editUser: TypeError: Cannot set properties of null (setting 'tenant_id')
+ 
+2026-05-08 16:36:40: editUser: TypeError: Cannot set properties of null (setting 'tenant_id')
+ 
+2026-05-08 16:39:08: logUserActivity: SequelizeValidationError: notNull Violation: auth_tbl_user_activity.user_id cannot be null
+ 
+2026-05-08 16:48:46: editUser: SequelizeValidationError: notNull Violation: main_tbl_doctor.year_of_experience cannot be null,
+notNull Violation: main_tbl_doctor.joining_date cannot be null
+ 
+2026-05-08 16:52:49: editUser: SequelizeValidationError: notNull Violation: main_tbl_doctor.year_of_experience cannot be null,
+notNull Violation: main_tbl_doctor.joining_date cannot be null
+ 
+2026-05-08 16:56:02: editUser: ValidationError: "joining_date" is required
+ 
+2026-05-08 16:56:42: editUser: ValidationError: "joining_date" is required
+ 
+2026-05-08 17:01:42: logUserActivity: SequelizeValidationError: notNull Violation: auth_tbl_user_activity.user_id cannot be null
+ 

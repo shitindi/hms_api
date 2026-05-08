@@ -34,6 +34,8 @@ const { LabTestCatalog } = require('../models/Main/LabTestCatalog');
 const { LabResultStatus } = require('../models/Lookup/LabResultStatus');
 const { MedicineForm } = require('../models/Lookup/Medicineform');
 const { PrescriptionStatus } = require('../models/Lookup/PrescriptionStatus');
+const { DefaultRole } = require('../models/Auth/DefaultRole');
+const { TenantBranch } = require('../models/Client/TenantBranch');
 
 
 // Authentication lookup
@@ -393,8 +395,19 @@ const PrescriptionStatuses = async (req, res, next) => {
     }
 }
 
+const DefaultRoles = async (req, res, next) => {
+    try {
+        const default_role = await DefaultRole.findAll()
+        res.status(200).json(default_role)
+    } catch (err) {
+        logData('DefaultRoles: ' + err)
+        next(err)
+    }
+}
+
 const GetLookupsAll = async (req, res, next) => {
     try {
+         const { user_id, tenantId } = req.jwtPayload;
         const activation_types = await ActivationType.findAll()
         const tenant_statuses = await TenantType.findAll()
         const user_statuses = await UserStatus.findAll()
@@ -427,6 +440,12 @@ const GetLookupsAll = async (req, res, next) => {
 
         const medicine_forms = await MedicineForm.findAll()
         const prescription_statuses = await PrescriptionStatus.findAll()
+        const default_roles = await DefaultRole.findAll()
+        const branches = await TenantBranch.findAll({
+            where: {tenant_id: tenantId},
+            attributes: ['id', 'branch_name']
+        })
+
         res.status(200).json({
             activation_types,
             tenant_statuses,
@@ -457,7 +476,9 @@ const GetLookupsAll = async (req, res, next) => {
             lab_test_categories,
             lab_result_statuses,
             medicine_forms,
-            prescription_statuses
+            prescription_statuses,
+            default_roles,
+            branches
         })
 
     } catch (err) {
@@ -502,6 +523,7 @@ module.exports = {
     LabTestCategories,
     LabResultStatuses,
     MedicineForms,
-    PrescriptionStatuses
+    PrescriptionStatuses,
+    DefaultRoles
 
 }

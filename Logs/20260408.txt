@@ -1,2 +1,0 @@
-2026-04-08 13:28:10: doctorDetails: SequelizeDatabaseError: column IdType.id does not exist
- 

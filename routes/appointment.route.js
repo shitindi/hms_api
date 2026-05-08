@@ -25,6 +25,20 @@ router.get("/appointments/:id?", verifyAccessToken, appointmentController.appoin
 
 /**
  * @openapi
+ * '/appointments/today':
+ *  get:
+ *    tags:
+ *    - Health Management
+ *    summary: Get Appointment list by today
+ *    responses:
+ *      200:
+ *        description: Ok, get List of appointments requested today
+ */
+
+router.get("/today", verifyAccessToken, appointmentController.todayAppointments)
+
+/**
+ * @openapi
  * '/appointments/by-doctor':
  *  get:
  *    tags:
@@ -125,8 +139,14 @@ router.post("/lab-request", verifyAccessToken, appointmentController.editLabRequ
 router.post("/lab-result", verifyAccessToken, appointmentController.editLabResults)
 
 /* NOT DOCUMENTED YET */
-router.post("/lab-result", verifyAccessToken, appointmentController.editLabResultSingle)
+router.post("/lab-result-single", verifyAccessToken, appointmentController.editLabResultSingle)
 
 /* NOT DOCUMENTED YET */
 router.get('/lab-results/:id', verifyAccessToken, appointmentController.viewLabRequests)
+
+/* NOT DOCUMENTED YET */
+router.get('/visit-history/:id', verifyAccessToken, appointmentController.visingHistory)
+
+/* NOT DOCUMENTED YET */
+router.post('/pre-diagnosis', verifyAccessToken, appointmentController.editPreDiagnosis)
 module.exports = router;

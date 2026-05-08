@@ -6,7 +6,7 @@ const patientSchema = Joi.object({
     tenant_id: Joi.number().required(),
     contact_id: Joi.number().allow(null),
     created_by: Joi.number().required(),
-    registration_no: Joi.string().max(20).allow(null),
+    registration_no: Joi.string().max(20).required(),
     id_type: Joi.number().allow(null),
     id_number: Joi.number().allow(null),
     marital_status: Joi.number().required(true).default(1),

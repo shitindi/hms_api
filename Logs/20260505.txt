@@ -1,0 +1,6 @@
+2026-05-05 20:46:01: todayAppointmentsBilling: ReferenceError: getDateOnly is not defined
+ 
+2026-05-05 20:46:08: todayAppointmentsBilling: ReferenceError: getDateOnly is not defined
+ 
+2026-05-05 20:48:41: todayAppointmentsBilling: SequelizeDatabaseError: column Prescription->Medicine.pyament_status does not exist
+ 

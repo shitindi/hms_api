@@ -5,7 +5,7 @@ const { Sequelize } = require('sequelize');
 
 const { logData, logUserActivity, } = require('../helpers/logger');
 
-const { Appointment: Appointments } = require('../models/Main/Apointment')
+const { Appointment: Appointments, Appointment } = require('../models/Main/Apointment')
 const { AppointmentStatus } = require('../models/Lookup/AppointmentStatus')
 const { AppointmentType } = require('../models/Lookup/AppointmentType')
 const { Doctor } = require('../models/Main/Doctor')
@@ -14,7 +14,7 @@ const { Patient } = require('../models/Main/Patient');
 const { Op, where } = require('sequelize');
 const { User } = require('../models/Auth/User');
 const { Contact } = require('../models/Auth/Contact');
-const { appointmentSchema, labTestRequestSchema, labTestResultSchema, labTestResultSingleSchema } = require('../helpers/validator/apointment_validation_schema');
+const { appointmentSchema, labTestRequestSchema, labTestResultSchema, labTestResultSingleSchema, preDiagnosisSchema } = require('../helpers/validator/apointment_validation_schema');
 const { Department } = require('../models/Lookup/Department');
 const { Gender } = require('../models/Lookup/Gender');
 const { BloodGroup } = require('../models/Lookup/BloodGroup');
@@ -25,6 +25,14 @@ const { PatientVital } = require('../models/Main/PatientVital');
 const { LabRequest } = require('../models/Main/LabRequest');
 const { LabTestCatalog } = require('../models/Main/LabTestCatalog');
 const { LabResultStatus } = require('../models/Lookup/LabResultStatus');
+const { Prescription } = require('../models/Main/Prescription');
+const { Medicine } = require('../models/Main/Medicine');
+const { MedicineForm } = require('../models/Lookup/Medicineform');
+const { PrescriptionStatus } = require('../models/Lookup/PrescriptionStatus');
+const { LabTestCategory } = require('../models/Lookup/LabTestCategory');
+const { sequelize } = require('../helpers/sequelize_init');
+const { PaymentStatus } = require('../models/Main/PaymentStatus');
+const { AppointmentChecklist } = require('../models/Main/AppointmentChecklist');
 
 
 const appointmentDetails = async (req, res, next) => {
@@ -48,7 +56,8 @@ const appointmentDetails = async (req, res, next) => {
                             model: Contact, as: "Contact",
                         }]
                     }]
-                }, {
+                },
+                {
                     model: Department, as: 'Department',
                 },
                 {
@@ -93,10 +102,33 @@ const appointmentDetails = async (req, res, next) => {
                     model: LabRequest, as: 'LabReqests',
                     include: [
                         {
-                            model: LabTestCatalog, as: 'TestCatalog'
+                            model: LabTestCatalog, as: 'TestCatalog',
+                            include: [
+                                {
+                                    model: LabTestCategory, as: 'Category'
+                                }
+                            ]
                         }
                     ]
                 },
+                {
+                    model: Prescription, as: 'Prescription',
+                    include: [
+                        {
+                            model: Medicine, as: "Medicine",
+                            attributes: ['id', 'name', 'generic_name', 'brand_name', 'manufacturer'],
+                            include: [
+                                {
+                                    model: MedicineForm, as: 'Form'
+                                }
+                            ]
+                        },
+                        {
+                            model: PrescriptionStatus, as: 'Status'
+                        }
+                    ]
+                }
+                    ,
                 {
                     model: User, as: "CreatedBy",
                     attributes: ['id', 'user_name'],
@@ -104,6 +136,9 @@ const appointmentDetails = async (req, res, next) => {
                         model: Contact, as: 'Contact',
                         attributes: ['id', 'first_name', 'last_name']
                     }]
+                },
+                {
+                    model: PaymentStatus, as: 'PaymentStatus'
                 }
 
                 ]
@@ -154,6 +189,10 @@ const appointmentDetails = async (req, res, next) => {
                         model: Contact, as: 'Contact',
                         attributes: ['id', 'first_name', 'last_name']
                     }]
+                },
+
+                {
+                    model: PaymentStatus, as: 'PaymentStatus'
                 }
 
                 ]
@@ -169,11 +208,162 @@ const appointmentDetails = async (req, res, next) => {
         )
 
     } catch (err) {
+        console.error('APPOINT: ', err)
         logData('appointmentDetails: ' + err)
         next(err)
     }
 }
 
+const todayAppointments = async (req, res, next) => {
+    try {
+        const { userId, tenantId } = req.jwtPayload;
+
+        let appointments = null;
+
+
+        // no parameter is passed
+        appointments = await Appointments.findAll({
+            where: {
+                [Op.and]: [{ tenant_id: tenantId },
+                { appointment_status: [1, 2, 3] },
+                Sequelize.where(Sequelize.cast(Sequelize.col('appointment_date'), 'date'), getDateOnly(new Date()))]
+            },
+            order: [['id', 'ASC']],
+            include: [{
+                model: Doctor, as: "Doctor",
+                attributes: ['id'],
+                include: [{
+                    model: User, as: "User",
+                    attributes: ['id'],
+                    include: [{
+                        model: Contact, as: "Contact",
+                        attributes: ['id', 'first_name', 'last_name']
+                    }]
+                }]
+            },
+            {
+                model: Department, as: 'Department',
+            },
+            {
+                model: AppointmentType, as: 'AppointmentType',
+            },
+            {
+                model: Priority, as: 'Priority'
+            },
+            {
+                model: AppointmentStatus, as: 'AppointmentStatus'
+            },
+            {
+                model: Patient, as: "Patient",
+                attributes: ['id'],
+                include: [{
+                    model: Contact, as: "Contact",
+                    attributes: ['id', 'first_name', 'last_name'],
+                }]
+            },
+            {
+                model: User, as: "CreatedBy",
+                attributes: ['id', 'user_name'],
+                include: [{
+                    model: Contact, as: 'Contact',
+                    attributes: ['id', 'first_name', 'last_name']
+                }]
+            },
+
+            {
+                model: PaymentStatus, as: 'PaymentStatus'
+            },
+            {
+                model: PatientActivity, as: 'PatientActivity'
+            }
+
+            ]
+
+        })
+
+
+
+        await logUserActivity(userId, 14, 4, true)
+
+        res.status(200).json(
+            appointments
+        )
+
+    } catch (err) {
+        console.error('APPOINT: ', err)
+        logData('appointmentDetails: ' + err)
+        next(err)
+    }
+}
+
+
+const visingHistory = async (req, res, next) => {
+    try {
+        const patientId = req.params.id;
+        const { userId, tenantId } = req.jwtPayload;
+
+        let appointments = null;
+
+        if (patientId && patientId > 0) {
+            // parameter is passed
+            appointments = await Appointments.findAll({
+                where: { patient_id: patientId, tenant_id: tenantId },
+                attributes: ['id', 'appointment_date', 'appointment_reason'],
+                include: [{
+                    model: Doctor, as: "Doctor",
+                    attributes: ['id'],
+                    include: [{
+                        model: User, as: "User",
+                        attributes: ['id'],
+                        include: [{
+                            model: Contact, as: "Contact",
+                            attributes: ['first_name', 'last_name']
+                        }]
+                    }]
+                },
+                {
+                    model: Department, as: 'Department',
+                },
+
+                {
+                    model: LabRequest, as: 'LabReqests',
+                    attributes: ['id'],
+                    include: [
+                        {
+                            model: LabTestCatalog, as: 'TestCatalog',
+                            attributes: ['id', 'test_name']
+                        }
+                    ]
+                },
+                {
+                    model: Prescription, as: 'Prescription',
+                    attributes: ['id'],
+                    include: [
+                        {
+                            model: Medicine, as: "Medicine",
+                            attributes: ['id', 'name'],
+                        },
+                    ]
+                }
+
+                ]
+
+            })
+
+        }
+
+        await logUserActivity(userId, 14, 4, true)
+
+        res.status(200).json(
+            appointments
+        )
+
+    } catch (err) {
+        console.error('THE DATA: ', err)
+        logData('visingHistory: ' + err)
+        next(err)
+    }
+}
 const appointmentsViewByDoctor = async (req, res, next) => {
 
     try {
@@ -194,9 +384,11 @@ const appointmentsViewByDoctor = async (req, res, next) => {
         // parameter is passed
         const appointments = await Appointments.findAll({
             where: {
-                [Op.and]: [{ tenant_id: tenantId, doctor_id: doctorId, appointment_status: [2, 3] },
+                [Op.and]: [{ tenant_id: tenantId, doctor_id: doctorId, appointment_status: [ 3] },
                 Sequelize.where(Sequelize.cast(Sequelize.col('appointment_date'), 'date'), getDateOnly(new Date()))]
             },
+            // limit: 10,
+            order: [['id', 'DESC']],
             include: [
                 {
                     model: Department, as: 'Department',
@@ -234,6 +426,10 @@ const appointmentsViewByDoctor = async (req, res, next) => {
 
                     ]
                 }
+                ,
+                {
+                    model: PaymentStatus, as: 'PaymentStatus'
+                }
             ]
 
         })
@@ -251,8 +447,6 @@ const appointmentsViewByDoctor = async (req, res, next) => {
         next(err)
     }
 }
-
-
 
 const editAppointment = async (req, res, next) => {
     try {
@@ -321,8 +515,8 @@ const editAppointment = async (req, res, next) => {
     }
 }
 
-
 const checkinAppointment = async (req, res, next) => {
+    const transaction = await sequelize.transaction()
     try {
 
         let appointmentId = await req.body?.id ?? -1
@@ -338,6 +532,10 @@ const checkinAppointment = async (req, res, next) => {
             attributes: ['id', 'patient_id', 'appointment_status']
         });
 
+        const Checklist = await AppointmentChecklist.findOne({
+            where: { appointment_id: appointmentId }
+        })
+
         let action = 0;
         // Exist same group name in same tenant
         if (Appointment) {
@@ -351,8 +549,14 @@ const checkinAppointment = async (req, res, next) => {
                 }
 
                 Appointment.appointment_status = 3
-                await Appointment.save()
+                await Appointment.save({transaction})
 
+                if (!Checklist) {
+                    await AppointmentChecklist.create(
+                        { appointment_id: appointmentId },
+                        {transaction}
+                    )
+                }
                 action = 2
             }
 
@@ -365,6 +569,7 @@ const checkinAppointment = async (req, res, next) => {
 
         await logUserActivity(userId, 14, action, true, appointmentId)
 
+        transaction.commit()
         res.status(200).json({
             ...Appointment,
             message: "Patiend checked in  successfuly!",
@@ -373,26 +578,25 @@ const checkinAppointment = async (req, res, next) => {
 
 
     } catch (err) {
-
+        transaction.rollback()
         console.error('ERROR: ', err)
         logData('checkinAppointment: +' + err)
         next(err)
     }
 }
 
-
 const viewLabRequests = async (req, res, next) => {
 
     try {
 
-        const appointmentId =  req.params.id;
+        const appointmentId = req.params.id;
 
         const { userId, tenantId } = req.jwtPayload;
 
         // parameter is passed
         const appointments = await LabRequest.findAll({
             where: { appointment_id: appointmentId },
-    
+
             include: [
                 {
                     model: LabTestCatalog, as: 'TestCatalog'
@@ -400,7 +604,17 @@ const viewLabRequests = async (req, res, next) => {
 
                 {
                     model: LabResultStatus, as: 'ResultStatus'
-                },           
+                },
+
+                {
+                    model: PaymentStatus, as: 'PaymentStatus'
+                },
+                {
+                    model: Appointment, as: 'Appointment',
+                    where: { appointment_status: 3 },
+                    attributes: ['id', 'appointment_status'],
+                    required: true
+                }
             ]
 
         })
@@ -419,9 +633,9 @@ const viewLabRequests = async (req, res, next) => {
     }
 }
 
-
-
 const editLabRequests = async (req, res, next) => {
+    const transaction = await sequelize.transaction()
+
     try {
 
         let labTests = await labTestRequestSchema.validateAsync(req.body)
@@ -433,6 +647,10 @@ const editLabRequests = async (req, res, next) => {
             where: { appointment_id: appointmentId }
         });
 
+        const Checklist = await AppointmentChecklist.findOne({
+            where: { appointment_id: preDiagnosis.appointment_id }
+        })
+
         let action = 0;
         if (existLabTest) {
             // if ID is present then is for update
@@ -441,10 +659,10 @@ const editLabRequests = async (req, res, next) => {
                 // delete tests items then add new one
                 await LabRequest.destroy({
                     where: { appointment_id: appointmentId }
-                })
+                }, {transaction})
 
                 await LabRequest.bulkCreate(
-                    labTests.test_items
+                    labTests.test_items, {transaction}
                 )
                 action = 2
             }
@@ -452,16 +670,29 @@ const editLabRequests = async (req, res, next) => {
 
         } else {
 
-
             const test_items = await LabRequest.bulkCreate(
-                labTests.test_items
+                labTests.test_items,
+                {transaction}
             )
+
+            await Appointment.update(
+                { current_activity: 6 },
+                { where: { id: appointmentId } },
+                {transaction}
+
+            )
+
+            if (Checklist) {
+                Checklist.is_lab_requested = true
+                Checklist.save({transaction})
+            }
             action = 1
         }
 
 
         await logUserActivity(userId, 16, action, true, appointmentId)
 
+        transaction.commit()
         res.status(200).json({
             ...labTests,
             message: "Lab test details updated successfuly!",
@@ -470,6 +701,7 @@ const editLabRequests = async (req, res, next) => {
 
 
     } catch (err) {
+        transaction.rollback()
         logData('editLabRequests: +' + err)
         next(err)
     }
@@ -583,6 +815,58 @@ const editLabResultSingle = async (req, res, next) => {
 }
 
 
+const editPreDiagnosis = async (req, res, next) => {
+    const transaction = await sequelize.transaction()
+    try {
+        let preDiagnosis = await preDiagnosisSchema.validateAsync(req.body)
+        const { userId, tenantId } = req.jwtPayload;
+
+        const Appointment = await Appointments.findOne({
+            where: { id: preDiagnosis.appointment_id }
+        });
+
+        const Checklist = await AppointmentChecklist.findOne({
+            where: { appointment_id: preDiagnosis.appointment_id }
+        })
+        let action = 0;
+        // Exist same group name in same tenant
+        if (Appointment) {
+            // if ID is present then is for update
+            if (preDiagnosis.appointment_id > 0 && preDiagnosis.appointment_id == Appointment.id) {
+
+                Appointment.appointment_reason = preDiagnosis.appointment_reason,
+                    Appointment.pre_diagnosis = preDiagnosis?.pre_diagnosis,
+                    Appointment.doctor_suggestion = preDiagnosis?.doctor_suggestion
+                await Appointment.save({transaction})
+                if (Checklist) {
+                    Checklist.pre_diagnosis_done = true
+                    Checklist.save({transaction})
+                }
+                action = 2
+            }
+
+
+        } else {
+            next(createError.NotFound('The specified appointment does not exists!'))
+        }
+
+
+        // const { userId, tenatId} =  req.jwtPayload;
+        await logUserActivity(userId, 14, action, true, Appointment.id)
+
+        transaction.commit()
+        res.status(200).json({
+            ...preDiagnosis,
+            message: "Appointment details updated successfuly!",
+        })
+    } catch (err) {
+        transaction.rollback()
+        logData('editPreDiagnosis: ' + err)
+        next(err)
+    }
+}
+
+
 module.exports = {
     appointmentDetails,
     appointmentsViewByDoctor,
@@ -591,5 +875,8 @@ module.exports = {
     editLabRequests,
     editLabResults,
     editLabResultSingle,
-    viewLabRequests
+    viewLabRequests,
+    visingHistory,
+    editPreDiagnosis,
+    todayAppointments
 }

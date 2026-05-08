@@ -74,7 +74,10 @@ const userSchema = Joi.object({
     contact_id: Joi.number().allow(null),
     tenant_id: Joi.number().allow(null),
     user_status: Joi.number().default(1),
-    department_id: Joi.number()
+    department_id: Joi.number(),
+    default_branch: Joi.number().allow(null),
+    default_role: Joi.number().required()
+
     
 }).with('password','confirm_password').options({stripUnknown: true})
 
