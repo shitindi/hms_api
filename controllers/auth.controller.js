@@ -298,6 +298,7 @@ const login = async (req, res, next) => {
             where: { user_name: login.email }
         }
         );
+       // console.error('==================', User)
 
         if( !User){
            await logLoginAttempt(null, login.email, req.ip , false)
@@ -307,6 +308,10 @@ const login = async (req, res, next) => {
      
 
         const isMatch = await hash.isPasswordmatch(login.password, User.password)
+
+        //const userPassword =  await hash.hashPassword(login.password)
+
+         //logData('Login_PASS: ' + userPassword + '___Plain: ' + login.passwor + ', isMatch: ' + isMatch)
 
         await logLoginAttempt(User.id, login.email, req.ip , isMatch)
 
@@ -362,7 +367,7 @@ const login = async (req, res, next) => {
             licensingInfo
         })
     } catch(error){
-             logData('Login: ' + error)
+        logData('Login: ' + error)
 
         if (error.isJoi) return next(createError.BadRequest(error?.details[0]?.message ?? 'Validation error'))
         next(error)
