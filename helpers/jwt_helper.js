@@ -102,6 +102,7 @@ const verifyRefreshToken = async refreshToken => {
         return userId
 
     }catch(err){
+
         logData('verifyRefreshToken: ', err)
         throw(err)
     }

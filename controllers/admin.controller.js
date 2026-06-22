@@ -498,7 +498,7 @@ const editUser = async (req, res, next) => {
         if (contact.contact_type == 1)
             doctor = await doctorSchema.validateAsync(req.body)
 
-        console.error('DOCTOR:--------------------------', doctor)
+
         const { user_id, tenantId } = req.jwtPayload;
 
         let is_doctor = contact.contact_type == 1 ? true : false;
@@ -634,6 +634,9 @@ const editUser = async (req, res, next) => {
             user.is_active = user.user_status == 1 ? true : false
             user.email_verified = true
 
+             if (is_doctor) {
+                user.default_role = 2
+             }
 
             user = await Users.create(user, { transaction })
 

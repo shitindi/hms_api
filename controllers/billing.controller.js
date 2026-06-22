@@ -52,9 +52,9 @@ const todayAppointmentsBilling = async (req, res, next) => {
                 },
                 {
                     model: Prescription, as: 'Prescription',
-                    where: { pyament_status: [1, 3, 5] },
+                  //  where: { pyament_status: [1, 3, 5] },
                     required: false,
-                    attributes: ['id', 'quantity'],
+                    attributes: ['id', 'quantity','pyament_status'],
                     include: [
                         {
                             model: Medicine, as: 'Medicine',
@@ -64,9 +64,9 @@ const todayAppointmentsBilling = async (req, res, next) => {
                 },
                 {
                     model: LabRequest, as: 'LabReqests',
-                    where: { pyament_status: [1, 3, 5] },
+                  //  where: { pyament_status: [1, 3, 5] },
                     required: false,
-                    attributes: ['id'],
+                    attributes: ['id', 'pyament_status'],
                     include: [
                         {
                             model: LabTestCatalog, as: 'TestCatalog',

@@ -79,6 +79,7 @@ const { AppointmentChecklist } = require('../models/Main/AppointmentChecklist')
 const { BillingService } = require('../models/Lookup/BillingService')
 const { Billing } = require('../models/Main/Billing')
 const { BillingItem } = require('../models/Main/BillingItem')
+const { AdmissionSequence } = require('../models/Main/AdmissionSequence')
 
 const seedDatabase = async () => {
     try {
@@ -486,10 +487,9 @@ const updateDbSchema = async () => {
 
     try {
 
-
-        await Payment.sync({ alter: true })
+        await AdmissionSequence.sync({ alter: true })
             .then(data => { })
-            .catch(err => console.log('error Create table tbl lookups_tbl_billing_service: ' + err))
+            .catch(err => console.log('error Create table tbl main_tbl_admission_sequence: ' + err))
 
         return
 

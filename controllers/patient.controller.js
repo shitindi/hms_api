@@ -18,6 +18,7 @@ const { Gender } = require('../models/Lookup/Gender');
 const { PatientVital } = require('../models/Main/PatientVital');
 const { getDateOnly } = require('../helpers/utility');
 const { Appointment } = require('../models/Main/Apointment');
+const { AdmissionSequence } = require('../models/Main/AdmissionSequence');
 
 const patientDetails = async (req, res, next) => {
 
@@ -172,7 +173,7 @@ const editPatient = async (req, res, next) => {
                 action = 2
             }
         } else {
-            // Otherwise create new group
+            // Otherwise create new patient
 
             if (!patient.contact_id || !(patient.contact_id > 0)) {
                 contact.id = null
@@ -180,6 +181,9 @@ const editPatient = async (req, res, next) => {
                 patient.contact_id = contact.id
 
             }
+            if (patient.auto_generate_no == true)
+                 patient.registration_no = createRegistrationNumber(tenantId,transaction).toString()
+
             patient = await Patients.create(patient, { transaction })
             action = 1
         }
@@ -200,6 +204,29 @@ const editPatient = async (req, res, next) => {
         transaction.rollback()
         logData('createPatient: +' + err)
         next(err)
+    }
+}
+
+const createRegistrationNumber = async(tenantId, transaction) => {
+
+    let Sequence = await AdmissionSequence.findOne(
+        {
+            where: {tenant_id: tenantId}
+    }
+    )
+
+    if (!Sequence){
+        await AdmissionSequence.create(
+            {tenant_id: tenantId, sequence_no: 1},
+            {transaction}
+        )
+
+        return 1
+    }else{
+        const nextSequence = Sequence.sequence_no + 1
+        Sequence.sequence_no = nextSequence
+        await  Sequence.save({transaction})
+        return nextSequence
     }
 }
 

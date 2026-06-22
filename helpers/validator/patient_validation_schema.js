@@ -18,7 +18,8 @@ const patientSchema = Joi.object({
     joining_date: Joi.date().allow(null),
     insurer_id: Joi.number().allow(null),
     insurance_number: Joi.string().min(5).max(20).allow(null),
-    is_active: Joi.bool().required().default(true)
+    is_active: Joi.bool().required().default(true),
+    auto_generate_no: Joi.bool().default(true).allow(null)
 }).options({ stripUnknown: true }).options({ stripUnknown: true })
 
 

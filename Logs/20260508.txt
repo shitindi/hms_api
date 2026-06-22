@@ -48,3 +48,13 @@ notNull Violation: main_tbl_doctor.joining_date cannot be null
  
 2026-05-08 17:01:42: logUserActivity: SequelizeValidationError: notNull Violation: auth_tbl_user_activity.user_id cannot be null
  
+2026-05-08 19:38:14: Login: ValidationError: "email" must be a valid email
+ 
+2026-05-08 19:38:25: Login: NotFoundError: User not registered
+ 
+2026-05-08 19:38:34: Login: UnauthorizedError: Username or password is not valid
+ 
+2026-05-08 20:22:24: REFRESH: BadRequestError: Bad Request
+ 
+2026-05-08 20:22:24: REFRESH: BadRequestError: Bad Request
+ 

@@ -20,7 +20,8 @@ const appointmentSchema = Joi.object({
     pyament_status: Joi.number().default(1).allow(null),
     pre_diagnosis: Joi.string().allow(null),
     doctor_suggestion: Joi.string().allow(null),
-    appointment_fee: Joi.number().allow(null)
+    appointment_fee: Joi.number().allow(null),
+    patient_insured: Joi.bool().default(false).allow(null)
 }
 ).options({ stripUnknown: true }).options({ stripUnknown: true })
 

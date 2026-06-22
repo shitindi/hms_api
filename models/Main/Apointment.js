@@ -75,6 +75,10 @@ const Appointment = db.define('main_tbl_apointment', {
         type: DataTypes.SMALLINT,
        allowNull: false
     },
+    patient_insured: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false
+    },
     pyament_status: {
         type: DataTypes.SMALLINT,
         allowNull: false

@@ -674,15 +674,19 @@ const refresh = async (req, res, next) => {
     try{
         const { refreshToken } = req.body
         if( !refreshToken) throw createError.BadRequest()
-        const userId = await verifyRefreshToken(refreshToken)
+            let userId = -1;
+            try{
+                 userId = await verifyRefreshToken(refreshToken)
+            }catch(err){
+                 throw createError.Unauthorized()
+            }
+       
 
         //Generate a pair of refresh and access tokens
         const User = await Users.findOne({
             where: {id: userId}, attributes: ['id','user_name','tenant_id'],
         })
-
         const userPermissions = await loadUserPermissions(userId, User.tenant_id)
-
         const accessToken = await signAccessToken(User, userPermissions)
         const newRefreshToken = await signRefreshToken(userId)
 
@@ -691,7 +695,7 @@ const refresh = async (req, res, next) => {
         })
         
         if (!session){
-            return reject(createError.Unauthorized()) 
+            throw createError.Unauthorized() //   return reject(createError.Unauthorized()) 
         }
         session.user_token = accessToken
         session.refresh_token = newRefreshToken
@@ -699,9 +703,9 @@ const refresh = async (req, res, next) => {
         ActiveSession.update(session.dataValues, {where: {user_id:userId}, fields: ['user_token','refresh_token', 'user_ip']})
 
         let licensingInfo = checkLicensingStatus(User.tenant_id)
-
          res.status(200).json({accessToken, refreshToken: newRefreshToken, licensingInfo})
     }catch(error){
+        console.error('REFRESH: ' + error)
          logData('REFRESH: ' + error)
         next(error)
     }
