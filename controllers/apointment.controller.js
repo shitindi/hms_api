@@ -33,6 +33,11 @@ const { LabTestCategory } = require('../models/Lookup/LabTestCategory');
 const { sequelize } = require('../helpers/sequelize_init');
 const { PaymentStatus } = require('../models/Main/PaymentStatus');
 const { AppointmentChecklist } = require('../models/Main/AppointmentChecklist');
+const { PreDiagnosis } = require('../models/Main/PreDiagnosis');
+const { PatientDiseaseHistory } = require('../models/Main/PatientDiseaseHistory');
+const { Disease } = require('../models/Lookup/MedicalDisease');
+const { PatientSymptom } = require('../models/Main/PatientSymptom');
+const { Symptom } = require('../models/Lookup/Symptoms');
 
 
 const appointmentDetails = async (req, res, next) => {
@@ -93,8 +98,7 @@ const appointmentDetails = async (req, res, next) => {
                     {
                         model: Insurer, as: 'Insurer'
                     },
-
-
+    
                     ]
 
                 },
@@ -139,7 +143,28 @@ const appointmentDetails = async (req, res, next) => {
                 },
                 {
                     model: PaymentStatus, as: 'PaymentStatus'
-                }
+                },
+                    {
+                        model: PreDiagnosis, as: 'PreDiagnosis',
+                        include: [
+                            {
+                                model: PatientDiseaseHistory, as: 'DiseaseHistory',
+                                include: [
+                                    {
+                                        model: Disease, as: 'Disease'
+                                    }
+                                ]
+                            },
+                            {
+                                model: PatientSymptom, as: 'PatientSymptoms',
+                                include: [
+                                    {
+                                        model: Symptom, as: 'Symtomps'
+                                    }
+                                ]
+                            }
+                        ]
+                    }
 
                 ]
 
@@ -384,7 +409,7 @@ const appointmentsViewByDoctor = async (req, res, next) => {
         // parameter is passed
         const appointments = await Appointments.findAll({
             where: {
-                [Op.and]: [{ tenant_id: tenantId, doctor_id: doctorId, appointment_status: [ 3] },
+                [Op.and]: [{ tenant_id: tenantId, doctor_id: doctorId, appointment_status: [3] },
                 Sequelize.where(Sequelize.cast(Sequelize.col('appointment_date'), 'date'), getDateOnly(new Date()))]
             },
             // limit: 10,
@@ -549,12 +574,12 @@ const checkinAppointment = async (req, res, next) => {
                 }
 
                 Appointment.appointment_status = 3
-                await Appointment.save({transaction})
+                await Appointment.save({ transaction })
 
                 if (!Checklist) {
                     await AppointmentChecklist.create(
                         { appointment_id: appointmentId },
-                        {transaction}
+                        { transaction }
                     )
                 }
                 action = 2
@@ -659,10 +684,10 @@ const editLabRequests = async (req, res, next) => {
                 // delete tests items then add new one
                 await LabRequest.destroy({
                     where: { appointment_id: appointmentId }
-                }, {transaction})
+                }, { transaction })
 
                 await LabRequest.bulkCreate(
-                    labTests.test_items, {transaction}
+                    labTests.test_items, { transaction }
                 )
                 action = 2
             }
@@ -672,19 +697,19 @@ const editLabRequests = async (req, res, next) => {
 
             const test_items = await LabRequest.bulkCreate(
                 labTests.test_items,
-                {transaction}
+                { transaction }
             )
 
             await Appointment.update(
                 { current_activity: 6 },
                 { where: { id: appointmentId } },
-                {transaction}
+                { transaction }
 
             )
 
             if (Checklist) {
                 Checklist.is_lab_requested = true
-                Checklist.save({transaction})
+                Checklist.save({ transaction })
             }
             action = 1
         }
@@ -821,33 +846,88 @@ const editPreDiagnosis = async (req, res, next) => {
         let preDiagnosis = await preDiagnosisSchema.validateAsync(req.body)
         const { userId, tenantId } = req.jwtPayload;
 
-        const Appointment = await Appointments.findOne({
-            where: { id: preDiagnosis.appointment_id }
-        });
+
+
+        const Diagnosis = await PreDiagnosis.findOne({
+            where: { appointment_id: preDiagnosis.appointment_id }
+        })
 
         const Checklist = await AppointmentChecklist.findOne({
             where: { appointment_id: preDiagnosis.appointment_id }
         })
         let action = 0;
         // Exist same group name in same tenant
-        if (Appointment) {
+        if (Diagnosis) {
             // if ID is present then is for update
-            if (preDiagnosis.appointment_id > 0 && preDiagnosis.appointment_id == Appointment.id) {
+            if (preDiagnosis.appointment_id > 0 && preDiagnosis.appointment_id == Diagnosis.appointment_id) {
 
-                Appointment.appointment_reason = preDiagnosis.appointment_reason,
-                    Appointment.pre_diagnosis = preDiagnosis?.pre_diagnosis,
-                    Appointment.doctor_suggestion = preDiagnosis?.doctor_suggestion
-                await Appointment.save({transaction})
+                await PreDiagnosis.update(
+                    preDiagnosis,
+                    { transaction }
+                )
+
                 if (Checklist) {
                     Checklist.pre_diagnosis_done = true
-                    Checklist.save({transaction})
+                    await Checklist.save({ transaction })
+                }
+
+                // Delete and add disease history and symtoms
+                await PatientSymptom.destroy({
+                    where: { diagnosis_id: Diagnosis.id },
+                    transaction
+                })
+
+                await PatientDiseaseHistory.destroy({
+                    where: { diagnosis_id: Diagnosis.id },
+                    transaction
+                })
+
+                if (preDiagnosis.ros.length > 0) {
+                    await PatientSymptom.bulkCreate(
+                        preDiagnosis.ros.map(item => {
+                            return { diagnosis_id: Diagnosis.id, symptom_id: item }
+                        }, { transaction })
+                    )
+                }
+
+                if (preDiagnosis.past_history.length > 0) {
+                    await PatientDiseaseHistory.bulkCreate(
+                        preDiagnosis.past_history.map(item => {
+                            return { diagnosis_id: Diagnosis.id, disease_id: item }
+                        }, { transaction })
+                    )
                 }
                 action = 2
             }
 
 
         } else {
-            next(createError.NotFound('The specified appointment does not exists!'))
+            
+            await PreDiagnosis.create(
+                preDiagnosis, {transaction}
+            )
+
+            if (Checklist) {
+                    Checklist.pre_diagnosis_done = true
+                    await Checklist.save({ transaction })
+                }
+
+                if (preDiagnosis.ros.length > 0) {
+                    await PatientSymptom.bulkCreate(
+                        preDiagnosis.ros.map(item => {
+                            return { diagnosis_id: Diagnosis.id, symptom_id: item }
+                        }, { transaction })
+                    )
+                }
+
+                if (preDiagnosis.past_history.length > 0) {
+                    await PatientDiseaseHistory.bulkCreate(
+                        preDiagnosis.past_history.map(item => {
+                            return { diagnosis_id: Diagnosis.id, disease_id: item }
+                        }, { transaction })
+                    )
+                }
+            action = 1
         }
 
 
@@ -857,7 +937,7 @@ const editPreDiagnosis = async (req, res, next) => {
         transaction.commit()
         res.status(200).json({
             ...preDiagnosis,
-            message: "Appointment details updated successfuly!",
+            message: "Pre diagnosis details updated successfuly!",
         })
     } catch (err) {
         transaction.rollback()

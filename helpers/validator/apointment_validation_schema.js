@@ -26,10 +26,25 @@ const appointmentSchema = Joi.object({
 ).options({ stripUnknown: true }).options({ stripUnknown: true })
 
 const preDiagnosisSchema = Joi.object({
+    id: Joi.number().allow(null),
     appointment_id: Joi.number().required(),
-    appointment_reason: Joi.string().min(3).max(1024).required(),
-    pre_diagnosis: Joi.string().allow(null),
-    doctor_suggestion: Joi.string().allow(null)
+    chief_complaint: Joi.string().allow(null),
+    duration: Joi.number().allow(null),
+    history_of_present_illness: Joi.string().allow(null),
+    ros_notes: Joi.string().allow(null),
+    past_medical_history_notes: Joi.string().allow(null),
+    family_history: Joi.string().allow(null),
+    social_history: Joi.string().allow(null),
+    general_examination: Joi.string().allow(null),
+    local_examination: Joi.string().allow(null),
+    systemic_examination: Joi.string().allow(null),
+    ros: Joi.array()
+    .items(Joi.number().integer())
+    .default([]),
+
+     past_history: Joi.array()
+    .items(Joi.number().integer())
+    .default([])
 }
 ).options({ stripUnknown: true }).options({ stripUnknown: true })
 
@@ -52,25 +67,25 @@ const labTestResultSchema = Joi.object({
         result_status: Joi.string().max(20).allow(null),
         result_notes: Joi.string().max(300).allow(null),
         result_date: Joi.date().required(),
-        result_completed: Joi.boolean().default(true) 
+        result_completed: Joi.boolean().default(true)
     })
 }).options({ stripUnknown: true })
 
 const labTestResultSingleSchema = Joi.object({
-        id: Joi.number().required(),
-        test_result: Joi.string().required().max(100),
-        result_status: Joi.string().max(20).allow(null),
-        result_notes: Joi.string().max(300).allow(null),
-        result_date: Joi.date().required(),
-        result_completed: Joi.boolean().default(true) 
+    id: Joi.number().required(),
+    test_result: Joi.string().required().max(100),
+    result_status: Joi.string().max(20).allow(null),
+    result_notes: Joi.string().max(300).allow(null),
+    result_date: Joi.date().required(),
+    result_completed: Joi.boolean().default(true)
 }).options({ stripUnknown: true })
 
 module.exports = {
-     appointmentSchema,
-     labTestRequestSchema,
-     labTestResultSchema,
-     labTestResultSingleSchema,
-     preDiagnosisSchema
-    
-    }
+    appointmentSchema,
+    labTestRequestSchema,
+    labTestResultSchema,
+    labTestResultSingleSchema,
+    preDiagnosisSchema
+
+}
 

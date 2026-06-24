@@ -1,0 +1,26 @@
+2026-06-24 08:00:16: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-24 08:00:16: verifyRefreshToken: 
+ 
+2026-06-24 08:00:16: verifyRefreshToken: 
+ 
+2026-06-24 08:00:16: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-24 08:00:16: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-24 08:00:16: verifyRefreshToken: 
+ 
+2026-06-24 08:00:16: verifyRefreshToken: 
+ 
+2026-06-24 08:00:16: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-24 08:00:16: verifyRefreshToken: 
+ 
+2026-06-24 08:00:16: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-24 08:37:50: REFRESH: BadRequestError: Bad Request
+ 
+2026-06-24 08:37:50: REFRESH: BadRequestError: Bad Request
+ 
+2026-06-24 11:26:56: appointmentDetails: SequelizeEagerLoadingError: main_tbl_prediagnosis is not associated to main_tbl_patient!
+ 

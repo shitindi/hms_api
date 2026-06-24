@@ -80,6 +80,11 @@ const { BillingService } = require('../models/Lookup/BillingService')
 const { Billing } = require('../models/Main/Billing')
 const { BillingItem } = require('../models/Main/BillingItem')
 const { AdmissionSequence } = require('../models/Main/AdmissionSequence')
+const { Symptom } = require('../models/Lookup/Symptoms')
+const { Disease } = require('../models/Lookup/MedicalDisease')
+const { PatientSymptom } = require('../models/Main/PatientSymptom')
+const { PatientDiseaseHistory } = require('../models/Main/PatientDiseaseHistory')
+const { PreDiagnosis } = require('../models/Main/PreDiagnosis')
 
 const seedDatabase = async () => {
     try {
@@ -133,6 +138,39 @@ const seedDatabase = async () => {
         const PrescriptionStatusCount = await PrescriptionStatus.count()
 
         const BillingServicesCount = await BillingService.count()
+
+        const DiseaseCount = await Disease.count()
+        const SymptomCount = await Symptom.count()
+
+        const rosOptions = [
+  { label: "Cough", group: "Respiratory" },
+  { label: "Shortness of breath", group: "Respiratory" },
+  { label: "Chest pain", group: "Cardiovascular" },
+  { label: "Palpitations", group: "Cardiovascular" },
+  { label: "Abdominal pain", group: "Gastrointestinal" },
+  { label: "Vomiting", group: "Gastrointestinal" },
+  { label: "Diarrhea", group: "Gastrointestinal" },
+  { label: "Headache", group: "Neurological" },
+  { label: "Dizziness", group: "Neurological" },
+  { label: "Joint pain", group: "Musculoskeletal" },
+];
+
+        if (DiseaseCount == 0) {
+            await Disease.bulkCreate([
+                { name: 'Hypertension' }, { name: 'Diabetes' }, { name: 'Asthma' }, { name: 'HIV' },
+                { name: 'Tuberculosis' }, { name: 'Previous surgery' }, { name: 'Drug allergy' }, { name: 'Kidney disease' },
+                { name: 'Heart disease' }, { name: 'Epilepsy' }, 
+            ])
+        }
+
+        if (SymptomCount == 0) {
+            await Symptom.bulkCreate([
+                {name: 'Cough'}, {name: 'Shortness of breath'}, {name: 'Chest pain'}, {name: 'Palpitations'}, 
+                {name: 'Abdominal pain'}, {name: 'Vomiting'}, {name: 'Diarrhea'}, {name: 'Headache'}, 
+                {name: 'Dizziness'}, {name: 'Joint pain'}
+            ])
+        }
+
 
         if (BillingServicesCount == 0) {
             await BillingService.bulkCreate([
@@ -487,9 +525,19 @@ const updateDbSchema = async () => {
 
     try {
 
-        await AdmissionSequence.sync({ alter: true })
+
+          await PreDiagnosis.sync({ alter: true })
             .then(data => { })
-            .catch(err => console.log('error Create table tbl main_tbl_admission_sequence: ' + err))
+            .catch(err => console.log('error Create table tbl main_tbl_prediagnosis: ' + err))
+
+
+        await PatientSymptom.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl main_tbl_patient_symptom: ' + err))
+
+        await PatientDiseaseHistory.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl main_tbl_patient_disease_history: ' + err))
 
         return
 
@@ -616,6 +664,13 @@ const updateDbSchema = async () => {
             .then(data => { })
             .catch(err => console.log('error Create table tbl lookups_tbl_prescription_status: ' + err))
 
+        await Symptom.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl lookups_tbl_symptom: ' + err))
+
+        await Disease.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl lookups_tbl_disease: ' + err))
         // END OF LOOKUPS
 
 
@@ -800,6 +855,14 @@ const updateDbSchema = async () => {
         await AppointmentChecklist.sync({ alter: true })
             .then(data => { })
             .catch(err => console.log('error Create table tbl main_tbl_apointment_checklist: ' + err))
+
+        await PatientSymptom.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl main_tbl_patient_symptom: ' + err))
+
+        await PatientDiseaseHistory.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl main_tbl_patient_disease_history: ' + err))
 
         return
     } catch (error) {

@@ -36,6 +36,8 @@ const { MedicineForm } = require('../models/Lookup/Medicineform');
 const { PrescriptionStatus } = require('../models/Lookup/PrescriptionStatus');
 const { DefaultRole } = require('../models/Auth/DefaultRole');
 const { TenantBranch } = require('../models/Client/TenantBranch');
+const { Symptom } = require('../models/Lookup/Symptoms');
+const { Disease } = require('../models/Lookup/MedicalDisease');
 
 
 // Authentication lookup
@@ -395,6 +397,26 @@ const PrescriptionStatuses = async (req, res, next) => {
     }
 }
 
+const Diseases = async (req, res, next) => {
+    try {
+        const diseases = await Disease.findAll()
+        res.status(200).json(diseases)
+    } catch (err) {
+        logData('Diseases: ' + err)
+        next(err)
+    }
+}
+
+const Symptoms = async (req, res, next) => {
+    try {
+        const symptoms = await Symptom.findAll()
+        res.status(200).json(symptoms)
+    } catch (err) {
+        logData('Symptoms: ' + err)
+        next(err)
+    }
+}
+
 const DefaultRoles = async (req, res, next) => {
     try {
         const default_role = await DefaultRole.findAll()
@@ -441,6 +463,10 @@ const GetLookupsAll = async (req, res, next) => {
         const medicine_forms = await MedicineForm.findAll()
         const prescription_statuses = await PrescriptionStatus.findAll()
         const default_roles = await DefaultRole.findAll()
+
+        const diseases = await Disease.findAll()
+        const symptoms = await Symptom.findAll()
+
         const branches = await TenantBranch.findAll({
             where: {tenant_id: tenantId},
             attributes: ['id', 'branch_name']
@@ -478,7 +504,11 @@ const GetLookupsAll = async (req, res, next) => {
             medicine_forms,
             prescription_statuses,
             default_roles,
-            branches
+            branches,
+
+            diseases,
+            symptoms
+
         })
 
     } catch (err) {
