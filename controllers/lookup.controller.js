@@ -38,6 +38,9 @@ const { DefaultRole } = require('../models/Auth/DefaultRole');
 const { TenantBranch } = require('../models/Client/TenantBranch');
 const { Symptom } = require('../models/Lookup/Symptoms');
 const { Disease } = require('../models/Lookup/MedicalDisease');
+const { Unit } = require('../models/Lookup/Unit');
+const { BilledConsumable } = require('../models/Main/BilledConsumable');
+const { LabRequestStatus } = require('../models/Lookup/LabRequestStatus');
 
 
 // Authentication lookup
@@ -397,6 +400,16 @@ const PrescriptionStatuses = async (req, res, next) => {
     }
 }
 
+const DefaultRoles = async (req, res, next) => {
+    try {
+        const default_role = await DefaultRole.findAll()
+        res.status(200).json(default_role)
+    } catch (err) {
+        logData('DefaultRoles: ' + err)
+        next(err)
+    }
+}
+
 const Diseases = async (req, res, next) => {
     try {
         const diseases = await Disease.findAll()
@@ -417,19 +430,41 @@ const Symptoms = async (req, res, next) => {
     }
 }
 
-const DefaultRoles = async (req, res, next) => {
+
+const Units = async (req, res, next) => {
     try {
-        const default_role = await DefaultRole.findAll()
-        res.status(200).json(default_role)
+        const units = await Unit.findAll()
+        res.status(200).json(units)
     } catch (err) {
-        logData('DefaultRoles: ' + err)
+        logData('Units: ' + err)
         next(err)
     }
 }
 
+
+const BilledConsumables = async (req, res, next) => {
+    try {
+        const consumable = await BilledConsumable.findAll()
+        res.status(200).json(consumable)
+    } catch (err) {
+        logData('BilledConsumables: ' + err)
+        next(err)
+    }
+}
+
+const LabRequestStatuses = async (req, res, next) => {
+    try {
+        const statues = await LabRequestStatus.findAll()
+        res.status(200).json(statues)
+    } catch (err) {
+        logData('LabRequestStatuses: ' + err)
+        next(err)
+    }
+}
 const GetLookupsAll = async (req, res, next) => {
     try {
-         const { user_id, tenantId } = req.jwtPayload;
+        const { user_id, tenantId } = req.jwtPayload;
+        
         const activation_types = await ActivationType.findAll()
         const tenant_statuses = await TenantType.findAll()
         const user_statuses = await UserStatus.findAll()
@@ -466,6 +501,10 @@ const GetLookupsAll = async (req, res, next) => {
 
         const diseases = await Disease.findAll()
         const symptoms = await Symptom.findAll()
+
+        const units = await Unit.findAll()
+        const billed_consumables = await BilledConsumable.findAll()
+        const lab_request_statuses = await LabRequestStatus.findAll()
 
         const branches = await TenantBranch.findAll({
             where: {tenant_id: tenantId},
@@ -507,7 +546,11 @@ const GetLookupsAll = async (req, res, next) => {
             branches,
 
             diseases,
-            symptoms
+            symptoms,
+
+            units,
+            billed_consumables,
+            lab_request_statuses
 
         })
 
@@ -554,6 +597,13 @@ module.exports = {
     LabResultStatuses,
     MedicineForms,
     PrescriptionStatuses,
-    DefaultRoles
+    DefaultRoles,
+
+    Diseases,
+    Symptoms,
+
+    Units,
+    BilledConsumables,
+    LabRequestStatuses
 
 }

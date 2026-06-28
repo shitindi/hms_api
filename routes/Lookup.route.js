@@ -385,6 +385,77 @@ router.get("/default-roles", lookupController.DefaultRoles)
 
 /**
  * @openapi
+ * '/lookups/diseases':
+ *  get:
+ *    tags:
+ *    - Lookups
+ *    summary: Get get list of diseases
+ *    responses:
+ *      200:
+ *        description: Ok
+ */
+router.get("/diseases", lookupController.Diseases)
+
+
+
+
+/**
+ * @openapi
+ * '/lookups/symptoms':
+ *  get:
+ *    tags:
+ *    - Lookups
+ *    summary: Get get list of patient symptoms
+ *    responses:
+ *      200:
+ *        description: Ok
+ */
+router.get("/symptoms", lookupController.Symptoms)
+
+/**
+ * @openapi
+ * '/lookups/units':
+ *  get:
+ *    tags:
+ *    - Lookups
+ *    summary: Get get list of units
+ *    responses:
+ *      200:
+ *        description: Ok
+ */
+router.get("/units", lookupController.Units)
+
+
+
+/**
+ * @openapi
+ * '/lookups/consumable':
+ *  get:
+ *    tags:
+ *    - Lookups
+ *    summary: Get get list of consumable
+ *    responses:
+ *      200:
+ *        description: Ok
+ */
+router.get("/consumable", lookupController.BilledConsumables)
+
+/**
+ * @openapi
+ * '/lookups/lab-request-statues':
+ *  get:
+ *    tags:
+ *    - Lookups
+ *    summary: Get get list of lab request statues
+ *    responses:
+ *      200:
+ *        description: Ok
+ */
+router.get("/lab-request-statues", lookupController.LabRequestStatuses)
+
+
+/**
+ * @openapi
  * '/lookups/get-all-lookups':
  *  get:
  *    tags:

@@ -41,8 +41,8 @@ const PreDiagnosis = db.define('main_tbl_prediagnosis', {
 }
 )
 
-Appointment.hasOne(PreDiagnosis, {  as: 'PreDiagnosis', foreignKey: { name: 'patient_id', allowNull: true }, onDelete: 'NO ACTION', onUpdate: 'CASCADE' })
-PreDiagnosis.belongsTo(Appointment, { as: 'Appointment', foreignKey: { name: 'patient_id', allowNull: true }, onDelete: 'NO ACTION', onUpdate: 'CASCADE' })
+Appointment.hasOne(PreDiagnosis, {  as: 'PreDiagnosis', foreignKey: { name: 'appointment_id', allowNull: true }, onDelete: 'NO ACTION', onUpdate: 'CASCADE' })
+PreDiagnosis.belongsTo(Appointment, { as: 'Appointment', foreignKey: { name: 'appointment_id', allowNull: true }, onDelete: 'NO ACTION', onUpdate: 'CASCADE' })
 
 module.exports = { PreDiagnosis }
 

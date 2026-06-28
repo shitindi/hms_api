@@ -1,4 +1,5 @@
 const { sequelize: db, DataTypes } = require('../../helpers/sequelize_init')
+const { LabRequestStatus } = require('../Lookup/LabRequestStatus')
 const { LabResultStatus } = require('../Lookup/LabResultStatus')
 const { Appointment } = require('./Apointment')
 const { LabTestCatalog } = require('./LabTestCatalog')
@@ -21,6 +22,9 @@ const LabRequest = db.define('main_tbl_lab_request', {
     },
     result_status: {
         type: DataTypes.SMALLINT
+    },
+    request_status: {
+        type: DataTypes.SMALLINT,
     },
     request_notes: {
         type: DataTypes.TEXT
@@ -61,5 +65,9 @@ LabRequest.belongsTo(LabTestCatalog, { as: 'TestCatalog', foreignKey: { name: 't
 
 LabResultStatus.hasMany(LabRequest, { as: 'LabReqests', foreignKey: { name: 'result_status', allowNull: true }, onDelete: 'NO ACTION', onUpdate: 'CASCADE' })
 LabRequest.belongsTo(LabResultStatus, { as: 'ResultStatus', foreignKey: { name: 'result_status', allowNull: true }, onDelete: 'NO ACTION', onUpdate: 'CASCADE' })
+
+LabRequest.belongsTo(LabRequestStatus, { as: 'RequestStatus', foreignKey: { name: 'request_status', allowNull: true }, onDelete: 'NO ACTION', onUpdate: 'CASCADE' })
+
 module.exports = { LabRequest }
+
 

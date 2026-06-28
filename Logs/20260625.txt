@@ -1,0 +1,66 @@
+2026-06-25 08:38:13: verifyRefreshToken: 
+ 
+2026-06-25 08:38:13: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-25 08:38:13: verifyRefreshToken: 
+ 
+2026-06-25 08:38:13: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-25 08:38:13: verifyRefreshToken: 
+ 
+2026-06-25 08:38:13: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-25 08:38:13: verifyRefreshToken: 
+ 
+2026-06-25 08:38:13: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-25 08:38:13: verifyRefreshToken: 
+ 
+2026-06-25 08:38:13: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-25 08:38:13: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-25 08:38:13: verifyRefreshToken: 
+ 
+2026-06-25 08:38:13: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-25 08:38:13: verifyRefreshToken: 
+ 
+2026-06-25 08:38:13: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-25 08:38:13: verifyRefreshToken: 
+ 
+2026-06-25 08:38:13: verifyRefreshToken: 
+ 
+2026-06-25 08:38:13: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-25 08:38:13: verifyRefreshToken: 
+ 
+2026-06-25 08:38:13: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-25 08:38:15: verifyRefreshToken: 
+ 
+2026-06-25 08:38:15: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-25 08:38:15: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-25 08:38:15: verifyRefreshToken: 
+ 
+2026-06-25 09:03:52: editPreDiagnosis: ValidationError: "duration" must be a number
+ 
+2026-06-25 09:06:25: editPreDiagnosis: TypeError: Cannot read properties of null (reading 'id')
+ 
+2026-06-25 09:09:30: editPreDiagnosis: TypeError: Cannot read properties of null (reading 'id')
+ 
+2026-06-25 09:11:34: editPreDiagnosis: TypeError: Assignment to constant variable.
+ 
+2026-06-25 09:13:49: editPreDiagnosis: SequelizeForeignKeyConstraintError: insert or update on table "main_tbl_patient_symptoms" violates foreign key constraint "main_tbl_patient_symptoms_diagnosis_id_fkey"
+ 
+2026-06-25 09:16:52: editPreDiagnosis: SequelizeForeignKeyConstraintError: insert or update on table "main_tbl_patient_symptoms" violates foreign key constraint "main_tbl_patient_symptoms_diagnosis_id_fkey"
+ 
+2026-06-25 09:30:08: editPreDiagnosis: SequelizeForeignKeyConstraintError: insert or update on table "main_tbl_patient_symptoms" violates foreign key constraint "main_tbl_patient_symptoms_diagnosis_id_fkey"
+ 
+2026-06-25 09:42:08: editPreDiagnosis: SequelizeForeignKeyConstraintError: insert or update on table "main_tbl_patient_disease_histories" violates foreign key constraint "main_tbl_patient_disease_histories_diagnosis_id_fkey"
+ 
+2026-06-25 09:43:42: editPreDiagnosis: ReferenceError: symptoms is not defined
+ 

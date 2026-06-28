@@ -38,6 +38,7 @@ const { PatientDiseaseHistory } = require('../models/Main/PatientDiseaseHistory'
 const { Disease } = require('../models/Lookup/MedicalDisease');
 const { PatientSymptom } = require('../models/Main/PatientSymptom');
 const { Symptom } = require('../models/Lookup/Symptoms');
+const { LabRequestStatus } = require('../models/Lookup/LabRequestStatus');
 
 
 const appointmentDetails = async (req, res, next) => {
@@ -98,7 +99,7 @@ const appointmentDetails = async (req, res, next) => {
                     {
                         model: Insurer, as: 'Insurer'
                     },
-    
+
                     ]
 
                 },
@@ -112,6 +113,12 @@ const appointmentDetails = async (req, res, next) => {
                                     model: LabTestCategory, as: 'Category'
                                 }
                             ]
+                        },
+                        {
+                            model: LabResultStatus, as : 'ResultStatus'
+                        },
+                        {
+                            model: LabRequestStatus, as: 'RequestStatus'
                         }
                     ]
                 },
@@ -144,27 +151,27 @@ const appointmentDetails = async (req, res, next) => {
                 {
                     model: PaymentStatus, as: 'PaymentStatus'
                 },
-                    {
-                        model: PreDiagnosis, as: 'PreDiagnosis',
-                        include: [
-                            {
-                                model: PatientDiseaseHistory, as: 'DiseaseHistory',
-                                include: [
-                                    {
-                                        model: Disease, as: 'Disease'
-                                    }
-                                ]
-                            },
-                            {
-                                model: PatientSymptom, as: 'PatientSymptoms',
-                                include: [
-                                    {
-                                        model: Symptom, as: 'Symtomps'
-                                    }
-                                ]
-                            }
-                        ]
-                    }
+                {
+                    model: PreDiagnosis, as: 'PreDiagnosis',
+                    include: [
+                        {
+                            model: PatientDiseaseHistory, as: 'DiseaseHistory',
+                            include: [
+                                {
+                                    model: Disease, as: 'Disease'
+                                }
+                            ]
+                        },
+                        {
+                            model: PatientSymptom, as: 'PatientSymptoms',
+                            include: [
+                                {
+                                    model: Symptom, as: 'Symtomps'
+                                }
+                            ]
+                        }
+                    ]
+                }
 
                 ]
 
@@ -402,7 +409,7 @@ const appointmentsViewByDoctor = async (req, res, next) => {
             }
         )
 
-        const doctorId = 0 // = doctor?.id ?? -1
+        const doctorId = doctor?.id ?? -1
 
 
 
@@ -733,6 +740,7 @@ const editLabRequests = async (req, res, next) => {
 }
 
 const editLabResults = async (req, res, next) => {
+      const transaction = await sequelize.transaction()
     try {
 
         let labTests = await labTestResultSchema.validateAsync(req.body)
@@ -753,19 +761,32 @@ const editLabResults = async (req, res, next) => {
         let action = 0;
         if (existLabTest) {
 
+            let isCompleted = true
             existLabTest.forEach(async (test, index, tests,) => {
                 const tst = labTests.test_items.find(t => t.id === test.id)
-                if (!tst)
+                if (!tst || !tst.test_result)
                     return
 
+                isCompleted  &= tst.result_completed 
                 tests[index].test_result = tst.test_result
                 tests[index].result_status = tst.result_status
                 tests[index].result_date = tst.result_date
                 tests[index].result_completed = tst.result_completed
                 tests[index].result_notes = tst.result_notes
-
-                await tests[index].save()
+                tests[index].request_status = tst.request_status
+               const saved = await tests[index].save({transaction})
             })
+
+            if (isCompleted){
+              const appointment = await Appointment.findOne({
+                where: {id: existLabTest[0].appointment_id}
+              })
+              if (appointment){
+                appointment.current_activity = 8
+                await appointment.save({transaction})
+              }
+               
+            }
 
             action = 2
 
@@ -775,8 +796,9 @@ const editLabResults = async (req, res, next) => {
         }
 
 
-        await logUserActivity(userId, 16, action, true, testIds[0])
+        await logUserActivity(userId, 17, action, true, testIds[0])
 
+        transaction.commit()        
         res.status(200).json({
             ...labTests,
             message: "Lab test details updated successfuly!",
@@ -785,6 +807,9 @@ const editLabResults = async (req, res, next) => {
 
 
     } catch (err) {
+
+        transaction.rollback()
+        console.error('editLabResults ============================: ', err)
         logData('editLabResults: +' + err)
         next(err)
     }
@@ -822,7 +847,7 @@ const editLabResultSingle = async (req, res, next) => {
         }
 
 
-        await logUserActivity(userId, 14, action, true, labTest.id)
+        await logUserActivity(userId, 17, action, true, labTest.id)
 
         res.status(200).json({
             ...labTest,
@@ -848,7 +873,7 @@ const editPreDiagnosis = async (req, res, next) => {
 
 
 
-        const Diagnosis = await PreDiagnosis.findOne({
+        let Diagnosis = await PreDiagnosis.findOne({
             where: { appointment_id: preDiagnosis.appointment_id }
         })
 
@@ -902,31 +927,32 @@ const editPreDiagnosis = async (req, res, next) => {
 
 
         } else {
-            
-            await PreDiagnosis.create(
-                preDiagnosis, {transaction}
+
+            Diagnosis = await PreDiagnosis.create(
+                preDiagnosis, { transaction }
             )
-
             if (Checklist) {
-                    Checklist.pre_diagnosis_done = true
-                    await Checklist.save({ transaction })
-                }
+                Checklist.pre_diagnosis_done = true
+                await Checklist.save({ transaction })
+            }
 
-                if (preDiagnosis.ros.length > 0) {
-                    await PatientSymptom.bulkCreate(
-                        preDiagnosis.ros.map(item => {
-                            return { diagnosis_id: Diagnosis.id, symptom_id: item }
-                        }, { transaction })
-                    )
-                }
+            if (preDiagnosis.ros.length > 0) {
 
-                if (preDiagnosis.past_history.length > 0) {
-                    await PatientDiseaseHistory.bulkCreate(
-                        preDiagnosis.past_history.map(item => {
-                            return { diagnosis_id: Diagnosis.id, disease_id: item }
-                        }, { transaction })
-                    )
-                }
+                await PatientSymptom.bulkCreate(
+                    preDiagnosis.ros.map(item => {
+                        return { diagnosis_id: Diagnosis.id, symptom_id: item }
+                    }
+                    ), { transaction })
+            }
+
+            if (preDiagnosis.past_history.length > 0) {
+                await PatientDiseaseHistory.bulkCreate(
+                    preDiagnosis.past_history.map(item => {
+                        return { diagnosis_id: Diagnosis.id, disease_id: item }
+                    }), { transaction }
+                )
+            }
+            preDiagnosis.id = Diagnosis.id
             action = 1
         }
 
@@ -940,6 +966,7 @@ const editPreDiagnosis = async (req, res, next) => {
             message: "Pre diagnosis details updated successfuly!",
         })
     } catch (err) {
+        console.error('PRE_DIAG: ', err)
         transaction.rollback()
         logData('editPreDiagnosis: ' + err)
         next(err)

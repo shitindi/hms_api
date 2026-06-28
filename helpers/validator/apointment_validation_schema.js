@@ -29,7 +29,7 @@ const preDiagnosisSchema = Joi.object({
     id: Joi.number().allow(null),
     appointment_id: Joi.number().required(),
     chief_complaint: Joi.string().allow(null),
-    duration: Joi.number().allow(null),
+    duration: Joi.string().allow(null),
     history_of_present_illness: Joi.string().allow(null),
     ros_notes: Joi.string().allow(null),
     past_medical_history_notes: Joi.string().allow(null),
@@ -56,18 +56,20 @@ const labTestRequestSchema = Joi.object({
         test_id: Joi.number().required(),
         request_notes: Joi.string().max(300).allow(null),
         request_date: Joi.date().required(),
-        pyament_status: Joi.number().default(1).allow(null)
+        pyament_status: Joi.number().default(1).allow(null),
+        request_status: Joi.number().default(1)
     })
 }).options({ stripUnknown: true })
 
 const labTestResultSchema = Joi.object({
     test_items: Joi.array().items({
         id: Joi.number().required(),
-        test_result: Joi.string().required().max(100),
-        result_status: Joi.string().max(20).allow(null),
+        test_result: Joi.string().max(100).allow(null),
+        result_status: Joi.number().allow(null),
         result_notes: Joi.string().max(300).allow(null),
         result_date: Joi.date().required(),
-        result_completed: Joi.boolean().default(true)
+        result_completed: Joi.boolean().default(true),
+        request_status: Joi.number().allow(null),
     })
 }).options({ stripUnknown: true })
 

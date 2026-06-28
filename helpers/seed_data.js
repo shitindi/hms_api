@@ -85,6 +85,10 @@ const { Disease } = require('../models/Lookup/MedicalDisease')
 const { PatientSymptom } = require('../models/Main/PatientSymptom')
 const { PatientDiseaseHistory } = require('../models/Main/PatientDiseaseHistory')
 const { PreDiagnosis } = require('../models/Main/PreDiagnosis')
+const { Unit } = require('../models/Lookup/Unit')
+const { BilledConsumable } = require('../models/Main/BilledConsumable')
+const { LabTestConsumable } = require('../models/Main/LabTestConsumable')
+const { LabRequestStatus } = require('../models/Lookup/LabRequestStatus')
 
 const seedDatabase = async () => {
     try {
@@ -134,6 +138,7 @@ const seedDatabase = async () => {
         const DefaultRolesCount = await DefaultRole.count()
         const LabTestCategoryCount = await LabTestCategory.count()
         const LabResultStatusCount = await LabResultStatus.count()
+        const LabRequestStatusCount = await LabRequestStatus.count()
         const MedicalFormCount = await MedicineForm.count()
         const PrescriptionStatusCount = await PrescriptionStatus.count()
 
@@ -142,32 +147,73 @@ const seedDatabase = async () => {
         const DiseaseCount = await Disease.count()
         const SymptomCount = await Symptom.count()
 
-        const rosOptions = [
-  { label: "Cough", group: "Respiratory" },
-  { label: "Shortness of breath", group: "Respiratory" },
-  { label: "Chest pain", group: "Cardiovascular" },
-  { label: "Palpitations", group: "Cardiovascular" },
-  { label: "Abdominal pain", group: "Gastrointestinal" },
-  { label: "Vomiting", group: "Gastrointestinal" },
-  { label: "Diarrhea", group: "Gastrointestinal" },
-  { label: "Headache", group: "Neurological" },
-  { label: "Dizziness", group: "Neurological" },
-  { label: "Joint pain", group: "Musculoskeletal" },
-];
+        const UnitCount = await Unit.count()
+        const ConsumableCount = await BilledConsumable.count()
+
+        if (UnitCount == 0) {
+            await Unit.bulkCreate([
+                { ID: 1, name: "Piece" },
+                { ID: 2, name: "Pair" },
+                { ID: 3, name: "Pack" },
+                { ID: 4, name: "Box" },
+                { ID: 5, name: "Bottle" },
+                { ID: 6, name: "Tube" },
+                { ID: 7, name: "Bag" },
+                { ID: 8, name: "Kit" },
+                { ID: 9, name: "Vial" },
+                { ID: 10, name: "Ampoule" }
+            ])
+        }
+
+        if (ConsumableCount == 0) {
+            await BilledConsumable.bulkCreate([
+                { name: "Syringe", unit: 1, unit_price: 500, created_by: 1 },
+                { name: "Needle", unit: 1, unit_price: 300, created_by: 1 },
+                { name: "Vacutainer Tube", unit: 6, unit_price: 1200, created_by: 1 },
+                { name: "EDTA Tube", unit: 6, unit_price: 1000, created_by: 1 },
+                { name: "Plain Tube", unit: 6, unit_price: 900, created_by: 1 },
+                { name: "Citrate Tube", unit: 6, unit_price: 1200, created_by: 1 },
+                { name: "Fluoride Tube", unit: 6, unit_price: 1200, created_by: 1 },
+                { name: "Urine Collection Container", unit: 1, unit_price: 1000, created_by: 1 },
+                { name: "Stool Collection Container", unit: 1, unit_price: 1500, created_by: 1 },
+                { name: "Blood Culture Bottle", unit: 5, unit_price: 12000, created_by: 1 },
+                { name: "Microscope Slide", unit: 1, unit_price: 200, created_by: 1 },
+                { name: "Cover Slip", unit: 1, unit_price: 100, created_by: 1 },
+                { name: "Sample Collection Swab", unit: 1, unit_price: 800, created_by: 1 },
+                { name: "Specimen Transport Bag", unit: 7, unit_price: 1000, created_by: 1 },
+                { name: "Laboratory Gloves", unit: 2, unit_price: 600, created_by: 1 },
+                { name: "Face Mask", unit: 1, unit_price: 500, created_by: 1 },
+                { name: "Alcohol Swab", unit: 1, unit_price: 100, created_by: 1 },
+                { name: "Tourniquet", unit: 1, unit_price: 2000, created_by: 1 },
+                { name: "Pipette Tip", unit: 1, unit_price: 50, created_by: 1 },
+                { name: "Sample Label Sticker", unit: 1, unit_price: 100, created_by: 1 },
+
+                { name: "Dressing", unit: 1, unit_price: 2000, created_by: 1 },
+                { name: "Cotton Wool", unit: 1, unit_price: 1000, created_by: 1 },
+                { name: "Gauze Swab", unit: 1, unit_price: 500, created_by: 1 },
+                { name: "Adhesive Plaster", unit: 1, unit_price: 300, created_by: 1 },
+                { name: "Bandage", unit: 1, unit_price: 1500, created_by: 1 },
+                { name: "Disposable Gloves", unit: 2, unit_price: 600, created_by: 1 },
+                { name: "Alcohol Solution", unit: 5, unit_price: 5000, created_by: 1 },
+                { name: "Disinfectant Solution", unit: 5, unit_price: 6000, created_by: 1 },
+                { name: "Biohazard Waste Bag", unit: 7, unit_price: 1200, created_by: 1 },
+                { name: "Sharps Disposal Container", unit: 1, unit_price: 10000, created_by: 1 }
+            ])
+        }
 
         if (DiseaseCount == 0) {
             await Disease.bulkCreate([
                 { name: 'Hypertension' }, { name: 'Diabetes' }, { name: 'Asthma' }, { name: 'HIV' },
                 { name: 'Tuberculosis' }, { name: 'Previous surgery' }, { name: 'Drug allergy' }, { name: 'Kidney disease' },
-                { name: 'Heart disease' }, { name: 'Epilepsy' }, 
+                { name: 'Heart disease' }, { name: 'Epilepsy' },
             ])
         }
 
         if (SymptomCount == 0) {
             await Symptom.bulkCreate([
-                {name: 'Cough'}, {name: 'Shortness of breath'}, {name: 'Chest pain'}, {name: 'Palpitations'}, 
-                {name: 'Abdominal pain'}, {name: 'Vomiting'}, {name: 'Diarrhea'}, {name: 'Headache'}, 
-                {name: 'Dizziness'}, {name: 'Joint pain'}
+                { name: 'Cough' }, { name: 'Shortness of breath' }, { name: 'Chest pain' }, { name: 'Palpitations' },
+                { name: 'Abdominal pain' }, { name: 'Vomiting' }, { name: 'Diarrhea' }, { name: 'Headache' },
+                { name: 'Dizziness' }, { name: 'Joint pain' }
             ])
         }
 
@@ -199,6 +245,21 @@ const seedDatabase = async () => {
             await LabResultStatus.bulkCreate([
                 { id: 1, name: 'Normal' }, { id: 2, name: 'High' },
                 { id: 3, name: 'Low' }, { id: 4, name: 'Abnormal' }
+            ])
+        }
+
+        if (LabRequestStatusCount == 0) {
+            await LabRequestStatus.bulkCreate([
+                { ID: 1, name: "Pending" },
+                { ID: 2, name: "Sample Collection" },
+                { ID: 3, name: "Sample Collected" },
+                { ID: 4, name: "Received in Laboratory" },
+                { ID: 5, name: "In Progress" },
+                { ID: 6, name: "Awaiting Verification" },
+                { ID: 7, name: "Completed" },
+                { ID: 8, name: "Reported" },
+                { ID: 9, name: "Cancelled" },
+                { ID: 10, name: "Rejected" }
             ])
         }
         if (LabTestCategoryCount == 0) {
@@ -289,7 +350,7 @@ const seedDatabase = async () => {
                 { ID: 5, name: "Medicine prescription", is_active: true },
                 { ID: 6, name: "Laboratory or diagnosting testing", is_active: true },
                 { ID: 7, name: "Clinical procedure", is_active: true },
-                { ID: 8, name: "Doctor review of results", is_active: true },
+                { ID: 8, name: "Lab Result Ready", is_active: true },
                 { ID: 9, name: "Pharmacy", is_active: true },
                 { ID: 10, name: "Billing and payments", is_active: true },
                 { ID: 11, name: "Admission", is_active: true },
@@ -407,6 +468,7 @@ const seedDatabase = async () => {
                     { id: 14, item_name: 'Apointment details', module_id: module.id, code: 114 },
                     { id: 15, item_name: 'Medicine details', module_id: module.id, code: 115 },
                     { id: 16, item_name: 'Billing details', module_id: module.id, code: 116 },
+                    { id: 17, item_name: 'Laboratory services', module_id: module.id, code: 117 },
 
 
                 ])
@@ -526,18 +588,14 @@ const updateDbSchema = async () => {
     try {
 
 
-          await PreDiagnosis.sync({ alter: true })
+        await LabRequestStatus.sync({ alter: true })
             .then(data => { })
-            .catch(err => console.log('error Create table tbl main_tbl_prediagnosis: ' + err))
+            .catch(err => console.log('error Create table tbl lookups_tbl_lab_request_status: ' + err))
 
-
-        await PatientSymptom.sync({ alter: true })
+        await LabRequest.sync({ alter: true })
             .then(data => { })
-            .catch(err => console.log('error Create table tbl main_tbl_patient_symptom: ' + err))
+            .catch(err => console.log('error Create table tbl main_tbl_lab_request: ' + err))
 
-        await PatientDiseaseHistory.sync({ alter: true })
-            .then(data => { })
-            .catch(err => console.log('error Create table tbl main_tbl_patient_disease_history: ' + err))
 
         return
 
@@ -671,6 +729,11 @@ const updateDbSchema = async () => {
         await Disease.sync({ alter: true })
             .then(data => { })
             .catch(err => console.log('error Create table tbl lookups_tbl_disease: ' + err))
+
+        await Unit.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl lookups_tbl_unit: ' + err))
+
         // END OF LOOKUPS
 
 
@@ -856,6 +919,11 @@ const updateDbSchema = async () => {
             .then(data => { })
             .catch(err => console.log('error Create table tbl main_tbl_apointment_checklist: ' + err))
 
+
+        await PreDiagnosis.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl main_tbl_prediagnosis: ' + err))
+
         await PatientSymptom.sync({ alter: true })
             .then(data => { })
             .catch(err => console.log('error Create table tbl main_tbl_patient_symptom: ' + err))
@@ -863,6 +931,14 @@ const updateDbSchema = async () => {
         await PatientDiseaseHistory.sync({ alter: true })
             .then(data => { })
             .catch(err => console.log('error Create table tbl main_tbl_patient_disease_history: ' + err))
+
+        await BilledConsumable.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl main_tbl_billed_consumable: ' + err))
+
+        await LabTestConsumable.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl main_tbl_lab_test_consumable: ' + err))
 
         return
     } catch (error) {

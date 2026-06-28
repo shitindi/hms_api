@@ -15,6 +15,7 @@ const doctorroute = require('./routes/doctor.route.js')
 const patientRoute = require('./routes/patient.route.js')
 const medicineRoute = require('./routes/Pharmacy.route.js')
 const billingRoute = require('./routes/Billing.route.js')
+const labServiceRoute = require('./routes/labservice.route.js')
 require('dotenv').config()
 //require('./helpers/init_redis')
 
@@ -57,6 +58,7 @@ app.use("/doctors", doctorroute)
 app.use("/patients", patientRoute)
 app.use("/pharmacy", medicineRoute)
 app.use("/billing" , billingRoute)
+app.use("/labservices", labServiceRoute)
 
 // Catch all routes
 app.use (async (req, res, next) =>{

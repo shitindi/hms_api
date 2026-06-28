@@ -1,0 +1,48 @@
+2026-06-27 21:28:17: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-27 21:28:17: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-27 21:28:17: verifyRefreshToken: 
+ 
+2026-06-27 21:28:17: verifyRefreshToken: 
+ 
+2026-06-27 21:28:17: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-27 21:28:17: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-27 21:28:17: verifyRefreshToken: 
+ 
+2026-06-27 21:28:17: verifyRefreshToken: 
+ 
+2026-06-27 21:28:17: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-28 11:31:18: REFRESH: BadRequestError: Bad Request
+ 
+2026-06-28 11:31:18: REFRESH: BadRequestError: Bad Request
+ 
+2026-06-28 12:41:11: editLabResults: +ValidationError: "value" must be of type object
+ 
+2026-06-28 12:46:57: editLabResults: +ValidationError: "value" must be of type object
+ 
+2026-06-28 12:55:01: editLabResults: +ValidationError: "test_items[0].result_status" must be a string
+ 
+2026-06-28 12:56:12: editLabResults: +ValidationError: "test_items[1].test_result" must be a string
+ 
+2026-06-28 13:00:49: editLabResults: +ValidationError: "test_items[1].test_result" must be a string
+ 
+2026-06-28 13:11:36: editLabResults: +ReferenceError: tests is not defined
+ 
+2026-06-28 16:30:15: Login: ForbiddenError: Account is not verified
+ 
+2026-06-28 16:30:39: REFRESH: BadRequestError: Bad Request
+ 
+2026-06-28 16:30:39: REFRESH: BadRequestError: Bad Request
+ 
+2026-06-28 16:32:45: REFRESH: BadRequestError: Bad Request
+ 
+2026-06-28 16:32:45: REFRESH: BadRequestError: Bad Request
+ 
+2026-06-28 17:13:41: REFRESH: BadRequestError: Bad Request
+ 
+2026-06-28 17:13:41: REFRESH: BadRequestError: Bad Request
+ 
