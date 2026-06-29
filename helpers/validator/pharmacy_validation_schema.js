@@ -33,8 +33,19 @@ const prescriptionSchema = Joi.object({
     })
 
 })
+
+const prescriptionDispensingSchema = Joi.object({
+
+    prescription_items: Joi.array().items({
+        id: Joi.number().required(),
+        status_id: Joi.number().required(),
+        dispense_date: Joi.date().required()
+    })
+
+})
     .options({ stripUnknown: true })
 module.exports = {
     medicineSchema,
-    prescriptionSchema
+    prescriptionSchema,
+    prescriptionDispensingSchema
 }//2 6 17 

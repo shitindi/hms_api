@@ -1,0 +1,74 @@
+2026-06-29 07:00:41: verifyRefreshToken: 
+ 
+2026-06-29 07:00:41: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-29 07:00:41: verifyRefreshToken: 
+ 
+2026-06-29 07:00:41: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-29 07:00:41: verifyRefreshToken: 
+ 
+2026-06-29 07:00:41: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-29 07:00:42: verifyRefreshToken: 
+ 
+2026-06-29 07:00:42: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-29 07:00:42: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-29 07:00:42: verifyRefreshToken: 
+ 
+2026-06-29 07:00:42: verifyRefreshToken: 
+ 
+2026-06-29 07:00:42: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-29 07:00:42: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-29 07:00:42: verifyRefreshToken: 
+ 
+2026-06-29 07:00:42: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-29 07:00:42: verifyRefreshToken: 
+ 
+2026-06-29 07:00:42: verifyRefreshToken: 
+ 
+2026-06-29 07:00:42: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-29 07:00:42: verifyRefreshToken: 
+ 
+2026-06-29 07:00:42: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-29 07:01:47: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-29 07:01:47: verifyRefreshToken: 
+ 
+2026-06-29 07:01:47: REFRESH: UnauthorizedError: Unauthorized
+ 
+2026-06-29 07:01:47: verifyRefreshToken: 
+ 
+2026-06-29 07:09:11: REFRESH: BadRequestError: Bad Request
+ 
+2026-06-29 07:09:11: REFRESH: BadRequestError: Bad Request
+ 
+2026-06-29 07:49:38: REFRESH: BadRequestError: Bad Request
+ 
+2026-06-29 07:49:38: REFRESH: BadRequestError: Bad Request
+ 
+2026-06-29 07:49:41: todayLabRequests: ReferenceError: Sequelize is not defined
+ 
+2026-06-29 07:51:11: todayLabRequests: ReferenceError: Sequelize is not defined
+ 
+2026-06-29 07:52:55: todayLabRequests: ReferenceError: Sequelize is not defined
+ 
+2026-06-29 07:53:50: todayLabRequests: ReferenceError: Sequelize is not defined
+ 
+2026-06-29 07:54:23: todayLabRequests: ReferenceError: getDateOnly is not defined
+ 
+2026-06-29 07:54:51: todayLabRequests: ReferenceError: Doctor is not defined
+ 
+2026-06-29 07:55:37: todayLabRequests: ReferenceError: Gender is not defined
+ 
+2026-06-29 12:07:34: REFRESH: BadRequestError: Bad Request
+ 
+2026-06-29 12:07:34: REFRESH: BadRequestError: Bad Request
+ 

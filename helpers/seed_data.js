@@ -586,15 +586,13 @@ const seedDatabase = async () => {
 const updateDbSchema = async () => {
 
     try {
+    
 
-
-        await LabRequestStatus.sync({ alter: true })
+        await Prescription.sync({ alter: true })
             .then(data => { })
-            .catch(err => console.log('error Create table tbl lookups_tbl_lab_request_status: ' + err))
+            .catch(err => console.log('error Create table tbl main_tbl_prescription: ' + err))
 
-        await LabRequest.sync({ alter: true })
-            .then(data => { })
-            .catch(err => console.log('error Create table tbl main_tbl_lab_request: ' + err))
+
 
 
         return
@@ -734,6 +732,9 @@ const updateDbSchema = async () => {
             .then(data => { })
             .catch(err => console.log('error Create table tbl lookups_tbl_unit: ' + err))
 
+        await LabRequestStatus.sync({ alter: true })
+            .then(data => { })
+            .catch(err => console.log('error Create table tbl lookups_tbl_lab_request_status: ' + err))
         // END OF LOOKUPS
 
 

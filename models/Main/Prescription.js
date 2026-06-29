@@ -39,6 +39,9 @@ const Prescription = db.define('main_tbl_prescription', {
     pyament_status: {
         type: DataTypes.SMALLINT,
         allowNull: false
+    },
+    dispense_date: {
+        type: DataTypes.DATE
     }
 
 }
